@@ -88,24 +88,24 @@ export function ArchiveDetailBanner({
         <span className="shrink-0">{selected.date}</span>
       </div>
 
-      {/* Expanded Details & Player (Always visible on lg+, toggleable on mobile) */}
+      {/* Expanded Details & Player (Always visible on lg+, player-only toggle on mobile) */}
       <div
         className={cn(
-          "pt-3.5 mt-3 lg:mt-0 border-t border-white/10 lg:border-t-0 space-y-3.5",
+          "pt-3 lg:pt-3.5 mt-3 lg:mt-0 border-t border-white/10 lg:border-t-0 space-y-3.5",
           mobileExpanded ? "block" : "hidden lg:block"
         )}
       >
-        {/* Album Cover */}
-        <div className="flex justify-center">
+        {/* Album Cover (Desktop lg+ only) */}
+        <div className="hidden lg:flex justify-center">
           <img
             src={selected.item.image}
             alt={selected.item.title}
-            className="w-[160px] h-[160px] lg:w-full lg:max-w-[250px] lg:h-auto aspect-square object-cover rounded-[7px] border border-white/15"
+            className="w-full max-w-[250px] h-auto aspect-square object-cover rounded-[7px] border border-white/15"
           />
         </div>
 
-        {/* Type Badge + Share + Genres */}
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        {/* Type Badge + Share + Genres (Desktop lg+ only) */}
+        <div className="hidden lg:flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span
               className={cn(
