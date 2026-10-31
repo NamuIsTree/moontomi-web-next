@@ -42,13 +42,48 @@ export async function fetchReviewList(params: {
   }));
 }
 
+const VIEWED_REVIEWS_STORAGE_KEY = "moontomi:viewed_reviews";
+const VIEW_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function shouldIncrementReviewView(reviewId: number): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = window.localStorage.getItem(VIEWED_REVIEWS_STORAGE_KEY);
+    const now = Date.now();
+    const parsed: Record<string, number> = raw ? JSON.parse(raw) : {};
+
+    for (const [key, ts] of Object.entries(parsed)) {
+      if (typeof ts !== "number" || now - ts > VIEW_COOLDOWN_MS) {
+        delete parsed[key];
+      }
+    }
+
+    const lastViewedAt = parsed[String(reviewId)];
+    if (
+      typeof lastViewedAt === "number" &&
+      now - lastViewedAt < VIEW_COOLDOWN_MS
+    ) {
+      return false;
+    }
+
+    parsed[String(reviewId)] = now;
+    window.localStorage.setItem(
+      VIEWED_REVIEWS_STORAGE_KEY,
+      JSON.stringify(parsed)
+    );
+    return true;
+  } catch {
+    return true;
+  }
+}
+
 export async function fetchReviewById(
   reviewId: number,
   incrementViews = false
 ): Promise<ReviewDetail | null> {
   const supabase = createClient();
 
-  if (incrementViews) {
+  if (incrementViews && shouldIncrementReviewView(reviewId)) {
     await supabase.rpc("increment_review_views", { p_review_id: reviewId });
   }
 
