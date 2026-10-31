@@ -403,7 +403,7 @@ export function TiptapReviewEditor({
   }
 
   return (
-    <div className="rounded-[7px] border border-[#bdc0c4] bg-white overflow-hidden focus-within:border-[#242d3c]">
+    <div className="rounded-[7px] border border-[#bdc0c4] bg-white focus-within:border-[#242d3c]">
       {/* Hidden Image Upload Input (supports single or multiple images) */}
       <input
         ref={fileInputRef}
@@ -414,8 +414,10 @@ export function TiptapReviewEditor({
         className="hidden"
       />
 
-      {/* Rich Text Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 p-2 bg-[#f3f3f3] border-b border-[#bdc0c4]/70 text-[#242d3c]">
+      {/* Sticky Toolbar Header (sticks directly under the 52px shrunk site header) */}
+      <div className="sticky top-[52px] z-30 rounded-t-[6px] bg-[#f3f3f3]/95 backdrop-blur-xs shadow-xs">
+        {/* Rich Text Toolbar */}
+        <div className="flex flex-wrap items-center gap-1 p-2 border-b border-[#bdc0c4]/70 text-[#242d3c]">
         {/* History */}
         <ToolbarButton
           onClick={() => editor.chain().focus().undo().run()}
@@ -783,6 +785,7 @@ export function TiptapReviewEditor({
           ))}
         </div>
       )}
+      </div>
 
       {/* Editable Content Area */}
       <div className="p-4 sm:p-5 min-h-[380px] editorial-prose">

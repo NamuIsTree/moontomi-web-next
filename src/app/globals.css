@@ -19,7 +19,7 @@ body {
   font-family: var(--font-line-seed), sans-serif;
   color: #171717;
   background-color: #ffffff;
-  overflow-x: hidden;
+  overflow-x: clip;
   caret-color: #ff8080;
 }
 
