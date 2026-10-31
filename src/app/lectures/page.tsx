@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
   Clock,
+  RotateCcw,
+  Search,
   Star,
 } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -48,50 +50,159 @@ const LECTURE_SORT_OPTIONS: SortOptionItem<LectureSortId>[] = [
   },
 ];
 
+const PAGE_STEP = 20;
+
 export default function LecturesPage() {
   const [selectedSort, setSelectedSort] = useState<LectureSortId>("id-desc");
-  const [lectures, setLectures] = useState<LectureListItem[]>([]);
-  const [page, setPage] = useState(1);
-  const [complete, setComplete] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [allLectures, setAllLectures] = useState<LectureListItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const loadMore = useCallback(
-    async (targetPage: number, sortId: LectureSortId, reset = false) => {
-      setLoading(true);
-      const [sortBy, order] = sortId.split("-") as [
-        "id" | "rating",
-        "asc" | "desc",
-      ];
+  // Filter & Search States
+  const [selectedNation, setSelectedNation] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [visibleCount, setVisibleCount] = useState<number>(PAGE_STEP);
 
-      try {
-        const items = await fetchLectureList({
-          page: targetPage,
-          limit: 15,
-          sortBy,
-          order,
-        });
-
-        setLectures((prev) => (reset ? items : [...prev, ...items]));
-        if (items.length < 10) {
-          setComplete(true);
-        } else {
-          setPage(targetPage + 1);
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    fetchLectureList({
+      page: 1,
+      limit: 1000,
+      sortBy: "id",
+      order: "desc",
+    })
+      .then((items) => {
+        if (mounted) {
+          setAllLectures(items);
         }
-      } finally {
-        setLoading(false);
+      })
+      .finally(() => {
+        if (mounted) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Extract distinct Nations (sorted by count descending)
+  const nationOptions = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const item of allLectures) {
+      const nation = item.artist.nation?.trim();
+      if (nation) {
+        counts.set(nation, (counts.get(nation) ?? 0) + 1);
       }
-    },
-    []
-  );
+    }
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([nation, count]) => ({ nation, count }));
+  }, [allLectures]);
+
+  // Extract distinct Genre Categories (sorted by count descending)
+  const categoryOptions = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const item of allLectures) {
+      const uniqueCats = new Set(
+        (item.genres ?? []).map((g) => g.category?.trim()).filter(Boolean)
+      );
+      for (const cat of uniqueCats) {
+        counts.set(cat, (counts.get(cat) ?? 0) + 1);
+      }
+    }
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([category, count]) => ({ category, count }));
+  }, [allLectures]);
+
+  // Filter + Sort Lectures
+  const filteredAndSortedLectures = useMemo(() => {
+    const [sortBy, order] = selectedSort.split("-") as [
+      "id" | "rating",
+      "asc" | "desc",
+    ];
+    const q = searchQuery.trim().toLowerCase();
+
+    const filtered = allLectures.filter((lecture) => {
+      // Rating sort excludes unrated and compilation (season_id === 8)
+      if (sortBy === "rating") {
+        if (lecture.rating === null || lecture.season.id === 8) {
+          return false;
+        }
+      }
+
+      if (
+        selectedNation !== "all" &&
+        lecture.artist.nation !== selectedNation
+      ) {
+        return false;
+      }
+
+      if (selectedCategory !== "all") {
+        const hasCat = (lecture.genres ?? []).some(
+          (g) => g.category === selectedCategory
+        );
+        if (!hasCat) return false;
+      }
+
+      if (q) {
+        const inTitle = lecture.title.toLowerCase().includes(q);
+        const inArtistKo = lecture.artist.name.toLowerCase().includes(q);
+        const inArtistEn = (lecture.artist.name_en ?? "")
+          .toLowerCase()
+          .includes(q);
+        const inPronounce = (lecture.artist.pronounce ?? "")
+          .toLowerCase()
+          .includes(q);
+        if (!inTitle && !inArtistKo && !inArtistEn && !inPronounce) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    return filtered.sort((a, b) => {
+      if (sortBy === "rating") {
+        const rA = a.rating ?? 0;
+        const rB = b.rating ?? 0;
+        if (rA !== rB) {
+          return order === "asc" ? rA - rB : rB - rA;
+        }
+        return a.id - b.id;
+      }
+      return order === "asc" ? a.id - b.id : b.id - a.id;
+    });
+  }, [
+    allLectures,
+    selectedSort,
+    selectedNation,
+    selectedCategory,
+    searchQuery,
+  ]);
 
   const handleSortChange = (option: SortOptionItem<LectureSortId>) => {
     if (option.id === selectedSort) return;
     setSelectedSort(option.id);
-    setLectures([]);
-    setPage(1);
-    setComplete(false);
-    loadMore(1, option.id, true);
+    setVisibleCount(PAGE_STEP);
   };
+
+  const handleResetFilters = () => {
+    setSelectedNation("all");
+    setSelectedCategory("all");
+    setSearchQuery("");
+    setVisibleCount(PAGE_STEP);
+  };
+
+  const isFiltering =
+    selectedNation !== "all" ||
+    selectedCategory !== "all" ||
+    searchQuery.trim() !== "";
+
+  const visibleLectures = filteredAndSortedLectures.slice(0, visibleCount);
+  const complete = visibleCount >= filteredAndSortedLectures.length;
 
   return (
     <PageContainer width="reading">
@@ -110,6 +221,97 @@ export default function LecturesPage() {
         onChange={handleSortChange}
       />
 
+      {/* Search & Filter Toolbar (Nation, Genre Category, Search) */}
+      <section className="p-3.5 sm:p-4 rounded-[7px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60 mb-6 space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3">
+          {/* 국적 필터 */}
+          <div className="sm:col-span-3">
+            <label className="block text-xs font-bold text-[#242d3c] mb-1">
+              국적
+            </label>
+            <select
+              value={selectedNation}
+              onChange={(e) => {
+                setSelectedNation(e.target.value);
+                setVisibleCount(PAGE_STEP);
+              }}
+              className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+            >
+              <option value="all">전체 국적</option>
+              {nationOptions.map(({ nation, count }) => (
+                <option key={nation} value={nation}>
+                  {nation} ({count})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* 장르 (카테고리) 필터 */}
+          <div className="sm:col-span-4">
+            <label className="block text-xs font-bold text-[#242d3c] mb-1">
+              장르 (카테고리)
+            </label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value);
+                setVisibleCount(PAGE_STEP);
+              }}
+              className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+            >
+              <option value="all">전체 장르</option>
+              {categoryOptions.map(({ category, count }) => (
+                <option key={category} value={category}>
+                  {category} ({count})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* 검색 (가수, 앨범제목) */}
+          <div className="sm:col-span-5">
+            <label className="block text-xs font-bold text-[#242d3c] mb-1">
+              검색 (가수 · 앨범제목)
+            </label>
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-[#808080] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setVisibleCount(PAGE_STEP);
+                }}
+                placeholder="가수명(한/영) 또는 앨범 제목 검색"
+                className="w-full pl-8 pr-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm text-[#171717] focus:outline-none focus:border-[#242d3c]"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Filter Status & Reset Row */}
+        <div className="flex items-center justify-between pt-1 text-xs text-[#808080] tabular-nums">
+          <div>
+            총{" "}
+            <strong className="text-[#242d3c] font-bold">
+              {filteredAndSortedLectures.length}
+            </strong>
+            개의 음평회 앨범
+          </div>
+
+          {isFiltering && (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="inline-flex items-center gap-1 font-bold text-[#242d3c] hover:text-[#ff8080] transition-colors cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>필터 초기화</span>
+            </button>
+          )}
+        </div>
+      </section>
+
       {/* Catalog Column Header */}
       <div className="hidden sm:flex items-center justify-between px-4 py-2 text-xs font-bold text-[#808080] border-b border-[#242d3c]/20">
         <div className="w-12 text-center">NO.</div>
@@ -118,9 +320,9 @@ export default function LecturesPage() {
       </div>
 
       <div className="divide-y divide-[#bdc0c4]/50">
-        {lectures.map((lecture, idx) => (
+        {visibleLectures.map((lecture, idx) => (
           <LectureRowItem
-            key={`${lecture.id}-${idx}`}
+            key={lecture.id}
             lecture={lecture}
             displayOrder={
               selectedSort === "id-desc" || selectedSort === "id-asc"
@@ -131,16 +333,16 @@ export default function LecturesPage() {
         ))}
       </div>
 
-      {!loading && lectures.length === 0 && complete && (
+      {!loading && filteredAndSortedLectures.length === 0 && (
         <div className="py-16 text-center text-sm text-[#808080] border border-[#bdc0c4]/50 rounded-[7px]">
-          등록된 음평회가 없습니다.
+          조건에 일치하는 음평회 앨범이 없습니다.
         </div>
       )}
 
       <InfiniteScrollSentinel
-        disabled={complete}
+        disabled={complete || loading}
         loading={loading}
-        onIntersect={() => loadMore(page, selectedSort)}
+        onIntersect={() => setVisibleCount((prev) => prev + PAGE_STEP)}
       />
     </PageContainer>
   );

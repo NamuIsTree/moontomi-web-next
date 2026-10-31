@@ -13,6 +13,10 @@ export function LectureRowItem({ lecture, displayOrder }: LectureRowItemProps) {
       ? `(${lecture.artist.name_en})`
       : "";
 
+  const uniqueCategories = Array.from(
+    new Set((lecture.genres ?? []).map((g) => g.category).filter(Boolean))
+  );
+
   return (
     <Link
       href={`/lecture/${lecture.id}`}
@@ -35,7 +39,7 @@ export function LectureRowItem({ lecture, displayOrder }: LectureRowItemProps) {
           />
         </div>
 
-        {/* Title & Artist */}
+        {/* Title, Artist, Nation & Genre Category Chips */}
         <div className="flex-1 min-w-0 px-1 sm:px-2">
           <div className="font-bold text-base sm:text-lg text-[#171717] group-hover:text-[#242d3c] leading-snug break-keep transition-colors">
             {lecture.title}
@@ -46,6 +50,24 @@ export function LectureRowItem({ lecture, displayOrder }: LectureRowItemProps) {
             </span>{" "}
             {subtitle && <span>{subtitle}</span>}
           </div>
+
+          {(lecture.artist.nation || uniqueCategories.length > 0) && (
+            <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+              {lecture.artist.nation && (
+                <span className="px-2 py-0.5 rounded-[7px] bg-[#242d3c]/10 text-[#242d3c] text-xs font-bold">
+                  {lecture.artist.nation}
+                </span>
+              )}
+              {uniqueCategories.map((cat) => (
+                <span
+                  key={cat}
+                  className="px-2 py-0.5 rounded-full border border-[#bdc0c4] bg-white text-xs font-semibold text-[#808080] uppercase"
+                >
+                  {cat}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Score or OPEN Badge */}

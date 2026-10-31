@@ -44,9 +44,11 @@ export interface LectureListItem {
   image: string;
   title: string;
   artist: ArtistInfo;
+  genres: GenreInfo[];
   date: string | null;
   rating: number | null; // 0.000 ~ 10.000 scale
   season: {
+    id?: number;
     name: string;
   };
 }

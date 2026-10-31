@@ -107,7 +107,8 @@ export async function fetchLectureList(params: {
       album:album_id(
         title,
         image_id,
-        artist:artist_id(name, name_en, pronounce, nation)
+        artist:artist_id(name, name_en, pronounce, nation),
+        album_genre(genre:genre_id(genre_id, category, name))
       )
     `
     );
@@ -134,6 +135,9 @@ export async function fetchLectureList(params: {
         pronounce: string | null;
         nation: string;
       };
+      album_genre?: {
+        genre: { genre_id: number; category: string; name: string };
+      }[];
     };
     const season = row.season as unknown as { name: string };
 
@@ -147,9 +151,11 @@ export async function fetchLectureList(params: {
         pronounce: album?.artist?.pronounce ?? null,
         nation: album?.artist?.nation ?? "",
       },
+      genres: (album?.album_genre ?? []).map((ag) => ag.genre).filter(Boolean),
       date: row.date,
       rating: row.rating !== null ? row.rating / 1000 : null,
       season: {
+        id: row.season_id,
         name: season?.name ?? "",
       },
     };
