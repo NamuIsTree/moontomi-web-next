@@ -6,12 +6,15 @@ import { PageContainer } from "@/components/layout/PageContainer";
 import { AlbumRankCarousel } from "@/components/home/AlbumRankCarousel";
 import { LatestLectureBanner } from "@/components/home/LatestLectureBanner";
 import { NewArrivalsSection } from "@/components/home/NewArrivalsSection";
+import { LatestArchiveSection } from "@/components/home/LatestArchiveSection";
 import {
   fetchLatestLecture,
   fetchTopLectures,
 } from "@/services/lecture.service";
 import { fetchReviewList } from "@/services/review.service";
+import { fetchArchiveList } from "@/services/archive.service";
 import type {
+  ArchivePublicItem,
   LatestLectureSummary,
   RankedLectureAlbum,
   ReviewListItem,
@@ -25,6 +28,8 @@ export default function HomePage() {
     useState<LatestLectureSummary | null>(null);
   const [latestReviews, setLatestReviews] = useState<ReviewListItem[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [latestArchives, setLatestArchives] = useState<ArchivePublicItem[]>([]);
+  const [archivesLoading, setArchivesLoading] = useState(true);
 
   useEffect(() => {
     fetchTopLectures().then(({ upperTop: upper, lowerTop: lower }) => {
@@ -45,6 +50,17 @@ export default function HomePage() {
       })
       .finally(() => {
         setReviewsLoading(false);
+      });
+    fetchArchiveList({
+      page: 1,
+      limit: 10,
+      order: "desc",
+    })
+      .then((archives) => {
+        setLatestArchives(archives.slice(0, 10));
+      })
+      .finally(() => {
+        setArchivesLoading(false);
       });
   }, []);
 
@@ -73,6 +89,13 @@ export default function HomePage() {
       <hr className="border-[#bdc0c4]/50 my-8" />
 
       <NewArrivalsSection reviews={latestReviews} loading={reviewsLoading} />
+
+      <hr className="border-[#bdc0c4]/50 my-8" />
+
+      <LatestArchiveSection
+        archives={latestArchives}
+        loading={archivesLoading}
+      />
     </PageContainer>
   );
 }
