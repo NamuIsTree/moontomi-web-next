@@ -433,6 +433,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_action: {
+        Args: {
+          p_action: string
+          p_password: string
+          p_payload?: Json
+        }
+        Returns: Json
+      }
       create_comment: {
         Args: {
           p_lecture_id: number

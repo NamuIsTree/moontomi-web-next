@@ -6,7 +6,13 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/comment/create/", "/comment/edit/", "/review/create"],
+        disallow: [
+          "/admin",
+          "/login",
+          "/comment/create/",
+          "/comment/edit/",
+          "/review/create",
+        ],
       },
     ],
     sitemap: "https://moontomi.com/sitemap.xml",

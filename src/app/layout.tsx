@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { AppHeader } from "@/components/layout/AppHeader";
-import { AppFooter } from "@/components/layout/AppFooter";
+import { AppShell } from "@/components/layout/AppShell";
 
 const bayatersStamp = localFont({
   src: "../fonts/BayatersStampdemo-51PB8.ttf",
@@ -116,9 +115,7 @@ export default function RootLayout({
       className={`${bayatersStamp.variable} ${lineSeed.variable} ${lobster.variable} ${nanumMyeongjo.variable} ${nohemi.variable} ${robotoMono.variable}`}
     >
       <body className="min-h-screen flex flex-col bg-white text-[#171717] antialiased selection:bg-[#ff8080]/25 selection:text-[#242d3c]">
-        <AppHeader />
-        <main className="flex-1 pt-[90px] md:pl-[75px] w-full">{children}</main>
-        <AppFooter />
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
