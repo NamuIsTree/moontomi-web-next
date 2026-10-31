@@ -188,10 +188,10 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
         {selected && (
           <aside
             className={cn(
-              "w-full lg:w-[350px] xl:w-[390px] shrink-0 sticky z-30 pb-1.5 lg:pb-0 transition-[top] duration-300",
+              "w-full lg:w-[350px] xl:w-[390px] shrink-0 sticky z-30 pt-3 pb-2.5 -mx-1 px-1 lg:mx-0 lg:px-0 lg:pt-0 lg:pb-0 bg-white/80 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none border-b border-[#bdc0c4]/45 lg:border-b-0 transition-[top] duration-300",
               headerShrunk
-                ? "top-[64px] lg:top-[68px]"
-                : "top-[102px] lg:top-[106px]"
+                ? "top-[52px] lg:top-[68px]"
+                : "top-[90px] lg:top-[106px]"
             )}
           >
             <ArchiveDetailBanner

@@ -28,7 +28,7 @@ export function ArchiveDetailBanner({
   const cleanRelease = selected.item.release?.trim() ?? "";
 
   return (
-    <div className="w-full rounded-[7px] bg-[#242d3c] text-[#f0f8ff] p-3.5 sm:p-5 shadow-md">
+    <div className="w-full rounded-[7px] bg-[#242d3c]/92 backdrop-blur-md text-[#f0f8ff] p-3.5 sm:p-5 shadow-lg ring-1 ring-black/10">
       {/* Mobile Compact Mini-Player Header (< lg) */}
       <div className="flex lg:hidden items-center gap-3">
         <img

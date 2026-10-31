@@ -414,10 +414,11 @@ export function TiptapReviewEditor({
         className="hidden"
       />
 
-      {/* Sticky Toolbar Header (sticks with a 12px margin below the 52px shrunk site header) */}
-      <div className="sticky top-[64px] z-30 rounded-t-[6px] bg-[#f3f3f3]/95 backdrop-blur-xs shadow-sm">
-        {/* Rich Text Toolbar */}
-        <div className="flex flex-wrap items-center gap-1 p-2 border-t border-b border-[#bdc0c4]/70 rounded-t-[6px] text-[#242d3c]">
+      {/* Sticky Toolbar Header (frosted translucent section with breathing room below the 52px site header) */}
+      <div className="sticky top-[52px] z-30 pt-2.5 pb-2 px-2 bg-white/80 backdrop-blur-md border-b border-[#bdc0c4]/50">
+        <div className="rounded-[7px] overflow-hidden border border-[#bdc0c4]/80 bg-[#f3f3f3]/90 backdrop-blur-md shadow-sm">
+          {/* Rich Text Toolbar */}
+          <div className="flex flex-wrap items-center gap-1 p-2 text-[#242d3c]">
         {/* History */}
         <ToolbarButton
           onClick={() => editor.chain().focus().undo().run()}
@@ -785,6 +786,7 @@ export function TiptapReviewEditor({
           ))}
         </div>
       )}
+        </div>
       </div>
 
       {/* Editable Content Area */}
