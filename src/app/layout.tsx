@@ -58,11 +58,9 @@ export default function RootLayout({
       lang="ko"
       className={`${bayatersStamp.variable} ${lineSeed.variable} ${lobster.variable} ${nanumMyeongjo.variable} ${nohemi.variable} ${robotoMono.variable}`}
     >
-      <body className="min-h-screen flex flex-col bg-white text-gray-900 antialiased">
+      <body className="min-h-screen flex flex-col bg-white text-[#171717] antialiased selection:bg-[#ff8080]/25 selection:text-[#242d3c]">
         <AppHeader />
-        <main className="flex-1 pt-[90px] pb-[80px] md:pl-[75px] w-full max-w-[1280px] mx-auto px-4">
-          {children}
-        </main>
+        <main className="flex-1 pt-[90px] md:pl-[75px] w-full">{children}</main>
         <AppFooter />
       </body>
     </html>
