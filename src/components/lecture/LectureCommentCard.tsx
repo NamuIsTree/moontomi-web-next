@@ -89,13 +89,13 @@ export function LectureCommentCard({
 
           {/* Best Track Picks (Gold / Silver / Bronze - Vertical Stack) */}
           {comment.bests.length > 0 && (
-            <div className="flex flex-col items-center justify-center gap-1.5 pt-1">
+            <div className="flex flex-col items-center justify-center gap-1 pt-1">
               {comment.bests.slice(0, 3).map((track, idx) => {
                 const medal = TRACK_MEDALS[idx] ?? TRACK_MEDALS[0];
                 return (
                   <span
                     key={`${track}-${idx}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f3f3f3] text-xs sm:text-sm font-semibold"
+                    className="inline-flex items-center gap-1.5 py-0.5 bg-white text-xs sm:text-sm font-semibold"
                     style={{ color: medal.color }}
                   >
                     <span

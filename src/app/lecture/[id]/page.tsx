@@ -126,7 +126,7 @@ export default function LectureDetailPage({
             />
           </div>
 
-          <div className="flex flex-col items-center justify-center py-4 px-6 rounded-[20px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60">
+          <div className="flex flex-col items-center justify-center py-4 px-6 bg-white">
             {lecture.rating !== null ? (
               <div
                 onMouseEnter={() => setRatingHover(true)}
