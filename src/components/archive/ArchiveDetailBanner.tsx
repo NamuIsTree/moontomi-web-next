@@ -28,24 +28,24 @@ export function ArchiveDetailBanner({
   const cleanRelease = selected.item.release?.trim() ?? "";
 
   return (
-    <div className="w-full rounded-[7px] bg-[#242d3c]/92 backdrop-blur-md text-[#f0f8ff] p-3.5 sm:p-5 shadow-lg ring-1 ring-black/10">
+    <div className="w-full max-w-full min-w-0 overflow-hidden rounded-[7px] bg-[#242d3c]/92 backdrop-blur-md text-[#f0f8ff] p-3 sm:p-5 shadow-lg">
       {/* Mobile Compact Mini-Player Header (< lg) */}
-      <div className="flex lg:hidden items-center gap-3">
+      <div className="flex lg:hidden items-center gap-2.5 w-full min-w-0">
         <img
           src={selected.item.image}
           alt={selected.item.title}
-          className="w-12 h-12 rounded-[6px] object-cover shrink-0 border border-white/15"
+          className="w-11 h-11 rounded-[6px] object-cover shrink-0 border border-white/15"
         />
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 text-[11px] text-[#f0f8ff]/75">
-            <span className="font-mono font-bold text-[#ff8080]">
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <div className="flex items-center gap-1.5 text-[11px] text-[#f0f8ff]/75 min-w-0">
+            <span className="font-mono font-bold text-[#ff8080] shrink-0">
               #{String(selected.id).padStart(3, "0")}
             </span>
-            <span className="px-1.5 py-0.2 rounded bg-white/10 font-nohemi font-bold text-[10px] uppercase text-[#f0f8ff]">
+            <span className="px-1.5 py-0.2 rounded bg-white/10 font-nohemi font-bold text-[10px] uppercase text-[#f0f8ff] shrink-0">
               {selected.item.type}
             </span>
-            <span className="truncate">by {selected.writer}</span>
+            <span className="truncate min-w-0">by {selected.writer}</span>
           </div>
           <div className="font-bold text-sm text-white truncate mt-0.5">
             {selected.item.title}
@@ -56,14 +56,14 @@ export function ArchiveDetailBanner({
           </div>
         </div>
 
-        <div className="shrink-0 flex items-center gap-2">
-          <span className="font-lobster text-xl text-[#ff8080] tabular-nums">
+        <div className="shrink-0 flex items-center gap-1.5 pl-1">
+          <span className="font-lobster text-lg text-[#ff8080] tabular-nums">
             {selected.rating.toFixed(1)}
           </span>
           <button
             type="button"
             onClick={() => setMobileExpanded((prev) => !prev)}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-[7px] bg-white/15 hover:bg-white/25 text-xs font-bold text-[#f0f8ff] cursor-pointer"
+            className="inline-flex items-center gap-1 px-2 py-1.5 rounded-[7px] bg-white/15 hover:bg-white/25 text-xs font-bold text-[#f0f8ff] cursor-pointer shrink-0"
           >
             <span>{mobileExpanded ? "접기" : "플레이어"}</span>
             {mobileExpanded ? (

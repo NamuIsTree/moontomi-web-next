@@ -23,7 +23,7 @@ export function ArchiveListItem({
       type="button"
       onClick={() => onSelect(archive)}
       className={cn(
-        "group w-full text-left flex items-center gap-3 sm:gap-4 p-2.5 sm:px-4 sm:py-3.5 rounded-[7px] border transition-all cursor-pointer focus:outline-none",
+        "group w-full max-w-full min-w-0 overflow-hidden text-left flex items-center gap-3 sm:gap-4 p-2.5 sm:px-4 sm:py-3.5 rounded-[7px] border transition-all cursor-pointer focus:outline-none",
         isSelected
           ? "bg-[#242d3c] text-[#f0f8ff] border-[#242d3c]"
           : "bg-white text-[#171717] border-[#bdc0c4]/70 hover:border-[#242d3c] hover:bg-[#f3f3f3]/50"
@@ -80,8 +80,8 @@ export function ArchiveListItem({
       </div>
 
       {/* Main Metadata: Title, Artist, Genres, Curator */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
+      <div className="flex-1 min-w-0 overflow-hidden">
+        <div className="flex items-center gap-1.5 min-w-0">
           <span
             className={cn(
               "sm:hidden font-mono text-[11px] font-bold tabular-nums shrink-0",
