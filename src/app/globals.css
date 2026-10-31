@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: #242d3c;
+  --color-accent: #ff8080;
+  --font-stamp: var(--font-bayaters-stamp), sans-serif;
+  --font-sans: var(--font-line-seed), sans-serif;
+  --font-lobster: var(--font-lobster), cursive;
+  --font-myeongjo: var(--font-nanum-myeongjo), serif;
+  --font-nohemi: var(--font-nohemi), sans-serif;
+  --font-mono: var(--font-roboto-mono), monospace;
+}
+
+body {
+  font-family: var(--font-line-seed), sans-serif;
+  color: #171717;
+  background-color: #ffffff;
+  overflow-x: hidden;
+}

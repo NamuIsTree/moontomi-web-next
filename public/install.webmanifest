@@ -1,0 +1,15 @@
+{
+    "background_color": "#242d3c",
+    "description": "MOONTOMI - 음평회",
+    "display": "fullscreen",
+    "icons": [
+        {
+            "src": "icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ],
+    "name": "MOONTOMI",
+    "start_url": "/"
+
+}
