@@ -13,15 +13,13 @@ export function ReviewListCard({ review }: ReviewListCardProps) {
       className="group block w-full border border-[#bdc0c4] hover:border-[#242d3c] rounded-[7px] overflow-hidden bg-white transition-all"
     >
       <div className="grid grid-cols-1 md:grid-cols-12">
-        {/* Slanted Editorial Cover Image */}
-        <div className="md:col-span-4 relative bg-white">
+        {/* Editorial Cover Image Frame */}
+        <div className="md:col-span-4 relative overflow-hidden bg-[#f3f3f3] border-b md:border-b-0 md:border-r border-[#bdc0c4]/50 min-h-[200px] md:min-h-[215px]">
           <div
-            className="w-full h-[190px] md:h-full min-h-[210px] bg-[#f3f3f3] bg-center bg-cover bg-no-repeat transition-all duration-300 [clip-path:polygon(100%_0,100%_82%,0%_98%,0_0%)] md:[clip-path:polygon(0_0,96%_0,90%_100%,0_100%)] md:group-hover:[clip-path:polygon(0_0,88%_0,78%_100%,0_100%)]"
+            className="absolute inset-0 bg-center bg-cover bg-no-repeat transition-transform duration-500 ease-out group-hover:scale-105"
             style={{ backgroundImage: `url(${review.image})` }}
           />
-          <span className="
-            absolute top-3 left-3 px-2.5 py-0.5 rounded-[7px] bg-[#242d3c]/90 text-[#f0f8ff] text-xs font-bold tracking-wide
-          ">
+          <span className="absolute top-3 left-3 z-10 px-2.5 py-0.5 rounded-[7px] bg-[#242d3c]/90 text-[#f0f8ff] text-xs font-bold tracking-wide">
             {review.type}
           </span>
         </div>

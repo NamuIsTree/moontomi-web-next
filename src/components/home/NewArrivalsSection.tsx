@@ -58,21 +58,24 @@ export function NewArrivalsSection({
               className="group snap-start shrink-0 w-[270px] sm:w-[310px] rounded-[7px] overflow-hidden border border-[#bdc0c4] bg-white hover:border-[#242d3c] transition-all flex flex-col justify-between"
             >
               <div>
-                <div className="relative">
+                <div className="relative overflow-hidden bg-[#f3f3f3] border-b border-[#bdc0c4]/50 pt-[58%]">
                   <div
-                    className="w-full pt-[62%] bg-center bg-cover bg-no-repeat bg-[#242d3c] transition-all duration-300 [clip-path:polygon(100%_0,100%_80%,0%_98%,0_0%)] group-hover:[clip-path:polygon(100%_0,100%_76%,0%_94%,0_0%)]"
+                    className="absolute inset-0 bg-center bg-cover bg-no-repeat transition-transform duration-500 ease-out group-hover:scale-105"
                     style={{ backgroundImage: `url(${item.image})` }}
                   />
-                  <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-[7px] bg-[#242d3c]/90 text-[#f0f8ff] text-xs font-bold tracking-wide">
+                  <span className="absolute top-2.5 left-2.5 z-10 px-2.5 py-0.5 rounded-[7px] bg-[#242d3c]/90 text-[#f0f8ff] text-xs font-bold tracking-wide">
                     {item.type}
-                  </span>
-                  <span className="absolute bottom-0 right-3 text-xs font-bold text-[#808080] tabular-nums">
-                    {item.created_at}
                   </span>
                 </div>
 
-                <div className="px-4 pt-2.5 pb-3">
-                  <h3 className="font-myeongjo font-extrabold text-lg text-[#171717] group-hover:text-[#242d3c] leading-snug line-clamp-2 break-keep">
+                <div className="px-4 pt-3 pb-3">
+                  <div className="flex items-center justify-between text-xs text-[#808080] mb-1.5 tabular-nums">
+                    <span className="font-mono font-bold text-[#242d3c]">
+                      No. {String(item.id).padStart(2, "0")}
+                    </span>
+                    <span>{item.created_at}</span>
+                  </div>
+                  <h3 className="font-myeongjo font-extrabold text-lg text-[#171717] group-hover:text-[#242d3c] leading-snug line-clamp-2 break-keep transition-colors">
                     &ldquo;{item.title}&rdquo;
                   </h3>
                   <p className="text-sm text-[#171717]/80 leading-relaxed line-clamp-2 break-keep mt-2">
@@ -82,7 +85,7 @@ export function NewArrivalsSection({
               </div>
 
               <div className="px-4 py-3 border-t border-[#f3f3f3] flex items-center justify-between text-xs text-[#808080]">
-                <span className="font-bold text-[#242d3c] truncate max-w-[60%]">
+                <span className="font-myeongjo font-extrabold text-[#242d3c] truncate max-w-[65%]">
                   by {item.writer}
                 </span>
                 <span className="inline-flex items-center gap-1 tabular-nums">
