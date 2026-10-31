@@ -8,6 +8,7 @@ import {
   createReview,
   updateReview,
 } from "@/services/review.service";
+import { TiptapReviewEditor } from "@/components/review/TiptapReviewEditor";
 import { cn } from "@/lib/utils";
 
 interface ReviewEditorFormProps {
@@ -253,17 +254,15 @@ export function ReviewEditorForm({
         </div>
       </div>
 
-      {/* Content (HTML / Markdown / Text) */}
+      {/* Rich Text Content (TipTap) */}
       <div>
         <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
-          본문 (HTML 지원)
+          본문 에디터
         </label>
-        <textarea
-          rows={15}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="칼럼 본문을 입력하세요..."
-          className="w-full px-4 py-3 rounded-[7px] border border-[#bdc0c4] bg-white text-sm leading-relaxed focus:outline-none focus:border-[#242d3c] font-sans"
+        <TiptapReviewEditor
+          content={content}
+          onChange={setContent}
+          editable={!loading}
         />
       </div>
 

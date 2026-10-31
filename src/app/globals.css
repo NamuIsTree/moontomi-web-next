@@ -123,3 +123,60 @@ body {
   border-top: 1px solid rgba(189, 192, 196, 0.6);
   margin: 2.25rem 0;
 }
+
+/* TipTap / ProseMirror Editor & Viewer Rules */
+.ProseMirror {
+  outline: none;
+  min-height: 340px;
+}
+
+.tiptap-readonly .ProseMirror {
+  min-height: 0;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1.25em;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1.25em;
+}
+
+.ProseMirror table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid #bdc0c4;
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+}
+
+.ProseMirror th {
+  background-color: #f3f3f3;
+  font-weight: 700;
+}
+
+.tiptap-iframe-wrapper {
+  margin: 1.75rem auto;
+  width: 100%;
+}
+
+.tiptap-iframe-wrapper iframe,
+.editorial-prose iframe.el-tiptap-iframe {
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+  border: 0;
+  border-radius: 7px;
+}

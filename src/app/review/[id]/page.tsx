@@ -4,6 +4,7 @@ import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { ArrowLeft, Eye, FilePenLine } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
+import { TiptapReviewEditor } from "@/components/review/TiptapReviewEditor";
 import { fetchReviewById } from "@/services/review.service";
 import type { ReviewDetail } from "@/types/domain";
 
@@ -91,11 +92,10 @@ export default function ReviewDetailPage({
         </div>
       </header>
 
-      {/* Long-form Editorial Prose */}
-      <article
-        className="editorial-prose border-t border-[#bdc0c4]/60 pt-8 max-w-[68ch] mx-auto"
-        dangerouslySetInnerHTML={{ __html: review.content }}
-      />
+      {/* Long-form Editorial Prose (TipTap Readonly Viewer) */}
+      <article className="border-t border-[#bdc0c4]/60 pt-8">
+        <TiptapReviewEditor content={review.content} editable={false} />
+      </article>
     </PageContainer>
   );
 }
