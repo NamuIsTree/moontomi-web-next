@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-31T22:50:00+09:00",
+  "title": "Design System: MOONTOMI",
+  "extensions": {
+    "colorMeta": {
+      "midnight-slate": {
+        "role": "primary",
+        "displayName": "Midnight Slate",
+        "canonical": "#242d3c",
+        "tonalRamp": ["#11161e", "#1a222d", "#242d3c", "#38455b", "#51627e", "#7688a6", "#a8b6cc", "#dce2ec"]
+      },
+      "coral-pulse": {
+        "role": "primary",
+        "displayName": "Coral Pulse",
+        "canonical": "#ff8080",
+        "tonalRamp": ["#4d1414", "#7a2222", "#ad3434", "#d95353", "#ff8080", "#ffa3a3", "#ffc7c7", "#ffe8e8"]
+      },
+      "surface-white": {
+        "role": "neutral",
+        "displayName": "Surface White",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#171717", "#2e2e2e", "#4d4d4d", "#737373", "#999999", "#bfbfbf", "#e6e6e6", "#ffffff"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display (Bayaters Stamp)", "purpose": "Top brand header wordmark and Hall of Fame hero titles." },
+      "headline": { "displayName": "Headline (Nanum Myeongjo)", "purpose": "Review and column titles with quotation marks." },
+      "title": { "displayName": "Title (Nohemi / LINE Seed)", "purpose": "Album, lecture, and archive item titles." },
+      "body": { "displayName": "Body (LINE Seed KR)", "purpose": "Comments, review body copy, and general UI text." },
+      "label": { "displayName": "Label (Nohemi Bold)", "purpose": "ALBUM/SINGLE chips, genre tags, and OPEN badges." }
+    },
+    "shadows": [
+      { "name": "card-resting", "value": "0 2px 8px rgba(36, 45, 60, 0.06)", "purpose": "Subtle elevation for comment cards." },
+      { "name": "archive-banner", "value": "0 8px 24px rgba(36, 45, 60, 0.22)", "purpose": "Floating fixed archive detail banner." }
+    ],
+    "motion": [
+      { "name": "header-shrink", "value": "cubic-bezier(0.295, 0.695, 0.290, 1.005)", "purpose": "Smooth 0.3s transition when shrinking header and fixed banners on scroll." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Coral Pulse action button for submitting reviews and comments.",
+      "html": "<button class=\"ds-btn-primary\">UPLOAD</button>",
+      "css": ".ds-btn-primary { background: #ff8080; color: #ffffff; padding: 12px 28px; border-radius: 7px; border: none; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; transition: opacity 0.2s, transform 0.15s; } .ds-btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }"
+    },
+    {
+      "name": "Comment Card",
+      "kind": "card",
+      "refersTo": "card-comment",
+      "description": "Rounded comment card displaying writer, rating, top 3 tracks, and review text.",
+      "html": "<div class=\"ds-card-comment\"><div class=\"ds-card-meta\"><span>by 나무트리</span><span class=\"ds-date\">2026-10-31</span></div><div class=\"ds-score\">8.5</div><p class=\"ds-text\">첫 트랙부터 마지막 트랙까지 유기적인 흐름이 돋보이는 명반.</p></div>",
+      "css": ".ds-card-comment { background: #ffffff; color: #171717; border: 1px solid #bdc0c4; border-radius: 20px; padding: 16px 24px; max-width: 480px; } .ds-card-meta { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 8px; } .ds-date { color: #808080; font-size: 0.85rem; font-weight: 400; } .ds-score { font-size: 1.5rem; font-weight: 900; text-align: center; color: #242d3c; margin: 8px 0; } .ds-text { font-size: 0.95rem; line-height: 1.6; text-align: center; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Saturday Listening Room (토요일의 음감실)",
+    "overview": "MOONTOMI의 시각 시스템은 레코드 숍의 스탬프가 찍힌 아날로그 감성과 현대적인 웹 매거진의 단정함을 결합합니다. 상단과 하단을 단단하게 잡아주는 미드나잇 네이비(#242d3c) 프레임 안에서, 밝고 깨끗한 화이트 캔버스 위에 앨범 아트워크와 음악 비평 텍스트가 선명하게 드러납니다.",
+    "keyCharacteristics": [
+      "Framed Canvas: 상단 고정 헤더와 좌측 호버 확장형 레일 네비게이션, 하단 고정 푸터가 콘텐츠 영역을 액자처럼 감쌉니다.",
+      "Tactile Album Focus: 앨범 커버 이미지가 카드, 캐러셀, 상단 프리뷰 배너의 중심 시각 요소로 작동합니다.",
+      "Ceremonial Rating Display: 음평회 평점, 베스트 트랙(골드/실버/브론즈), 오픈 전 블라인드 상태(OPEN 칩 및 회전 기어 아이콘)를 명확한 시각적 위계로 표현합니다."
+    ],
+    "rules": [
+      {
+        "name": "The Two-Tone Anchor Rule",
+        "body": "브랜드 컬러는 언제나 Midnight Slate(#242d3c)가 구조(프레임)를 맡고 Coral Pulse(#ff8080)가 액션과 하이라이트를 맡는다. 임의의 블루/퍼플 그라데이션을 절대 섞지 않는다.",
+        "section": "colors"
+      },
+      {
+        "name": "The Role-Bound Typeface Rule",
+        "body": "서체는 지정된 역할에만 사용한다: Lobster는 오직 평점 숫자에만, Nanum Myeongjo는 칼럼 타이틀과 필진 표기에만, Bayaters Stamp는 브랜드 헤더에만 사용한다.",
+        "section": "typography"
+      }
+    ],
+    "dos": [
+      "Do 한글 본문과 한줄평에는 항상 word-break: keep-all을 적용하여 단어 중간이 끊어지지 않게 유지하세요.",
+      "Do 음평회 상세에서 아직 공개 전(rating === null)인 경우 평점 대신 OPEN 상태와 블라인드 처리된 한줄평(회전 기어 애니메이션 및 개별 토글 버튼)을 표시하세요.",
+      "Do 헤더의 스크롤 축소(scrollTop > 50일 때 90px → 50px)와 데스크톱 좌측 레일 여백(75px)의 공간적 일관성을 모든 페이지에서 유지하세요."
+    ],
+    "donts": [
+      "Don't 브랜드 컬러인 #242d3c와 #ff8080 외에 임의의 네온 컬러나 AI 기본 보라색 그라데이션을 사용하지 마세요.",
+      "Don't 평점 표기용 서체인 Lobster를 일반 본문이나 버튼 텍스트에 사용하지 마세요.",
+      "Don't 카드 안에 또 다른 박스형 카드를 중첩(Nested Cards)하여 화면을 답답하게 만들지 마세요."
+    ]
+  }
+}
