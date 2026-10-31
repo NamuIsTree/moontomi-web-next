@@ -16,18 +16,20 @@ export function ArchiveListItem({
   isSelected = false,
   onSelect,
 }: ArchiveListItemProps) {
+  const cleanRelease = archive.item.release?.trim() ?? "";
+
   return (
     <button
       type="button"
       onClick={() => onSelect(archive)}
       className={cn(
-        "group w-full text-left flex items-center gap-3.5 sm:gap-4 p-3 sm:px-4 sm:py-3.5 rounded-[7px] border transition-all cursor-pointer focus:outline-none",
+        "group w-full text-left flex items-center gap-3 sm:gap-4 p-2.5 sm:px-4 sm:py-3.5 rounded-[7px] border transition-all cursor-pointer focus:outline-none",
         isSelected
           ? "bg-[#242d3c] text-[#f0f8ff] border-[#242d3c]"
           : "bg-white text-[#171717] border-[#bdc0c4]/70 hover:border-[#242d3c] hover:bg-[#f3f3f3]/50"
       )}
     >
-      {/* Archive Number & Type */}
+      {/* Archive Number & Type (Desktop sm+) */}
       <div className="hidden sm:flex flex-col items-center justify-center w-12 shrink-0 tabular-nums">
         <span
           className={cn(
@@ -54,7 +56,7 @@ export function ArchiveListItem({
       </div>
 
       {/* Cover Thumbnail */}
-      <div className="relative w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-[7px] overflow-hidden bg-[#242d3c] border border-[#bdc0c4]/50">
+      <div className="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0 rounded-[7px] overflow-hidden bg-[#242d3c] border border-[#bdc0c4]/50">
         <img
           src={archive.item.image}
           alt={archive.item.title}
@@ -70,7 +72,7 @@ export function ArchiveListItem({
         >
           <Play
             className={cn(
-              "w-5 h-5 fill-current",
+              "w-4 h-4 sm:w-5 sm:h-5 fill-current",
               isSelected ? "text-[#ff8080]" : "text-white"
             )}
           />
@@ -79,10 +81,10 @@ export function ArchiveListItem({
 
       {/* Main Metadata: Title, Artist, Genres, Curator */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <span
             className={cn(
-              "sm:hidden font-mono text-xs font-bold tabular-nums",
+              "sm:hidden font-mono text-[11px] font-bold tabular-nums shrink-0",
               isSelected ? "text-[#ff8080]" : "text-[#808080]"
             )}
           >
@@ -111,17 +113,17 @@ export function ArchiveListItem({
             )}
           >
             {archive.item.artist}
-          </span>{" "}
-          <span>({archive.item.release})</span>
+          </span>
+          {cleanRelease ? <span> ({cleanRelease})</span> : null}
         </div>
 
         {/* Genre Chips & Curator Meta */}
-        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-          {archive.item.genres.slice(0, 2).map((genre) => (
+        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+          {archive.item.genres.slice(0, 1).map((genre) => (
             <span
               key={genre.genre_id}
               className={cn(
-                "px-2 py-0.5 rounded-full text-xs font-semibold uppercase",
+                "px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold uppercase",
                 isSelected
                   ? "bg-white/15 text-[#f0f8ff]"
                   : "bg-[#f3f3f3] text-[#242d3c]"
@@ -134,20 +136,21 @@ export function ArchiveListItem({
           ))}
           <span
             className={cn(
-              "text-xs tabular-nums",
+              "text-[11px] sm:text-xs tabular-nums truncate",
               isSelected ? "text-[#f0f8ff]/70" : "text-[#808080]"
             )}
           >
-            by {archive.writer} · {archive.date}
+            by {archive.writer}
+            <span className="hidden sm:inline"> · {archive.date}</span>
           </span>
         </div>
       </div>
 
       {/* Rating Column */}
-      <div className="shrink-0 text-right tabular-nums flex flex-col items-end justify-center">
+      <div className="shrink-0 text-right tabular-nums flex flex-col items-end justify-center pl-1">
         <div
           className={cn(
-            "font-lobster text-xl sm:text-2xl leading-none",
+            "font-lobster text-lg sm:text-2xl leading-none",
             isSelected ? "text-[#ff8080]" : "text-[#242d3c]"
           )}
         >

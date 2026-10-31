@@ -131,23 +131,23 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
   return (
     <PageContainer width="wide" className="space-y-6">
       {/* Page Header + View Mode Switcher */}
-      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-5 border-b-2 border-[#242d3c]">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#242d3c] tracking-tight">
+      <header className="flex items-end justify-between gap-3 pb-4 sm:pb-5 border-b-2 border-[#242d3c]">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-3xl font-bold text-[#242d3c] tracking-tight">
             아카이브 스테이션
           </h1>
-          <p className="text-sm text-[#808080] mt-1">
-            큐레이션된 음반과 싱글을 목록으로 한눈에 열람하고 바로 감상하세요
+          <p className="text-xs sm:text-sm text-[#808080] mt-1 break-keep">
+            큐레이션된 음반과 싱글을 목록으로 열람하고 바로 감상하세요
           </p>
         </div>
 
         {/* View Toggle (List vs Grid) */}
-        <div className="inline-flex rounded-[7px] overflow-hidden border border-[#bdc0c4] divide-x divide-[#bdc0c4] bg-white self-start sm:self-auto">
+        <div className="inline-flex shrink-0 rounded-[7px] overflow-hidden border border-[#bdc0c4] divide-x divide-[#bdc0c4] bg-white">
           <button
             type="button"
             onClick={() => setViewMode("list")}
             className={cn(
-              "inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer",
+              "inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs font-bold transition-colors cursor-pointer",
               viewMode === "list"
                 ? "bg-[#242d3c] text-[#f0f8ff]"
                 : "bg-white text-[#242d3c] hover:bg-[#f3f3f3]"
@@ -155,17 +155,17 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
           >
             <LayoutList
               className={cn(
-                "w-4 h-4",
+                "w-3.5 h-3.5 sm:w-4 sm:h-4",
                 viewMode === "list" ? "text-[#ff8080]" : "text-[#242d3c]"
               )}
             />
-            <span>리스트 뷰</span>
+            <span>리스트</span>
           </button>
           <button
             type="button"
             onClick={() => setViewMode("grid")}
             className={cn(
-              "inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer",
+              "inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs font-bold transition-colors cursor-pointer",
               viewMode === "grid"
                 ? "bg-[#242d3c] text-[#f0f8ff]"
                 : "bg-white text-[#242d3c] hover:bg-[#f3f3f3]"
@@ -173,37 +173,40 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
           >
             <LayoutGrid
               className={cn(
-                "w-4 h-4",
+                "w-3.5 h-3.5 sm:w-4 sm:h-4",
                 viewMode === "grid" ? "text-[#ff8080]" : "text-[#242d3c]"
               )}
             />
-            <span>그리드 뷰</span>
+            <span>그리드</span>
           </button>
         </div>
       </header>
 
       {/* Split-View Workspace: Left Sticky Player Deck + Right Filter & Catalog List */}
-      <div className="flex flex-col lg:flex-row items-start gap-6">
+      <div className="flex flex-col lg:flex-row items-start gap-4 lg:gap-6">
         {/* Left Column: Sticky Inspector & Player Deck */}
         {selected && (
           <aside
             className={cn(
-              "w-full lg:w-[350px] xl:w-[390px] shrink-0 sticky z-30 bg-white pb-2 lg:pb-0 transition-[top] duration-300",
+              "w-full lg:w-[350px] xl:w-[390px] shrink-0 sticky z-30 bg-white pb-1.5 lg:pb-0 transition-[top] duration-300",
               headerShrunk
                 ? "top-[52px] lg:top-[68px]"
                 : "top-[90px] lg:top-[106px]"
             )}
           >
-            <ArchiveDetailBanner selected={selected} />
+            <ArchiveDetailBanner
+              selected={selected}
+              defaultExpandedOnMobile={Boolean(initialArchiveId)}
+            />
           </aside>
         )}
 
         {/* Right Column: Filter Toolbar + Archive Catalog (List or Grid) */}
-        <div className="w-full lg:flex-1 min-w-0 space-y-4">
+        <div className="w-full lg:flex-1 min-w-0 space-y-3.5 sm:space-y-4">
           {/* Filter & Search Toolbar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 p-3.5 rounded-[7px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-[7px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60">
             <div>
-              <label className="block text-xs font-bold text-[#242d3c] mb-1">
+              <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c] mb-1">
                 정렬 기준
               </label>
               <select
@@ -211,21 +214,21 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
                 onChange={(e) =>
                   handleOrderChange(e.target.value as "desc" | "asc")
                 }
-                className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
               >
-                <option value="desc">최신 등록순</option>
-                <option value="asc">초기 등록순</option>
+                <option value="desc">최신순</option>
+                <option value="asc">초기순</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#242d3c] mb-1">
+              <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c] mb-1">
                 별점 필터
               </label>
               <select
                 value={minRating}
                 onChange={(e) => handleMinRatingChange(Number(e.target.value))}
-                className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
               >
                 {RATING_FILTER_OPTIONS.map((opt) => (
                   <option key={opt.min} value={opt.min}>
@@ -236,7 +239,7 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#242d3c] mb-1">
+              <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c] mb-1">
                 유형
               </label>
               <select
@@ -244,16 +247,16 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
                 onChange={(e) =>
                   setTypeFilter(e.target.value as "all" | "album" | "single")
                 }
-                className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
               >
-                <option value="all">전체 (ALBUM &amp; SINGLE)</option>
+                <option value="all">전체</option>
                 <option value="album">ALBUM</option>
                 <option value="single">SINGLE</option>
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-[#242d3c] mb-1">
+            <div className="col-span-3 sm:col-span-1">
+              <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c] mb-1">
                 빠른 검색
               </label>
               <div className="relative">
@@ -262,8 +265,8 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="곡 · 아티스트 · 추천인"
-                  className="w-full pl-8 pr-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm text-[#171717] focus:outline-none focus:border-[#242d3c]"
+                  placeholder="곡 · 아티스트 · 추천인 검색"
+                  className="w-full pl-8 pr-3 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm text-[#171717] focus:outline-none focus:border-[#242d3c]"
                 />
               </div>
             </div>

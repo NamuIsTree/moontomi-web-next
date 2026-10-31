@@ -17,23 +17,23 @@ export function NewArrivalsSection({
   const displayItems = reviews.slice(0, 10);
 
   return (
-    <section className="py-4">
-      <div className="flex items-end justify-between gap-4 mb-5">
-        <div>
-          <h2 className="text-2xl font-bold text-[#242d3c] tracking-tight">
+    <section className="py-3 sm:py-4">
+      <div className="flex items-center justify-between gap-2 mb-4 sm:mb-5">
+        <div className="min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold text-[#242d3c] tracking-tight">
             New Arrivals
           </h2>
-          <p className="text-sm sm:text-base text-[#808080] mt-0.5">
-            새로 도착한 칼럼 · 결산 · 비평 (최신 최대 10선)
+          <p className="text-xs sm:text-sm text-[#808080] mt-0.5 truncate">
+            새로 도착한 칼럼 · 결산 · 비평 10선
           </p>
         </div>
 
         <Link
           href="/reviews"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[7px] text-xs sm:text-sm font-bold text-[#242d3c] hover:bg-[#f3f3f3] transition-colors shrink-0"
+          className="inline-flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-[7px] text-xs sm:text-sm font-bold text-[#242d3c] hover:bg-[#f3f3f3] transition-colors shrink-0"
         >
-          <span>전체 칼럼 보기</span>
-          <ArrowRight className="w-4 h-4 text-[#ff8080]" />
+          <span>더보기</span>
+          <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ff8080]" />
         </Link>
       </div>
 

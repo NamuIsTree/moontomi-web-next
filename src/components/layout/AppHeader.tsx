@@ -155,6 +155,35 @@ export function AppHeader() {
           <div className="mt-0.5">Since Saturday Listening Club</div>
         </div>
       </aside>
+
+      {/* Mobile Bottom Navigation Bar (< md) */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#242d3c] text-[#f0f8ff] border-t border-white/15 grid grid-cols-5 h-[56px]">
+        {NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+          const isActive =
+            item.path === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.path) ||
+                (item.path === "/reviews" && pathname.startsWith("/review")) ||
+                (item.path === "/lectures" &&
+                  (pathname.startsWith("/lecture") ||
+                    pathname.startsWith("/comment")));
+
+          return (
+            <Link
+              key={item.path}
+              href={item.path}
+              className={cn(
+                "flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold transition-colors",
+                isActive ? "text-[#ff8080]" : "text-[#f0f8ff]/75"
+              )}
+            >
+              <Icon className="w-4 h-4 shrink-0" />
+              <span className="truncate">{item.title}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </>
   );
 }

@@ -15,6 +15,8 @@ export function ArchiveGridTile({
   isSelected = false,
   onSelect,
 }: ArchiveGridTileProps) {
+  const cleanRelease = archive.item.release?.trim() ?? "";
+
   return (
     <button
       type="button"
@@ -36,7 +38,7 @@ export function ArchiveGridTile({
         <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
           <span
             className={cn(
-              "px-2 py-0.5 rounded-full border text-xs font-nohemi font-bold uppercase bg-black/65",
+              "px-1.5 sm:px-2 py-0.5 rounded-full border text-[10px] sm:text-xs font-nohemi font-bold uppercase bg-black/65",
               archive.item.type === "album"
                 ? "border-green-400 text-green-300"
                 : "border-orange-400 text-orange-300"
@@ -44,18 +46,18 @@ export function ArchiveGridTile({
           >
             {archive.item.type.toUpperCase()}
           </span>
-          <span className="px-2 py-0.5 rounded-full bg-black/65 font-mono text-xs font-bold text-[#f0f8ff] tabular-nums">
+          <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-black/65 font-mono text-[10px] sm:text-xs font-bold text-[#f0f8ff] tabular-nums">
             #{archive.id}
           </span>
         </div>
       </div>
 
       {/* Separated Readable Metadata Footer */}
-      <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
+      <div className="p-2.5 sm:p-3 flex-1 flex flex-col justify-between space-y-2">
         <div>
           <div
             className={cn(
-              "text-sm font-bold leading-snug line-clamp-1 break-keep",
+              "text-xs sm:text-sm font-bold leading-snug line-clamp-1 break-keep",
               isSelected ? "text-white" : "text-[#171717]"
             )}
           >
@@ -63,32 +65,43 @@ export function ArchiveGridTile({
           </div>
           <div
             className={cn(
-              "text-xs truncate mt-0.5",
+              "text-[11px] sm:text-xs truncate mt-0.5",
               isSelected ? "text-[#f0f8ff]/80" : "text-[#808080]"
             )}
           >
-            {archive.item.artist} ({archive.item.release})
+            {archive.item.artist}
+            {cleanRelease ? ` (${cleanRelease})` : ""}
           </div>
         </div>
 
-        <div className="pt-1 border-t border-[#bdc0c4]/30 flex items-center justify-between gap-2">
+        <div className="pt-1.5 border-t border-[#bdc0c4]/30 flex items-center justify-between gap-1.5">
           <span
             className={cn(
-              "text-xs truncate",
+              "text-[11px] sm:text-xs truncate min-w-0",
               isSelected ? "text-[#f0f8ff]/75" : "text-[#808080]"
             )}
           >
             by {archive.writer}
           </span>
           <div className="flex items-center gap-1 shrink-0 tabular-nums">
-            <StarRating
-              value={archive.rating}
-              size={13}
-              activeColor="#ffb400"
-              inactiveColor={
-                isSelected ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.15)"
-              }
-            />
+            <span
+              className={cn(
+                "sm:hidden font-lobster text-sm",
+                isSelected ? "text-[#ff8080]" : "text-[#242d3c]"
+              )}
+            >
+              {archive.rating.toFixed(1)}
+            </span>
+            <div className="hidden sm:block">
+              <StarRating
+                value={archive.rating}
+                size={13}
+                activeColor="#ffb400"
+                inactiveColor={
+                  isSelected ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.15)"
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
