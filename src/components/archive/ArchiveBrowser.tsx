@@ -182,91 +182,93 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
         </div>
       </header>
 
-      {/* Filter & Search Toolbar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 p-3.5 rounded-[7px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60">
-        <div>
-          <label className="block text-xs font-bold text-[#242d3c] mb-1">
-            정렬 기준
-          </label>
-          <select
-            value={order}
-            onChange={(e) =>
-              handleOrderChange(e.target.value as "desc" | "asc")
-            }
-            className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
-          >
-            <option value="desc">최신 등록순</option>
-            <option value="asc">초기 등록순</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-xs font-bold text-[#242d3c] mb-1">
-            별점 필터
-          </label>
-          <select
-            value={minRating}
-            onChange={(e) => handleMinRatingChange(Number(e.target.value))}
-            className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
-          >
-            {RATING_FILTER_OPTIONS.map((opt) => (
-              <option key={opt.min} value={opt.min}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-xs font-bold text-[#242d3c] mb-1">
-            유형
-          </label>
-          <select
-            value={typeFilter}
-            onChange={(e) =>
-              setTypeFilter(e.target.value as "all" | "album" | "single")
-            }
-            className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
-          >
-            <option value="all">전체 (ALBUM &amp; SINGLE)</option>
-            <option value="album">ALBUM</option>
-            <option value="single">SINGLE</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-xs font-bold text-[#242d3c] mb-1">
-            빠른 검색
-          </label>
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 text-[#808080] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="곡 · 아티스트 · 추천인"
-              className="w-full pl-8 pr-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm text-[#171717] focus:outline-none focus:border-[#242d3c]"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Split-View Workspace: Left Catalog + Right Sticky Player Deck */}
+      {/* Split-View Workspace: Left Sticky Player Deck + Right Filter & Catalog List */}
       <div className="flex flex-col lg:flex-row items-start gap-6">
-        {/* Mobile/Tablet Compact Sticky Player (Only below lg) */}
+        {/* Left Column: Sticky Inspector & Player Deck */}
         {selected && (
-          <div
+          <aside
             className={cn(
-              "lg:hidden sticky z-30 w-full bg-white pb-2 transition-[top] duration-300",
-              headerShrunk ? "top-[52px]" : "top-[90px]"
+              "w-full lg:w-[350px] xl:w-[390px] shrink-0 sticky z-30 bg-white pb-2 lg:pb-0 transition-[top] duration-300",
+              headerShrunk
+                ? "top-[52px] lg:top-[68px]"
+                : "top-[90px] lg:top-[106px]"
             )}
           >
             <ArchiveDetailBanner selected={selected} />
-          </div>
+          </aside>
         )}
 
-        {/* Left Column: Archive Catalog (List or Grid) */}
-        <div className="w-full lg:flex-1 min-w-0">
+        {/* Right Column: Filter Toolbar + Archive Catalog (List or Grid) */}
+        <div className="w-full lg:flex-1 min-w-0 space-y-4">
+          {/* Filter & Search Toolbar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 p-3.5 rounded-[7px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60">
+            <div>
+              <label className="block text-xs font-bold text-[#242d3c] mb-1">
+                정렬 기준
+              </label>
+              <select
+                value={order}
+                onChange={(e) =>
+                  handleOrderChange(e.target.value as "desc" | "asc")
+                }
+                className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+              >
+                <option value="desc">최신 등록순</option>
+                <option value="asc">초기 등록순</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#242d3c] mb-1">
+                별점 필터
+              </label>
+              <select
+                value={minRating}
+                onChange={(e) => handleMinRatingChange(Number(e.target.value))}
+                className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+              >
+                {RATING_FILTER_OPTIONS.map((opt) => (
+                  <option key={opt.min} value={opt.min}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#242d3c] mb-1">
+                유형
+              </label>
+              <select
+                value={typeFilter}
+                onChange={(e) =>
+                  setTypeFilter(e.target.value as "all" | "album" | "single")
+                }
+                className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+              >
+                <option value="all">전체 (ALBUM &amp; SINGLE)</option>
+                <option value="album">ALBUM</option>
+                <option value="single">SINGLE</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#242d3c] mb-1">
+                빠른 검색
+              </label>
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-[#808080] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="곡 · 아티스트 · 추천인"
+                  className="w-full pl-8 pr-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm text-[#171717] focus:outline-none focus:border-[#242d3c]"
+                />
+              </div>
+            </div>
+          </div>
+
           {viewMode === "list" ? (
             <div className="space-y-2.5">
               {visibleArchives.map((archive) => (
@@ -303,18 +305,6 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
             onIntersect={() => loadMore(page, order, minRating, page === 1)}
           />
         </div>
-
-        {/* Right Column (Desktop): Sticky Inspector & Player Deck */}
-        {selected && (
-          <aside
-            className={cn(
-              "hidden lg:block w-[350px] xl:w-[390px] shrink-0 sticky transition-[top] duration-300",
-              headerShrunk ? "top-[68px]" : "top-[106px]"
-            )}
-          >
-            <ArchiveDetailBanner selected={selected} />
-          </aside>
-        )}
       </div>
     </PageContainer>
   );
