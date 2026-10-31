@@ -14,9 +14,9 @@ export function ReviewListCard({ review }: ReviewListCardProps) {
     >
       <div className="grid grid-cols-1 md:grid-cols-12">
         {/* Slanted Editorial Cover Image */}
-        <div className="md:col-span-4 relative bg-[#f3f3f3]">
+        <div className="md:col-span-4 relative bg-white">
           <div
-            className="w-full h-[190px] md:h-full min-h-[210px] bg-center bg-cover bg-no-repeat transition-all duration-300 [clip-path:polygon(100%_0,100%_82%,0%_98%,0_0%)] md:[clip-path:polygon(0_0,96%_0,90%_100%,0_100%)] md:group-hover:[clip-path:polygon(0_0,88%_0,78%_100%,0_100%)]"
+            className="w-full h-[190px] md:h-full min-h-[210px] bg-[#f3f3f3] bg-center bg-cover bg-no-repeat transition-all duration-300 [clip-path:polygon(100%_0,100%_82%,0%_98%,0_0%)] md:[clip-path:polygon(0_0,96%_0,90%_100%,0_100%)] md:group-hover:[clip-path:polygon(0_0,88%_0,78%_100%,0_100%)]"
             style={{ backgroundImage: `url(${review.image})` }}
           />
           <span className="
