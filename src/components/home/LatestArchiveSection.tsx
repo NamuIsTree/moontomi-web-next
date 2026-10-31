@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight, CirclePlay, Disc3 } from "lucide-react";
+import { HorizontalScrollRail } from "@/components/ui/HorizontalScrollRail";
 import type { ArchivePublicItem } from "@/types/domain";
 
 interface LatestArchiveSectionProps {
@@ -20,7 +21,7 @@ export function LatestArchiveSection({
       <div className="flex items-end justify-between gap-4 mb-5">
         <div>
           <h2 className="text-2xl font-bold text-[#242d3c] tracking-tight">
-            Archive Crate
+            Archive Curate
           </h2>
           <p className="text-sm sm:text-base text-[#808080] mt-0.5">
             새로 큐레이션된 아카이브 음반 · 싱글 (최신 최대 10선)
@@ -50,14 +51,15 @@ export function LatestArchiveSection({
           등록된 아카이브 데이터가 없습니다.
         </div>
       ) : (
-        <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
+        <HorizontalScrollRail>
           {displayItems.map((entry) => {
             const primaryGenre = entry.item.genres[0];
             return (
               <Link
                 key={entry.id}
                 href={`/archive/${entry.id}`}
-                className="group snap-start shrink-0 w-[205px] sm:w-[225px] rounded-[7px] overflow-hidden border border-[#bdc0c4] bg-white hover:border-[#242d3c] transition-all flex flex-col justify-between"
+                draggable={false}
+                className="group shrink-0 w-[205px] sm:w-[225px] rounded-[7px] overflow-hidden border border-[#bdc0c4] bg-white hover:border-[#242d3c] transition-all flex flex-col justify-between"
               >
                 <div>
                   {/* Square Album Artwork */}
@@ -65,6 +67,7 @@ export function LatestArchiveSection({
                     <img
                       src={entry.item.image}
                       alt={entry.item.title}
+                      draggable={false}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
 
@@ -117,7 +120,7 @@ export function LatestArchiveSection({
               </Link>
             );
           })}
-        </div>
+        </HorizontalScrollRail>
       )}
     </section>
   );

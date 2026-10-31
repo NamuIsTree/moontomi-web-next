@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight, Eye } from "lucide-react";
+import { HorizontalScrollRail } from "@/components/ui/HorizontalScrollRail";
 import type { ReviewListItem } from "@/types/domain";
 
 interface NewArrivalsSectionProps {
@@ -50,12 +51,13 @@ export function NewArrivalsSection({
           등록된 칼럼 데이터가 없습니다.
         </div>
       ) : (
-        <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
+        <HorizontalScrollRail>
           {displayItems.map((item) => (
             <Link
               key={item.id}
               href={`/review/${item.id}`}
-              className="group snap-start shrink-0 w-[270px] sm:w-[310px] rounded-[7px] overflow-hidden border border-[#bdc0c4] bg-white hover:border-[#242d3c] transition-all flex flex-col justify-between"
+              draggable={false}
+              className="group shrink-0 w-[270px] sm:w-[310px] rounded-[7px] overflow-hidden border border-[#bdc0c4] bg-white hover:border-[#242d3c] transition-all flex flex-col justify-between"
             >
               <div>
                 <div className="relative">
@@ -92,7 +94,7 @@ export function NewArrivalsSection({
               </div>
             </Link>
           ))}
-        </div>
+        </HorizontalScrollRail>
       )}
     </section>
   );
