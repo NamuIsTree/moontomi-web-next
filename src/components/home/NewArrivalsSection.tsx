@@ -58,23 +58,22 @@ export function NewArrivalsSection({
               className="group snap-start shrink-0 w-[270px] sm:w-[310px] rounded-[7px] overflow-hidden border border-[#bdc0c4] bg-white hover:border-[#242d3c] transition-all flex flex-col justify-between"
             >
               <div>
-                <div className="relative overflow-hidden bg-[#f3f3f3] border-b border-[#bdc0c4]/50 pt-[58%]">
-                  <div
-                    className="absolute inset-0 bg-center bg-cover bg-no-repeat transition-transform duration-500 ease-out group-hover:scale-105"
-                    style={{ backgroundImage: `url(${item.image})` }}
-                  />
+                <div className="relative bg-white">
+                  <div className="w-full pt-[60%] relative overflow-hidden bg-[#f3f3f3] [clip-path:polygon(100%_0,100%_80%,0%_98%,0_0%)]">
+                    <div
+                      className="absolute inset-0 bg-center bg-cover bg-no-repeat transition-transform duration-500 ease-out group-hover:scale-105"
+                      style={{ backgroundImage: `url(${item.image})` }}
+                    />
+                  </div>
                   <span className="absolute top-2.5 left-2.5 z-10 px-2.5 py-0.5 rounded-[7px] bg-[#242d3c]/90 text-[#f0f8ff] text-xs font-bold tracking-wide">
                     {item.type}
                   </span>
+                  <span className="absolute bottom-0 right-3 z-10 text-xs font-bold text-[#808080] tabular-nums">
+                    {item.created_at}
+                  </span>
                 </div>
 
-                <div className="px-4 pt-3 pb-3">
-                  <div className="flex items-center justify-between text-xs text-[#808080] mb-1.5 tabular-nums">
-                    <span className="font-mono font-bold text-[#242d3c]">
-                      No. {String(item.id).padStart(2, "0")}
-                    </span>
-                    <span>{item.created_at}</span>
-                  </div>
+                <div className="px-4 pt-2.5 pb-3">
                   <h3 className="font-myeongjo font-extrabold text-lg text-[#171717] group-hover:text-[#242d3c] leading-snug line-clamp-2 break-keep transition-colors">
                     &ldquo;{item.title}&rdquo;
                   </h3>
