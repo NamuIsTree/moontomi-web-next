@@ -88,18 +88,22 @@ export default function LectureDetailPage({
       </div>
 
       {/* Album Liner Notes Hero */}
-      <section className="text-center space-y-3">
+      <section className="text-center space-y-2.5">
+        <div className="flex justify-center">
+          <span className="px-3 py-1 rounded-[7px] bg-[#f3f3f3] text-xs sm:text-sm font-bold text-[#242d3c] tabular-nums">
+            제 {lecture.id} 회 음평회
+          </span>
+        </div>
+
         <h1 className="text-2xl sm:text-3xl font-bold italic text-[#171717] break-keep">
           {lecture.title}
         </h1>
+
         <h2 className="text-base sm:text-lg italic text-[#171717]/80">
-          {lecture.artist} ({lecture.release})
+          {lecture.artist} ({lecture.release.trim()})
         </h2>
 
-        <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs font-bold text-[#242d3c] tabular-nums">
-          <span className="px-2.5 py-1 rounded-[7px] bg-[#f3f3f3] text-[#242d3c]">
-            제 {lecture.id} 회 음평회
-          </span>
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-0.5 text-xs font-bold text-[#242d3c] tabular-nums">
           {lecture.date && (
             <span className="px-2.5 py-1 rounded-[7px] bg-[#f3f3f3] text-[#808080]">
               {lecture.date}
