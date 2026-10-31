@@ -13,11 +13,11 @@ export function ReviewListCard({ review }: ReviewListCardProps) {
       className="group block w-full border border-[#bdc0c4] hover:border-[#242d3c] rounded-[7px] overflow-hidden bg-white transition-all"
     >
       <div className="grid grid-cols-1 md:grid-cols-12">
-        {/* Slanted Editorial Cover Frame (Fixed Diagonal + Inner Image Zoom on Hover) */}
-        <div className="md:col-span-4 relative bg-white min-h-[200px] md:min-h-[215px]">
-          <div className="absolute inset-0 overflow-hidden bg-[#f3f3f3] [clip-path:polygon(100%_0,100%_82%,0%_98%,0_0%)] md:[clip-path:polygon(0_0,96%_0,88%_100%,0_100%)]">
+        {/* Slanted Editorial Cover Image (Right Diagonal Kept + Smooth Inner Zoom on Hover) */}
+        <div className="md:col-span-4 relative bg-white">
+          <div className="relative w-full h-[190px] md:h-full min-h-[210px] overflow-hidden bg-[#f3f3f3] [clip-path:polygon(100%_0,100%_82%,0%_98%,0_0%)] md:[clip-path:polygon(0_0,95%_0,88%_100%,0_100%)]">
             <div
-              className="w-full h-full bg-center bg-cover bg-no-repeat transition-transform duration-500 ease-out group-hover:scale-105"
+              className="absolute inset-0 bg-center bg-cover bg-no-repeat transition-transform duration-500 ease-out group-hover:scale-105"
               style={{ backgroundImage: `url(${review.image})` }}
             />
           </div>
