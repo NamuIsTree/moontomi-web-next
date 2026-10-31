@@ -16,11 +16,7 @@ interface LectureCommentCardProps {
   isLectureOpen: boolean; // true when lecture.rating !== null
 }
 
-const TRACK_MEDALS = [
-  { label: "1ST", color: "#ffb400" },
-  { label: "2ND", color: "#4a4f5a" },
-  { label: "3RD", color: "#6e3732" },
-];
+const TRACK_COLORS = ["#ffb400", "#4a4f5a", "#6e3732"];
 
 export function LectureCommentCard({
   comment,
@@ -90,24 +86,15 @@ export function LectureCommentCard({
           {/* Best Track Picks (Gold / Silver / Bronze - Vertical Stack) */}
           {comment.bests.length > 0 && (
             <div className="flex flex-col items-center justify-center gap-1 pt-1">
-              {comment.bests.slice(0, 3).map((track, idx) => {
-                const medal = TRACK_MEDALS[idx] ?? TRACK_MEDALS[0];
-                return (
-                  <span
-                    key={`${track}-${idx}`}
-                    className="inline-flex items-center gap-1.5 py-0.5 bg-white text-xs sm:text-sm font-semibold"
-                    style={{ color: medal.color }}
-                  >
-                    <span
-                      className="font-nohemi text-xs font-bold px-1.5 py-0.2 rounded-full text-white shrink-0"
-                      style={{ backgroundColor: medal.color }}
-                    >
-                      {medal.label}
-                    </span>
-                    <span className="break-keep">{track}</span>
-                  </span>
-                );
-              })}
+              {comment.bests.slice(0, 3).map((track, idx) => (
+                <span
+                  key={`${track}-${idx}`}
+                  className="py-0.5 bg-white text-sm sm:text-base font-semibold break-keep"
+                  style={{ color: TRACK_COLORS[idx] ?? TRACK_COLORS[0] }}
+                >
+                  {track}
+                </span>
+              ))}
             </div>
           )}
 
