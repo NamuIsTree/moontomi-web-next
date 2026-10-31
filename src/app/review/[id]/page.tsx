@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
-import { FilePenLine } from "lucide-react";
+import { ArrowLeft, Eye, FilePenLine } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { fetchReviewById } from "@/services/review.service";
 import type { ReviewDetail } from "@/types/domain";
@@ -33,48 +33,67 @@ export default function ReviewDetailPage({
 
   return (
     <PageContainer width="reading" className="space-y-8">
-      <header className="text-center space-y-2">
-        <div className="text-sm font-bold text-[#242d3c]">#{review.id}</div>
-        <div className="text-sm font-semibold text-[#808080]">
-          {review.created_at}
-        </div>
+      {/* Top Bar */}
+      <div className="flex items-center justify-between border-b border-[#bdc0c4]/60 pb-3">
+        <Link
+          href="/reviews"
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#242d3c] hover:text-[#ff8080] transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>칼럼 목록으로</span>
+        </Link>
 
-        <h1 className="font-myeongjo font-extrabold text-2xl sm:text-3xl italic text-[#171717] pt-1 break-keep">
+        <Link
+          href={`/review/${review.id}/edit`}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[7px] border border-[#bdc0c4] text-xs font-bold text-[#242d3c] hover:bg-[#f3f3f3] transition-colors"
+        >
+          <FilePenLine className="w-3.5 h-3.5 text-[#ff8080]" />
+          <span>원고 수정</span>
+        </Link>
+      </div>
+
+      {/* Editorial Article Header */}
+      <header className="text-center space-y-4 max-w-[700px] mx-auto">
+        <h1 className="font-myeongjo font-extrabold text-2xl sm:text-4xl text-[#171717] leading-snug break-keep">
           &ldquo;{review.title}&rdquo;
         </h1>
-        <h2 className="font-myeongjo text-base sm:text-lg italic text-[#171717]/80">
-          written by {review.writer}
-        </h2>
 
-        <div className="pt-2 flex items-center justify-center gap-2">
-          <span className="inline-flex items-center px-3 py-1 rounded-sm border border-[#242d3c]/40 text-xs font-bold text-[#171717]">
-            <span className="pr-2.5">{review.type}</span>
-            <span className="h-3 w-px bg-[#242d3c]/40" />
-            <span className="pl-2.5 text-[#808080]">
-              조회수 {review.views}회
-            </span>
+        {review.description && (
+          <p className="text-sm sm:text-base text-[#808080] leading-relaxed break-keep max-w-[58ch] mx-auto">
+            {review.description}
+          </p>
+        )}
+
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm">
+          <span className="px-2.5 py-1 rounded-[7px] bg-[#242d3c] text-[#f0f8ff] font-bold">
+            {review.type}
           </span>
-
-          <Link
-            href={`/review/${review.id}/edit`}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm border border-[#bdc0c4] text-xs font-semibold text-[#242d3c] hover:bg-[#f3f3f3] transition-colors"
-          >
-            <FilePenLine className="w-3.5 h-3.5" />
-            <span>수정</span>
-          </Link>
+          <span className="font-myeongjo font-extrabold text-[#242d3c]">
+            written by {review.writer}
+          </span>
+          <span className="text-[#bdc0c4]">|</span>
+          <span className="text-[#808080] tabular-nums">
+            {review.created_at}
+          </span>
+          <span className="text-[#bdc0c4]">|</span>
+          <span className="inline-flex items-center gap-1 text-[#808080] tabular-nums">
+            <Eye className="w-3.5 h-3.5 text-[#ff8080]" />
+            <span>{review.views}회</span>
+          </span>
         </div>
 
         <div className="pt-4 flex justify-center">
           <img
             src={review.image}
             alt={review.title}
-            className="w-[70%] md:w-[88%] max-w-[300px] h-auto object-cover shadow-xs"
+            className="w-[75%] sm:w-[85%] max-w-[340px] h-auto object-cover rounded-[7px] border border-[#bdc0c4]/70"
           />
         </div>
       </header>
 
+      {/* Long-form Editorial Prose */}
       <article
-        className="border-t border-[#bdc0c4]/50 pt-6 text-base leading-relaxed text-[#171717] break-keep space-y-4 [&_a]:text-[#ff8080] [&_img]:max-w-full [&_img]:h-auto [&_img]:mx-auto"
+        className="editorial-prose border-t border-[#bdc0c4]/60 pt-8 max-w-[68ch] mx-auto"
         dangerouslySetInnerHTML={{ __html: review.content }}
       />
     </PageContainer>

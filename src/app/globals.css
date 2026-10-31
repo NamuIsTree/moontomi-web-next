@@ -11,9 +11,115 @@
   --font-mono: var(--font-roboto-mono), monospace;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: var(--font-line-seed), sans-serif;
   color: #171717;
   background-color: #ffffff;
   overflow-x: hidden;
+  caret-color: #ff8080;
+}
+
+::selection {
+  background-color: rgba(255, 128, 128, 0.24);
+  color: #242d3c;
+}
+
+:focus-visible {
+  outline: 2px solid #ff8080;
+  outline-offset: 2px;
+}
+
+/* Custom Browser Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f3f3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bdc0c4;
+  border-radius: 7px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #242d3c;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Long-form Editorial Article Prose (Review Detail) */
+.editorial-prose {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: #171717;
+  word-break: keep-all;
+}
+
+.editorial-prose p {
+  margin-bottom: 1.35em;
+}
+
+.editorial-prose h1,
+.editorial-prose h2,
+.editorial-prose h3,
+.editorial-prose h4 {
+  font-family: var(--font-nanum-myeongjo), serif;
+  font-weight: 800;
+  color: #242d3c;
+  line-height: 1.35;
+  margin-top: 2em;
+  margin-bottom: 0.75em;
+}
+
+.editorial-prose a {
+  color: #242d3c;
+  text-decoration: underline;
+  text-decoration-color: #ff8080;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.editorial-prose a:hover {
+  color: #ff8080;
+}
+
+.editorial-prose img {
+  max-width: 100%;
+  height: auto;
+  margin: 1.75rem auto;
+  display: block;
+  border-radius: 7px;
+  border: 1px solid rgba(189, 192, 196, 0.5);
+}
+
+.editorial-prose iframe {
+  max-width: 100%;
+  margin: 1.75rem auto;
+  display: block;
+  border-radius: 7px;
+}
+
+.editorial-prose blockquote {
+  margin: 1.75rem 0;
+  padding: 1.25rem 1.5rem;
+  background-color: #f3f3f3;
+  border: 1px solid #bdc0c4;
+  border-radius: 7px;
+  font-family: var(--font-nanum-myeongjo), serif;
+  color: #242d3c;
+}
+
+.editorial-prose hr {
+  border: 0;
+  border-top: 1px solid rgba(189, 192, 196, 0.6);
+  margin: 2.25rem 0;
 }

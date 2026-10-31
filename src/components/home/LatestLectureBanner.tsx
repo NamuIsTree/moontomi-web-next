@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import type { LatestLectureSummary } from "@/types/domain";
 
 interface LatestLectureBannerProps {
@@ -8,13 +9,13 @@ interface LatestLectureBannerProps {
 export function LatestLectureBanner({ album }: LatestLectureBannerProps) {
   return (
     <section className="my-6">
-      <div className="relative overflow-hidden rounded-sm h-[220px] sm:h-[280px] md:h-[340px] flex items-center justify-center bg-[#242d3c]">
+      <div className="relative overflow-hidden rounded-[7px] h-[230px] sm:h-[290px] md:h-[340px] flex items-center justify-center bg-[#242d3c] border border-[#242d3c]">
         {/* Blurred Cover Backdrop */}
         <div
           className="absolute inset-0 bg-cover bg-center scale-110 blur-md brightness-75"
           style={{ backgroundImage: `url(${album.image})` }}
         />
-        <div className="absolute inset-0 bg-[#242d3c]/40" />
+        <div className="absolute inset-0 bg-[#242d3c]/45" />
 
         {/* Foreground Content */}
         <div className="relative z-10 w-full max-w-[900px] px-6 grid grid-cols-2 items-center gap-4 sm:gap-8">
@@ -22,7 +23,7 @@ export function LatestLectureBanner({ album }: LatestLectureBannerProps) {
             <img
               src={album.image}
               alt={album.title}
-              className="h-[130px] sm:h-[200px] md:h-[250px] w-auto aspect-square object-cover border-4 border-[#f0f8ff] shadow-lg"
+              className="h-[135px] sm:h-[205px] md:h-[250px] w-auto aspect-square object-cover border-4 border-[#f0f8ff] shadow-lg"
             />
           </div>
           <div className="text-center text-white space-y-2">
@@ -39,12 +40,13 @@ export function LatestLectureBanner({ album }: LatestLectureBannerProps) {
         </div>
       </div>
 
-      <div className="flex justify-center pt-4 pb-8">
+      <div className="flex justify-center pt-4 pb-6">
         <Link
           href={`/lecture/${album.id}`}
-          className="px-5 py-2 font-black text-[#242d3c] hover:bg-[#f3f3f3] rounded-sm transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[7px] border border-[#242d3c]/25 bg-white hover:bg-[#242d3c] text-[#242d3c] hover:text-[#f0f8ff] font-nohemi font-bold text-sm tracking-wider transition-colors"
         >
-          GO TO COMMENT &gt;&gt;
+          <span>GO TO COMMENT</span>
+          <ArrowRight className="w-4 h-4 text-[#ff8080]" />
         </Link>
       </div>
     </section>

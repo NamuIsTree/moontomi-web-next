@@ -13,11 +13,11 @@ import {
 import { cn } from "@/lib/utils";
 
 export const NAV_ITEMS = [
-  { title: "HOME", icon: Home, path: "/" },
-  { title: "칼럼", icon: Newspaper, path: "/reviews" },
-  { title: "음평회", icon: Disc3, path: "/lectures" },
-  { title: "둘러보기", icon: History, path: "/lookup" },
-  { title: "아카이브", icon: CirclePlay, path: "/archive" },
+  { title: "HOME", subtitle: "홈", icon: Home, path: "/" },
+  { title: "칼럼", subtitle: "매거진 · 결산", icon: Newspaper, path: "/reviews" },
+  { title: "음평회", subtitle: "정기 감상 기록", icon: Disc3, path: "/lectures" },
+  { title: "둘러보기", subtitle: "멤버별 평점 탐색", icon: History, path: "/lookup" },
+  { title: "아카이브", subtitle: "큐레이션 스테이션", icon: CirclePlay, path: "/archive" },
 ];
 
 export function AppHeader() {
@@ -39,16 +39,18 @@ export function AppHeader() {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 z-50 w-full bg-[#242d3c] text-[aliceblue] text-center font-stamp transition-all duration-300 md:pl-[85px]",
+          "fixed top-0 left-0 z-50 w-full bg-[#242d3c] text-[#f0f8ff] text-center font-stamp border-b border-white/10 transition-all duration-300 md:pl-[75px] flex items-center justify-center",
           shrink
-            ? "h-[50px] py-[5px] text-[30px] md:pl-[80px]"
-            : "h-[90px] py-[10px] text-[40px]"
+            ? "h-[52px] text-[30px]"
+            : "h-[90px] text-[40px]"
         )}
       >
-        <Link href="/" className="inline-block leading-tight">
-          MOONTOMI
+        <Link href="/" className="inline-flex flex-col items-center leading-none group">
+          <span className="tracking-wide group-hover:text-[#ff8080] transition-colors">
+            MOONTOMI
+          </span>
           {!shrink && (
-            <span className="block -mt-2 text-[15px] font-semibold font-sans">
+            <span className="mt-1 text-xs sm:text-[15px] font-semibold font-sans text-[#f0f8ff]/85 tracking-tight">
               문형규의 토요일, 음악에 미치는 날
             </span>
           )}
@@ -60,62 +62,98 @@ export function AppHeader() {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         className={cn(
-          "hidden md:flex flex-col fixed top-0 left-0 z-50 h-screen bg-white border-r border-gray-200 shadow-sm transition-all duration-300 overflow-hidden",
-          hovered ? "w-[240px]" : "w-[75px]"
+          "hidden md:flex flex-col justify-between fixed top-0 left-0 z-50 h-screen bg-white border-r border-[#bdc0c4]/70 transition-all duration-300 overflow-hidden",
+          hovered ? "w-[240px] shadow-lg" : "w-[75px]"
         )}
       >
-        <div
-          className={cn(
-            "flex items-center gap-3 px-4 border-b border-gray-200 transition-all duration-300",
-            shrink ? "h-[50px]" : "h-[90px]"
-          )}
-        >
-          <img
-            src="/icons/icon-192x192.png"
-            alt="MOONTOMI"
-            className="w-10 h-10 rounded-full shrink-0"
-          />
-          {hovered && (
-            <div className="overflow-hidden whitespace-nowrap">
+        <div>
+          <Link
+            href="/"
+            className={cn(
+              "flex items-center gap-3 px-4 border-b border-[#bdc0c4]/60 transition-all duration-300",
+              shrink ? "h-[52px]" : "h-[90px]"
+            )}
+          >
+            <img
+              src="/icons/icon-192x192.png"
+              alt="MOONTOMI"
+              className="w-10 h-10 rounded-full shrink-0 border border-[#bdc0c4]/50"
+            />
+            <div
+              className={cn(
+                "overflow-hidden whitespace-nowrap transition-opacity duration-200",
+                hovered ? "opacity-100" : "opacity-0"
+              )}
+            >
               <div className="font-stamp text-lg leading-none text-[#242d3c]">
                 HELLO! MOONTOMI
               </div>
-              <div className="text-xs text-gray-500 font-sans">NAVIGATION</div>
+              <div className="text-xs font-nohemi tracking-wider text-[#808080] mt-0.5">
+                SATURDAY LISTENING
+              </div>
             </div>
-          )}
-        </div>
+          </Link>
 
-        <nav className="flex flex-col py-2">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              item.path === "/"
-                ? pathname === "/"
-                : pathname.startsWith(item.path);
-            return (
-              <Link
-                key={item.path}
-                href={item.path}
-                className={cn(
-                  "flex items-center gap-4 px-6 py-3.5 text-sm font-sans transition-colors hover:bg-gray-100",
-                  isActive
-                    ? "text-[#ff8080] font-bold bg-gray-50"
-                    : "text-[#242d3c]"
-                )}
-              >
-                <Icon className="w-6 h-6 shrink-0" />
-                <span
+          <nav className="flex flex-col py-3 px-2 gap-1">
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon;
+              const isActive =
+                item.path === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(item.path) ||
+                    (item.path === "/reviews" && pathname.startsWith("/review")) ||
+                    (item.path === "/lectures" &&
+                      (pathname.startsWith("/lecture") ||
+                        pathname.startsWith("/comment")));
+
+              return (
+                <Link
+                  key={item.path}
+                  href={item.path}
                   className={cn(
-                    "whitespace-nowrap transition-opacity duration-200",
-                    hovered ? "opacity-100" : "opacity-0"
+                    "flex items-center gap-4 px-3.5 py-3 rounded-[7px] text-sm font-sans transition-colors",
+                    isActive
+                      ? "bg-[#242d3c] text-[#f0f8ff] font-bold"
+                      : "text-[#242d3c] hover:bg-[#f3f3f3]"
                   )}
                 >
-                  {item.title}
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
+                  <Icon
+                    className={cn(
+                      "w-5 h-5 shrink-0 transition-colors",
+                      isActive ? "text-[#ff8080]" : "text-[#242d3c]"
+                    )}
+                  />
+                  <div
+                    className={cn(
+                      "overflow-hidden whitespace-nowrap transition-opacity duration-200 leading-tight",
+                      hovered ? "opacity-100" : "opacity-0"
+                    )}
+                  >
+                    <div>{item.title}</div>
+                    <div
+                      className={cn(
+                        "text-xs font-normal mt-0.5",
+                        isActive ? "text-[#f0f8ff]/75" : "text-[#808080]"
+                      )}
+                    >
+                      {item.subtitle}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        <div
+          className={cn(
+            "px-5 py-4 border-t border-[#f3f3f3] text-xs text-[#808080] whitespace-nowrap transition-opacity duration-200",
+            hovered ? "opacity-100" : "opacity-0"
+          )}
+        >
+          <div className="font-bold text-[#242d3c]">대중 음악의 이해</div>
+          <div className="mt-0.5">Since Saturday Listening Club</div>
+        </div>
       </aside>
     </>
   );

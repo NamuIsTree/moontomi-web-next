@@ -95,24 +95,44 @@ export default function LecturesPage() {
 
   return (
     <PageContainer width="reading">
+      <header className="pb-5 mb-5 border-b-2 border-[#242d3c]">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#242d3c] tracking-tight">
+          정기 음평회
+        </h1>
+        <p className="text-sm text-[#808080] mt-1">
+          매주 토요일 함께 감상하고 평점과 베스트 트랙을 기록한 음반 카탈로그
+        </p>
+      </header>
+
       <SortToggleGroup
         options={LECTURE_SORT_OPTIONS}
         selectedId={selectedSort}
         onChange={handleSortChange}
       />
 
-      <div className="divide-y divide-[#bdc0c4]/40">
+      {/* Catalog Column Header */}
+      <div className="hidden sm:flex items-center justify-between px-4 py-2 text-xs font-bold text-[#808080] border-b border-[#242d3c]/20">
+        <div className="w-12 text-center">NO.</div>
+        <div className="flex-1 pl-4">ALBUM &amp; ARTIST</div>
+        <div className="w-24 text-right">SCORE</div>
+      </div>
+
+      <div className="divide-y divide-[#bdc0c4]/50">
         {lectures.map((lecture, idx) => (
           <LectureRowItem
             key={`${lecture.id}-${idx}`}
             lecture={lecture}
-            displayOrder={selectedSort === "id-desc" ? lecture.id : idx + 1}
+            displayOrder={
+              selectedSort === "id-desc" || selectedSort === "id-asc"
+                ? lecture.id
+                : idx + 1
+            }
           />
         ))}
       </div>
 
       {!loading && lectures.length === 0 && complete && (
-        <div className="py-16 text-center text-sm text-[#808080]">
+        <div className="py-16 text-center text-sm text-[#808080] border border-[#bdc0c4]/50 rounded-[7px]">
           등록된 음평회가 없습니다.
         </div>
       )}

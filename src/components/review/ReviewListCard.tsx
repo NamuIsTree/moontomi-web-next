@@ -10,46 +10,54 @@ export function ReviewListCard({ review }: ReviewListCardProps) {
   return (
     <Link
       href={`/review/${review.id}`}
-      className="group block w-full border-r border-b border-[#bdc0c4] rounded-r-[7px] rounded-bl-[7px] overflow-hidden bg-white hover:shadow-xs transition-all"
+      className="group block w-full border border-[#bdc0c4] hover:border-[#242d3c] rounded-[7px] overflow-hidden bg-white transition-all"
     >
       <div className="grid grid-cols-1 md:grid-cols-12">
-        {/* Slanted Image */}
-        <div className="md:col-span-4 relative">
+        {/* Slanted Editorial Cover Image */}
+        <div className="md:col-span-4 relative bg-[#f3f3f3]">
           <div
-            className="w-full h-[180px] md:h-[230px] bg-center bg-cover bg-no-repeat transition-all duration-300 [clip-path:polygon(100%_0,100%_80%,0%_98%,0_0%)] md:[clip-path:polygon(0_0,95%_0,90%_100%,0_100%)] md:group-hover:[clip-path:polygon(0_0,85%_0,75%_100%,0_100%)]"
+            className="w-full h-[190px] md:h-full min-h-[210px] bg-center bg-cover bg-no-repeat transition-all duration-300 [clip-path:polygon(100%_0,100%_82%,0%_98%,0_0%)] md:[clip-path:polygon(0_0,96%_0,90%_100%,0_100%)] md:group-hover:[clip-path:polygon(0_0,88%_0,78%_100%,0_100%)]"
             style={{ backgroundImage: `url(${review.image})` }}
           />
+          <span className="
+            absolute top-3 left-3 px-2.5 py-0.5 rounded-[7px] bg-[#242d3c]/90 text-[#f0f8ff] text-xs font-bold tracking-wide
+          ">
+            {review.type}
+          </span>
         </div>
 
-        {/* Content */}
-        <div className="md:col-span-8 p-4 flex flex-col justify-between">
+        {/* Article Summary Content */}
+        <div className="md:col-span-8 p-5 flex flex-col justify-between">
           <div>
-            <div className="flex justify-end text-xs text-[#808080] mb-1">
-              {review.created_at}
+            <div className="flex items-center justify-between text-xs text-[#808080] mb-2 tabular-nums">
+              <span className="font-mono font-bold text-[#242d3c]">
+                No. {String(review.id).padStart(2, "0")}
+              </span>
+              <span>{review.created_at}</span>
             </div>
 
-            <h2 className="font-myeongjo font-extrabold text-xl md:text-2xl text-[#171717] leading-snug break-keep">
+            <h2 className="font-myeongjo font-extrabold text-xl md:text-2xl text-[#171717] group-hover:text-[#242d3c] leading-snug break-keep transition-colors">
               &ldquo;{review.title}&rdquo;
             </h2>
 
-            <hr className="border-[#f3f3f3] my-2.5" />
+            <hr className="border-[#f3f3f3] my-3" />
 
-            <p className="text-sm md:text-base text-[#171717]/85 line-clamp-3 min-h-[60px] md:min-h-[90px] break-keep">
+            <p className="text-sm md:text-base text-[#171717]/80 leading-relaxed line-clamp-3 min-h-[60px] md:min-h-[76px] break-keep">
               {review.description}
             </p>
           </div>
 
-          <div className="flex items-center justify-between pt-3 text-sm">
-            <div className="inline-flex items-center gap-1.5 text-[#808080]">
-              <Eye className="w-4 h-4" />
+          <div className="flex items-center justify-between pt-4 mt-2 border-t border-[#f3f3f3] text-xs sm:text-sm">
+            <div className="inline-flex items-center gap-1.5 text-[#808080] tabular-nums">
+              <Eye className="w-4 h-4 text-[#ff8080]" />
               <span>조회수</span>
-              <span className="text-[#171717] font-semibold">
+              <span className="text-[#171717] font-bold">
                 {review.views}
               </span>
             </div>
 
-            <div className="text-[#171717] font-semibold">
-              by {review.writer}
+            <div className="font-myeongjo font-extrabold text-[#242d3c]">
+              written by {review.writer}
             </div>
           </div>
         </div>

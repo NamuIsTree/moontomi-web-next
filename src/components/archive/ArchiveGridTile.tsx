@@ -20,8 +20,10 @@ export function ArchiveGridTile({
       type="button"
       onClick={() => onSelect(archive)}
       className={cn(
-        "group relative aspect-square w-full overflow-hidden text-left flex flex-col justify-between p-2.5 cursor-pointer transition-all",
-        isSelected && "ring-2 ring-[#ff8080]"
+        "group relative aspect-square w-full rounded-[7px] overflow-hidden text-left flex flex-col justify-between p-3 cursor-pointer transition-all bg-[#242d3c]",
+        isSelected
+          ? "ring-2 ring-[#ff8080] ring-offset-2 ring-offset-white"
+          : "hover:ring-1 hover:ring-[#242d3c]"
       )}
     >
       {/* Background Cover with Zoom on Hover */}
@@ -29,19 +31,22 @@ export function ArchiveGridTile({
         className="absolute inset-0 bg-center bg-cover bg-no-repeat transition-transform duration-500 ease-out group-hover:scale-110"
         style={{ backgroundImage: `url(${archive.item.image})` }}
       />
-      <div className="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-colors" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/40 group-hover:from-black/75 transition-colors" />
 
-      {/* Top Type Badge */}
-      <div className="relative z-10">
+      {/* Top Row: Type Badge & Archive Number */}
+      <div className="relative z-10 flex items-center justify-between w-full">
         <span
           className={cn(
-            "inline-block px-2 py-0.5 rounded-full border-2 text-xs font-nohemi font-bold uppercase bg-black/35",
+            "inline-block px-2 py-0.5 rounded-full border-2 text-xs font-nohemi font-bold uppercase bg-black/45",
             archive.item.type === "album"
               ? "border-green-500 text-green-400"
               : "border-orange-400 text-orange-300"
           )}
         >
           {archive.item.type.toUpperCase()}
+        </span>
+        <span className="font-mono text-xs font-bold text-[#f0f8ff]/80 tabular-nums">
+          #{archive.id}
         </span>
       </div>
 
@@ -56,7 +61,7 @@ export function ArchiveGridTile({
         <div className="pt-0.5">
           <StarRating
             value={archive.rating}
-            size={18}
+            size={16}
             activeColor="#ffb400"
             inactiveColor="rgba(255,255,255,0.3)"
           />

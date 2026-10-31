@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { SeasonChip, GenreChipList } from "@/components/ui/GenreChipList";
+import { StarRating } from "@/components/ui/StarRating";
 import {
   createComment,
   updateComment,
@@ -23,6 +25,12 @@ interface CommentEditorFormProps {
 const PASSWORD_PATTERN =
   /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
 
+const BEST_TRACK_META = [
+  { label: "베스트 트랙 1위 (GOLD)", color: "#ffb400" },
+  { label: "베스트 트랙 2위 (SILVER)", color: "#4a4f5a" },
+  { label: "베스트 트랙 3위 (BRONZE)", color: "#6e3732" },
+];
+
 function getRatingSliderColor(rating: number): string {
   if (rating < 30) return "#3f51b5";
   if (rating < 50) return "#009688";
@@ -36,7 +44,7 @@ export function CommentEditorForm({
   lecture,
   commentId,
   initialWriter = "",
-  initialRating = 0,
+  initialRating = 70,
   initialBests = ["", "", ""],
   initialComment = "",
 }: CommentEditorFormProps) {
@@ -116,10 +124,19 @@ export function CommentEditorForm({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
+      <div className="border-b border-[#bdc0c4]/60 pb-3">
+        <Link
+          href={`/lecture/${lecture.id}`}
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#242d3c] hover:text-[#ff8080] transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>음평회 상세로 돌아가기</span>
+        </Link>
+      </div>
+
       {/* Album Header Info */}
       <section className="text-center space-y-2">
-        <div className="text-sm font-bold text-[#242d3c]">{lecture.id} 회</div>
         <h1 className="text-2xl sm:text-3xl font-bold italic text-[#171717]">
           {lecture.title}
         </h1>
@@ -127,7 +144,10 @@ export function CommentEditorForm({
           {lecture.artist} ({lecture.release})
         </h2>
 
-        <div className="pt-2">
+        <div className="flex items-center justify-center gap-2 pt-1">
+          <span className="px-2.5 py-1 rounded-[7px] bg-[#f3f3f3] text-xs font-bold text-[#242d3c]">
+            제 {lecture.id} 회 음평회
+          </span>
           <SeasonChip name={lecture.season.name} />
         </div>
 
@@ -135,29 +155,31 @@ export function CommentEditorForm({
           <GenreChipList genres={lecture.genres} />
         </div>
 
-        <div className="pt-4 flex justify-center">
+        <div className="pt-3 flex justify-center">
           <img
             src={lecture.image}
             alt={lecture.title}
-            className="w-[200px] h-[200px] object-cover shadow-xs"
+            className="w-[180px] h-[180px] object-cover rounded-[7px] border border-[#bdc0c4]"
           />
         </div>
 
-        <p className="pt-3 text-sm font-semibold text-[#808080]">
-          {mode === "create" ? "평가를 작성합니다" : "평가를 수정합니다"}
+        <p className="pt-2 text-xs font-bold text-[#808080]">
+          {mode === "create"
+            ? "이 음반에 대한 평점과 한줄평을 남깁니다"
+            : "작성한 평점과 한줄평을 수정합니다"}
         </p>
       </section>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {errorMessage && (
-          <div className="p-3 rounded-sm bg-[#ff8080]/15 border border-[#ff8080] text-sm text-[#171717] text-center">
+          <div className="p-3.5 rounded-[7px] bg-[#ff8080]/15 border border-[#ff8080] text-sm font-semibold text-[#171717] text-center">
             {errorMessage}
           </div>
         )}
 
         <div>
-          <label className="block text-xs font-bold text-[#242d3c] mb-1">
+          <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
             닉네임
           </label>
           <input
@@ -166,14 +188,21 @@ export function CommentEditorForm({
             readOnly={mode === "edit" || loading}
             onChange={(e) => setWriter(e.target.value)}
             placeholder="닉네임 입력"
-            className="w-full px-3.5 py-2.5 rounded-sm border border-[#bdc0c4] bg-white text-sm read-only:bg-[#f3f3f3] focus:outline-none focus:border-[#242d3c]"
+            className="w-full px-3.5 py-2.5 rounded-[7px] border border-[#bdc0c4] bg-white text-sm read-only:bg-[#f3f3f3] focus:outline-none focus:border-[#242d3c]"
           />
         </div>
 
         {/* Rating Slider */}
-        <div className="py-2 text-center space-y-2">
-          <div className="text-base font-bold text-[#242d3c]">
-            평점 : {(rating / 10).toFixed(1)}
+        <div className="p-4 rounded-[20px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60 text-center space-y-2 tabular-nums">
+          <div className="font-lobster text-4xl text-[#242d3c]">
+            {(rating / 10).toFixed(1)}
+          </div>
+          <div className="flex justify-center">
+            <StarRating
+              value={rating / 20}
+              size={22}
+              activeColor="#ff8080"
+            />
           </div>
           <input
             type="range"
@@ -183,25 +212,28 @@ export function CommentEditorForm({
             value={rating}
             onChange={(e) => setRating(Number(e.target.value))}
             style={{ accentColor: getRatingSliderColor(rating) }}
-            className="w-full cursor-pointer"
+            className="w-full cursor-pointer mt-2"
           />
         </div>
 
         {/* Best Tracks 1 ~ 3 */}
         {([0, 1, 2] as const).map((idx) => (
           <div key={idx}>
-            <label className="block text-xs font-bold text-[#242d3c] mb-1">
-              베스트 {idx + 1}
+            <label
+              className="block text-xs font-bold mb-1.5"
+              style={{ color: BEST_TRACK_META[idx].color }}
+            >
+              {BEST_TRACK_META[idx].label}
             </label>
             <select
               value={bests[idx]}
               onChange={(e) => handleBestChange(idx, e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-sm border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
+              className="w-full px-3.5 py-2.5 rounded-[7px] border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
             >
-              <option value="">수록곡 선택</option>
+              <option value="">수록곡 선택 (선택 사항)</option>
               {lecture.tracks.map((track, tIdx) => (
                 <option key={`${track}-${tIdx}`} value={track}>
-                  {track}
+                  {String(tIdx + 1).padStart(2, "0")}. {track}
                 </option>
               ))}
             </select>
@@ -210,21 +242,21 @@ export function CommentEditorForm({
 
         {/* Comment Textarea */}
         <div>
-          <label className="block text-xs font-bold text-[#242d3c] mb-1">
+          <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
             한줄평
           </label>
           <textarea
-            rows={3}
+            rows={4}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="앨범에 대한 한줄평을 남겨주세요"
-            className="w-full px-3.5 py-2.5 rounded-sm border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c] resize-y"
+            placeholder="앨범에 대한 감상과 한줄평을 남겨주세요"
+            className="w-full px-3.5 py-2.5 rounded-[7px] border border-[#bdc0c4] bg-white text-sm leading-relaxed focus:outline-none focus:border-[#242d3c] resize-y"
           />
         </div>
 
         {/* Password Field */}
         <div>
-          <label className="block text-xs font-bold text-[#242d3c] mb-1">
+          <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
             비밀번호
           </label>
           <div className="relative">
@@ -233,14 +265,14 @@ export function CommentEditorForm({
               value={password}
               readOnly={loading}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter Password"
-              className="w-full pl-3.5 pr-10 py-2.5 rounded-sm border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
+              placeholder="평가 수정 시 사용할 비밀번호"
+              className="w-full pl-3.5 pr-10 py-2.5 rounded-[7px] border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
             />
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
               aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
-              className="absolute inset-y-0 right-0 px-3 flex items-center text-[#808080] hover:text-[#242d3c]"
+              className="absolute inset-y-0 right-0 px-3 flex items-center text-[#808080] hover:text-[#242d3c] cursor-pointer"
             >
               {showPassword ? (
                 <Eye className="w-4 h-4" />
@@ -251,14 +283,14 @@ export function CommentEditorForm({
           </div>
         </div>
 
-        <div className="pt-4">
+        <div className="pt-3">
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-sm bg-[#ff8080] hover:opacity-90 disabled:opacity-50 text-white font-bold text-sm transition-opacity flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-3.5 rounded-[7px] bg-[#ff8080] hover:opacity-90 disabled:opacity-50 text-white font-bold text-sm transition-opacity flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-            <span>{mode === "create" ? "평가 제출" : "평가 수정"}</span>
+            <span>{mode === "create" ? "평가 제출하기" : "평가 수정하기"}</span>
           </button>
         </div>
       </form>

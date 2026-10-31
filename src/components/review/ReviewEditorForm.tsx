@@ -8,6 +8,7 @@ import {
   createReview,
   updateReview,
 } from "@/services/review.service";
+import { cn } from "@/lib/utils";
 
 interface ReviewEditorFormProps {
   mode: "create" | "edit";
@@ -120,13 +121,18 @@ export function ReviewEditorForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <h1 className="text-2xl font-bold text-center text-[#242d3c] py-2">
-        {mode === "create" ? "투고하기" : "원고 수정하기"}
-      </h1>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <header className="pb-4 border-b-2 border-[#242d3c]">
+        <h1 className="font-myeongjo font-extrabold text-2xl sm:text-3xl text-[#242d3c]">
+          {mode === "create" ? "원고 투고하기" : "원고 수정하기"}
+        </h1>
+        <p className="text-sm text-[#808080] mt-1">
+          칼럼, 연말 결산, 혹은 음악에 관한 자유로운 글을 작성합니다.
+        </p>
+      </header>
 
       {errorMessage && (
-        <div className="p-3 rounded-sm bg-[#ff8080]/15 border border-[#ff8080] text-sm text-[#171717] text-center">
+        <div className="p-3.5 rounded-[7px] bg-[#ff8080]/15 border border-[#ff8080] text-sm font-semibold text-[#171717] text-center">
           {errorMessage}
         </div>
       )}
@@ -134,19 +140,19 @@ export function ReviewEditorForm({
       {/* Thumbnail File Input */}
       <div className="space-y-3">
         <label className="block text-xs font-bold text-[#242d3c]">
-          썸네일 이미지
+          대표 썸네일 이미지
         </label>
         <input
           type="file"
           accept="image/*"
           onChange={handleFileChange}
-          className="w-full px-3 py-2 rounded-sm border border-[#bdc0c4] text-sm file:mr-3 file:px-3 file:py-1 file:rounded-sm file:border-0 file:bg-[#242d3c] file:text-white file:text-xs file:font-bold cursor-pointer"
+          className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] text-sm file:mr-3 file:px-3.5 file:py-1.5 file:rounded-[7px] file:border-0 file:bg-[#242d3c] file:text-[#f0f8ff] file:text-xs file:font-bold cursor-pointer"
         />
-        <div className="flex justify-center pt-1">
+        <div className="flex justify-center pt-2">
           <img
             src={previewUrl}
             alt="thumbnail-preview"
-            className="w-[88%] max-w-[300px] h-auto object-cover border border-[#bdc0c4]"
+            className="w-[80%] max-w-[280px] h-auto object-cover rounded-[7px] border border-[#bdc0c4]"
           />
         </div>
       </div>
@@ -154,68 +160,74 @@ export function ReviewEditorForm({
       {/* Writer & Type */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-bold text-[#242d3c] mb-1">
-            작성자
+          <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
+            필진 (작성자)
           </label>
           <input
             type="text"
             value={writer}
             onChange={(e) => setWriter(e.target.value)}
             placeholder="작성자 닉네임"
-            className="w-full px-3.5 py-2.5 rounded-sm border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
+            className="w-full px-3.5 py-2.5 rounded-[7px] border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-[#242d3c] mb-1">
-            타입
+          <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
+            분류
           </label>
-          <select
-            value={reviewType}
-            onChange={(e) => setReviewType(e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-sm border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
-          >
+          <div className="grid grid-cols-3 gap-2">
             {REVIEW_TYPES.map((t) => (
-              <option key={t} value={t}>
+              <button
+                key={t}
+                type="button"
+                onClick={() => setReviewType(t)}
+                className={cn(
+                  "py-2.5 rounded-[7px] border text-xs font-bold transition-colors cursor-pointer",
+                  reviewType === t
+                    ? "bg-[#242d3c] text-[#f0f8ff] border-[#242d3c]"
+                    : "bg-white text-[#242d3c] border-[#bdc0c4] hover:bg-[#f3f3f3]"
+                )}
+              >
                 {t}
-              </option>
+              </button>
             ))}
-          </select>
+          </div>
         </div>
       </div>
 
       {/* Title */}
       <div>
-        <label className="block text-xs font-bold text-[#242d3c] mb-1">
+        <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
           제목
         </label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="칼럼 제목"
-          className="w-full px-3.5 py-2.5 rounded-sm border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
+          placeholder="칼럼 제목을 입력하세요"
+          className="w-full px-3.5 py-2.5 rounded-[7px] border border-[#bdc0c4] bg-white text-sm font-myeongjo font-bold focus:outline-none focus:border-[#242d3c]"
         />
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-xs font-bold text-[#242d3c] mb-1">
-          설명
+        <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
+          리드문 (요약 설명)
         </label>
         <textarea
           rows={2}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="칼럼 요약 설명"
-          className="w-full px-3.5 py-2.5 rounded-sm border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
+          placeholder="목록과 기사 상단에 표시될 한두 문장의 요약 설명"
+          className="w-full px-3.5 py-2.5 rounded-[7px] border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
         />
       </div>
 
       {/* Password */}
       <div>
-        <label className="block text-xs font-bold text-[#242d3c] mb-1">
-          비밀번호
+        <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
+          원고 비밀번호
         </label>
         <div className="relative">
           <input
@@ -223,14 +235,14 @@ export function ReviewEditorForm({
             value={password}
             readOnly={loading}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter Password"
-            className="w-full pl-3.5 pr-10 py-2.5 rounded-sm border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
+            placeholder="추후 원고 수정에 사용할 비밀번호"
+            className="w-full pl-3.5 pr-10 py-2.5 rounded-[7px] border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
           />
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
             aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
-            className="absolute inset-y-0 right-0 px-3 flex items-center text-[#808080] hover:text-[#242d3c]"
+            className="absolute inset-y-0 right-0 px-3 flex items-center text-[#808080] hover:text-[#242d3c] cursor-pointer"
           >
             {showPassword ? (
               <Eye className="w-4 h-4" />
@@ -243,30 +255,30 @@ export function ReviewEditorForm({
 
       {/* Content (HTML / Markdown / Text) */}
       <div>
-        <label className="block text-xs font-bold text-[#242d3c] mb-1">
+        <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
           본문 (HTML 지원)
         </label>
         <textarea
-          rows={14}
+          rows={15}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="칼럼 본문을 입력하세요..."
-          className="w-full px-3.5 py-3 rounded-sm border border-[#bdc0c4] bg-white text-sm leading-relaxed focus:outline-none focus:border-[#242d3c] font-sans"
+          className="w-full px-4 py-3 rounded-[7px] border border-[#bdc0c4] bg-white text-sm leading-relaxed focus:outline-none focus:border-[#242d3c] font-sans"
         />
       </div>
 
-      <div className="pt-4">
+      <div className="pt-2">
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 rounded-sm bg-[#ff8080] hover:opacity-90 disabled:opacity-50 text-white font-bold text-sm transition-opacity flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-3.5 rounded-[7px] bg-[#ff8080] hover:opacity-90 disabled:opacity-50 text-white font-bold text-sm transition-opacity flex items-center justify-center gap-2 cursor-pointer"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <Upload className="w-4 h-4" />
           )}
-          <span>UPLOAD</span>
+          <span>{mode === "create" ? "UPLOAD COLUMN" : "UPDATE COLUMN"}</span>
         </button>
       </div>
     </form>
