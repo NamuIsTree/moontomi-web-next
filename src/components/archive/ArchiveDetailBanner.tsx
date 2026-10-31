@@ -95,7 +95,7 @@ export function ArchiveDetailBanner({
           mobileExpanded ? "block" : "hidden lg:block"
         )}
       >
-        {/* Album Cover (Desktop lg+ only) */}
+        {/* Album Cover (Desktop lg+ only — mobile already has thumbnail in compact bar) */}
         <div className="hidden lg:flex justify-center">
           <img
             src={selected.item.image}
@@ -104,8 +104,8 @@ export function ArchiveDetailBanner({
           />
         </div>
 
-        {/* Type Badge + Share + Genres (Desktop lg+ only) */}
-        <div className="hidden lg:flex flex-wrap items-center justify-between gap-2">
+        {/* Type Badge + Share + Genres */}
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span
               className={cn(
