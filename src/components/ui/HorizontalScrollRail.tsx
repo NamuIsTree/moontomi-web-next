@@ -186,7 +186,7 @@ export function HorizontalScrollRail({
         onClickCapture={handleClickCapture}
         onDragStart={(e) => e.preventDefault()}
         className={cn(
-          "flex gap-4 overflow-x-auto pb-4 select-none",
+          "flex gap-4 overflow-x-auto pb-1 select-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
           isDragging ? "cursor-grabbing" : "cursor-grab",
           className
         )}

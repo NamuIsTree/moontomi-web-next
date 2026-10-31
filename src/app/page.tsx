@@ -75,7 +75,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setReversed((prev) => !prev)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[7px] border border-[#242d3c]/25 bg-white hover:bg-[#242d3c] text-[#242d3c] hover:text-[#f0f8ff] font-nohemi font-bold text-sm tracking-wider transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[7px] bg-white hover:bg-[#242d3c] text-[#242d3c] hover:text-[#f0f8ff] font-nohemi font-bold text-sm tracking-wider transition-colors cursor-pointer"
             >
               <ArrowLeftRight className="w-4 h-4 text-[#ff8080]" />
               <span>{reversed ? "HALL OF SHAME" : "HALL OF FAME"}</span>

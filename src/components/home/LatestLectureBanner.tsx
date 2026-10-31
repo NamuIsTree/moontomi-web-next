@@ -43,7 +43,7 @@ export function LatestLectureBanner({ album }: LatestLectureBannerProps) {
       <div className="flex justify-center pt-4 pb-6">
         <Link
           href={`/lecture/${album.id}`}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[7px] border border-[#242d3c]/25 bg-white hover:bg-[#242d3c] text-[#242d3c] hover:text-[#f0f8ff] font-nohemi font-bold text-sm tracking-wider transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[7px] bg-white hover:bg-[#242d3c] text-[#242d3c] hover:text-[#f0f8ff] font-nohemi font-bold text-sm tracking-wider transition-colors"
         >
           <span>GO TO COMMENT</span>
           <ArrowRight className="w-4 h-4 text-[#ff8080]" />
