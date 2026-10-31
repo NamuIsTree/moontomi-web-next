@@ -59,13 +59,15 @@ body {
 /* Long-form Editorial Article Prose (Review Detail) */
 .editorial-prose {
   font-size: 1rem;
-  line-height: 1.85;
+  line-height: 1.65;
   color: #171717;
   word-break: keep-all;
 }
 
 .editorial-prose p {
-  margin-bottom: 1.35em;
+  margin-top: 0;
+  margin-bottom: 0.2em;
+  min-height: 1.2em;
 }
 
 .editorial-prose h1,
