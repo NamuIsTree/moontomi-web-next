@@ -19,12 +19,7 @@ export function ArchiveGridTile({
     <button
       type="button"
       onClick={() => onSelect(archive)}
-      className={cn(
-        "group relative aspect-square w-full rounded-[7px] overflow-hidden text-left flex flex-col justify-between p-3 cursor-pointer transition-all bg-[#242d3c]",
-        isSelected
-          ? "ring-2 ring-[#ff8080] ring-offset-2 ring-offset-white"
-          : "hover:ring-1 hover:ring-[#242d3c]"
-      )}
+      className="group relative aspect-square w-full rounded-[7px] overflow-hidden text-left flex flex-col justify-between p-3 cursor-pointer transition-all bg-[#242d3c] focus:outline-none focus-visible:outline-none"
     >
       {/* Background Cover with Zoom on Hover */}
       <div
@@ -32,6 +27,16 @@ export function ArchiveGridTile({
         style={{ backgroundImage: `url(${archive.item.image})` }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/40 group-hover:from-black/75 transition-colors" />
+
+      {/* Inset Selection / Hover Frame (strictly inside tile bounds) */}
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-0 z-20 rounded-[7px] transition-all",
+          isSelected
+            ? "ring-3 ring-inset ring-[#ff8080]"
+            : "group-hover:ring-2 group-hover:ring-inset group-hover:ring-white/60 group-focus-visible:ring-2 group-focus-visible:ring-inset group-focus-visible:ring-[#ff8080]"
+        )}
+      />
 
       {/* Top Row: Type Badge & Archive Number */}
       <div className="relative z-10 flex items-center justify-between w-full">

@@ -11,6 +11,7 @@ import {
   fetchArchiveList,
 } from "@/services/archive.service";
 import type { ArchivePublicItem } from "@/types/domain";
+import { cn } from "@/lib/utils";
 
 interface ArchiveBrowserProps {
   initialArchiveId?: number;
@@ -34,6 +35,18 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
   const [page, setPage] = useState(1);
   const [complete, setComplete] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [headerShrunk, setHeaderShrunk] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      setHeaderShrunk(scrollTop > 50);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     if (initialArchiveId && Number.isFinite(initialArchiveId)) {
@@ -116,7 +129,12 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
   return (
     <PageContainer width="archive" className="space-y-6">
       {/* Sticky Top Detail Preview + Filter Bar */}
-      <div className="sticky top-[52px] z-30 bg-white/95 backdrop-blur-xs pt-2 pb-3 border-b border-[#bdc0c4]/50 space-y-3">
+      <div
+        className={cn(
+          "sticky z-30 bg-white pt-2 pb-3 border-b border-[#bdc0c4]/50 space-y-3 transition-[top] duration-300",
+          headerShrunk ? "top-[52px]" : "top-[90px]"
+        )}
+      >
         {selected && <ArchiveDetailBanner selected={selected} />}
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
