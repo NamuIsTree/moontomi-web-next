@@ -3,6 +3,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import type { Database } from "@/types/database";
 
+if (typeof globalThis.WebSocket === "undefined") {
+  (globalThis as Record<string, unknown>).WebSocket = class WebSocket {};
+}
+
 export async function createClient(): Promise<SupabaseClient<Database>> {
   const cookieStore = await cookies();
 
