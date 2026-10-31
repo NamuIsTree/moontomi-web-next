@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { LayoutGrid, LayoutList, Search } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { InfiniteScrollSentinel } from "@/components/ui/InfiniteScrollSentinel";
 import { ArchiveDetailBanner } from "@/components/archive/ArchiveDetailBanner";
 import { ArchiveGridTile } from "@/components/archive/ArchiveGridTile";
+import { ArchiveListItem } from "@/components/archive/ArchiveListItem";
 import {
   fetchArchiveById,
   fetchArchiveList,
@@ -28,6 +29,7 @@ const RATING_FILTER_OPTIONS = [
 export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
   const [archives, setArchives] = useState<ArchivePublicItem[]>([]);
   const [selected, setSelected] = useState<ArchivePublicItem | null>(null);
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [order, setOrder] = useState<"desc" | "asc">("desc");
   const [minRating, setMinRating] = useState<number>(0);
   const [typeFilter, setTypeFilter] = useState<"all" | "album" | "single">("all");
@@ -68,7 +70,7 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
       try {
         const items = await fetchArchiveList({
           page: targetPage,
-          limit: 15,
+          limit: 20,
           order: targetOrder,
           minRating: targetMinRating,
           maxRating: 1000,
@@ -80,7 +82,7 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
           setSelected((prev) => prev ?? items[0]);
         }
 
-        if (items.length < 15) {
+        if (items.length < 20) {
           setComplete(true);
         } else {
           setPage(targetPage + 1);
@@ -127,108 +129,193 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
   }, [archives, typeFilter, searchQuery]);
 
   return (
-    <PageContainer width="archive" className="space-y-6">
-      {/* Sticky Top Detail Preview + Filter Bar */}
-      <div
-        className={cn(
-          "sticky z-30 bg-white pt-2 pb-3 border-b border-[#bdc0c4]/50 space-y-3 transition-[top] duration-300",
-          headerShrunk ? "top-[52px]" : "top-[90px]"
+    <PageContainer width="wide" className="space-y-6">
+      {/* Page Header + View Mode Switcher */}
+      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-5 border-b-2 border-[#242d3c]">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#242d3c] tracking-tight">
+            아카이브 스테이션
+          </h1>
+          <p className="text-sm text-[#808080] mt-1">
+            큐레이션된 음반과 싱글을 목록으로 한눈에 열람하고 바로 감상하세요
+          </p>
+        </div>
+
+        {/* View Toggle (List vs Grid) */}
+        <div className="inline-flex rounded-[7px] overflow-hidden border border-[#bdc0c4] divide-x divide-[#bdc0c4] bg-white self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setViewMode("list")}
+            className={cn(
+              "inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer",
+              viewMode === "list"
+                ? "bg-[#242d3c] text-[#f0f8ff]"
+                : "bg-white text-[#242d3c] hover:bg-[#f3f3f3]"
+            )}
+          >
+            <LayoutList
+              className={cn(
+                "w-4 h-4",
+                viewMode === "list" ? "text-[#ff8080]" : "text-[#242d3c]"
+              )}
+            />
+            <span>리스트 뷰</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("grid")}
+            className={cn(
+              "inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer",
+              viewMode === "grid"
+                ? "bg-[#242d3c] text-[#f0f8ff]"
+                : "bg-white text-[#242d3c] hover:bg-[#f3f3f3]"
+            )}
+          >
+            <LayoutGrid
+              className={cn(
+                "w-4 h-4",
+                viewMode === "grid" ? "text-[#ff8080]" : "text-[#242d3c]"
+              )}
+            />
+            <span>그리드 뷰</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Filter & Search Toolbar */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 p-3.5 rounded-[7px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60">
+        <div>
+          <label className="block text-xs font-bold text-[#242d3c] mb-1">
+            정렬 기준
+          </label>
+          <select
+            value={order}
+            onChange={(e) =>
+              handleOrderChange(e.target.value as "desc" | "asc")
+            }
+            className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+          >
+            <option value="desc">최신 등록순</option>
+            <option value="asc">초기 등록순</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-[#242d3c] mb-1">
+            별점 필터
+          </label>
+          <select
+            value={minRating}
+            onChange={(e) => handleMinRatingChange(Number(e.target.value))}
+            className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+          >
+            {RATING_FILTER_OPTIONS.map((opt) => (
+              <option key={opt.min} value={opt.min}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-[#242d3c] mb-1">
+            유형
+          </label>
+          <select
+            value={typeFilter}
+            onChange={(e) =>
+              setTypeFilter(e.target.value as "all" | "album" | "single")
+            }
+            className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+          >
+            <option value="all">전체 (ALBUM &amp; SINGLE)</option>
+            <option value="album">ALBUM</option>
+            <option value="single">SINGLE</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-[#242d3c] mb-1">
+            빠른 검색
+          </label>
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-[#808080] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="곡 · 아티스트 · 추천인"
+              className="w-full pl-8 pr-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm text-[#171717] focus:outline-none focus:border-[#242d3c]"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Split-View Workspace: Left Catalog + Right Sticky Player Deck */}
+      <div className="flex flex-col lg:flex-row items-start gap-6">
+        {/* Mobile/Tablet Compact Sticky Player (Only below lg) */}
+        {selected && (
+          <div
+            className={cn(
+              "lg:hidden sticky z-30 w-full bg-white pb-2 transition-[top] duration-300",
+              headerShrunk ? "top-[52px]" : "top-[90px]"
+            )}
+          >
+            <ArchiveDetailBanner selected={selected} />
+          </div>
         )}
-      >
-        {selected && <ArchiveDetailBanner selected={selected} />}
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
-          <div>
-            <label className="block text-xs font-bold text-[#242d3c] mb-1">
-              정렬 기준
-            </label>
-            <select
-              value={order}
-              onChange={(e) =>
-                handleOrderChange(e.target.value as "desc" | "asc")
-              }
-              className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
-            >
-              <option value="desc">최신 등록순</option>
-              <option value="asc">초기 등록순</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-[#242d3c] mb-1">
-              별점 필터
-            </label>
-            <select
-              value={minRating}
-              onChange={(e) => handleMinRatingChange(Number(e.target.value))}
-              className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
-            >
-              {RATING_FILTER_OPTIONS.map((opt) => (
-                <option key={opt.min} value={opt.min}>
-                  {opt.label}
-                </option>
+        {/* Left Column: Archive Catalog (List or Grid) */}
+        <div className="w-full lg:flex-1 min-w-0">
+          {viewMode === "list" ? (
+            <div className="space-y-2.5">
+              {visibleArchives.map((archive) => (
+                <ArchiveListItem
+                  key={archive.id}
+                  archive={archive}
+                  isSelected={selected?.id === archive.id}
+                  onSelect={setSelected}
+                />
               ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-[#242d3c] mb-1">
-              유형
-            </label>
-            <select
-              value={typeFilter}
-              onChange={(e) =>
-                setTypeFilter(e.target.value as "all" | "album" | "single")
-              }
-              className="w-full px-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
-            >
-              <option value="all">전체 (ALBUM &amp; SINGLE)</option>
-              <option value="album">ALBUM</option>
-              <option value="single">SINGLE</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-[#242d3c] mb-1">
-              내 목록 검색
-            </label>
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-[#808080] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="곡 · 아티스트 검색"
-                className="w-full pl-8 pr-3 py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm text-[#171717] focus:outline-none focus:border-[#242d3c]"
-              />
             </div>
-          </div>
-        </div>
-      </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+              {visibleArchives.map((archive) => (
+                <ArchiveGridTile
+                  key={archive.id}
+                  archive={archive}
+                  isSelected={selected?.id === archive.id}
+                  onSelect={setSelected}
+                />
+              ))}
+            </div>
+          )}
 
-      {/* Archive Square Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2.5">
-        {visibleArchives.map((archive) => (
-          <ArchiveGridTile
-            key={archive.id}
-            archive={archive}
-            isSelected={selected?.id === archive.id}
-            onSelect={setSelected}
+          {!loading && visibleArchives.length === 0 && complete && (
+            <div className="py-16 text-center text-sm text-[#808080] border border-[#bdc0c4]/50 rounded-[7px]">
+              조건에 일치하는 아카이브가 없습니다.
+            </div>
+          )}
+
+          <InfiniteScrollSentinel
+            disabled={complete}
+            loading={loading}
+            onIntersect={() => loadMore(page, order, minRating, page === 1)}
           />
-        ))}
-      </div>
-
-      {!loading && visibleArchives.length === 0 && complete && (
-        <div className="py-16 text-center text-sm text-[#808080] border border-[#bdc0c4]/50 rounded-[7px]">
-          조건에 일치하는 아카이브가 없습니다.
         </div>
-      )}
 
-      <InfiniteScrollSentinel
-        disabled={complete}
-        loading={loading}
-        onIntersect={() => loadMore(page, order, minRating, page === 1)}
-      />
+        {/* Right Column (Desktop): Sticky Inspector & Player Deck */}
+        {selected && (
+          <aside
+            className={cn(
+              "hidden lg:block w-[350px] xl:w-[390px] shrink-0 sticky transition-[top] duration-300",
+              headerShrunk ? "top-[68px]" : "top-[106px]"
+            )}
+          >
+            <ArchiveDetailBanner selected={selected} />
+          </aside>
+        )}
+      </div>
     </PageContainer>
   );
 }

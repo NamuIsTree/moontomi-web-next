@@ -19,57 +19,77 @@ export function ArchiveGridTile({
     <button
       type="button"
       onClick={() => onSelect(archive)}
-      className="group relative aspect-square w-full rounded-[7px] overflow-hidden text-left flex flex-col justify-between p-3 cursor-pointer transition-all bg-[#242d3c] focus:outline-none focus-visible:outline-none"
+      className={cn(
+        "group w-full rounded-[7px] overflow-hidden text-left flex flex-col justify-between border transition-all cursor-pointer focus:outline-none",
+        isSelected
+          ? "bg-[#242d3c] text-[#f0f8ff] border-[#242d3c] ring-2 ring-inset ring-[#ff8080]"
+          : "bg-white text-[#171717] border-[#bdc0c4]/80 hover:border-[#242d3c]"
+      )}
     >
-      {/* Background Cover with Zoom on Hover */}
-      <div
-        className="absolute inset-0 bg-center bg-cover bg-no-repeat transition-transform duration-500 ease-out group-hover:scale-110"
-        style={{ backgroundImage: `url(${archive.item.image})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/40 group-hover:from-black/75 transition-colors" />
-
-      {/* Inset Selection / Hover Frame (strictly inside tile bounds) */}
-      <div
-        className={cn(
-          "pointer-events-none absolute inset-0 z-20 rounded-[7px] transition-all",
-          isSelected
-            ? "ring-3 ring-inset ring-[#ff8080]"
-            : "group-hover:ring-2 group-hover:ring-inset group-hover:ring-white/60 group-focus-visible:ring-2 group-focus-visible:ring-inset group-focus-visible:ring-[#ff8080]"
-        )}
-      />
-
-      {/* Top Row: Type Badge & Archive Number */}
-      <div className="relative z-10 flex items-center justify-between w-full">
-        <span
-          className={cn(
-            "inline-block px-2 py-0.5 rounded-full border-2 text-xs font-nohemi font-bold uppercase bg-black/45",
-            archive.item.type === "album"
-              ? "border-green-500 text-green-400"
-              : "border-orange-400 text-orange-300"
-          )}
-        >
-          {archive.item.type.toUpperCase()}
-        </span>
-        <span className="font-mono text-xs font-bold text-[#f0f8ff]/80 tabular-nums">
-          #{archive.id}
-        </span>
+      {/* Square Cover Artwork */}
+      <div className="relative aspect-square w-full overflow-hidden bg-[#242d3c]">
+        <img
+          src={archive.item.image}
+          alt={archive.item.title}
+          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+        />
+        <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
+          <span
+            className={cn(
+              "px-2 py-0.5 rounded-full border text-xs font-nohemi font-bold uppercase bg-black/65",
+              archive.item.type === "album"
+                ? "border-green-400 text-green-300"
+                : "border-orange-400 text-orange-300"
+            )}
+          >
+            {archive.item.type.toUpperCase()}
+          </span>
+          <span className="px-2 py-0.5 rounded-full bg-black/65 font-mono text-xs font-bold text-[#f0f8ff] tabular-nums">
+            #{archive.id}
+          </span>
+        </div>
       </div>
 
-      {/* Bottom Title, Artist & Stars */}
-      <div className="relative z-10 space-y-0.5">
-        <div className="text-sm font-bold text-white leading-tight line-clamp-2 break-keep">
-          {archive.item.title}
+      {/* Separated Readable Metadata Footer */}
+      <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
+        <div>
+          <div
+            className={cn(
+              "text-sm font-bold leading-snug line-clamp-1 break-keep",
+              isSelected ? "text-white" : "text-[#171717]"
+            )}
+          >
+            {archive.item.title}
+          </div>
+          <div
+            className={cn(
+              "text-xs truncate mt-0.5",
+              isSelected ? "text-[#f0f8ff]/80" : "text-[#808080]"
+            )}
+          >
+            {archive.item.artist} ({archive.item.release})
+          </div>
         </div>
-        <div className="text-xs text-[#f0f8ff]/85 truncate">
-          {archive.item.artist}
-        </div>
-        <div className="pt-0.5">
-          <StarRating
-            value={archive.rating}
-            size={16}
-            activeColor="#ffb400"
-            inactiveColor="rgba(255,255,255,0.3)"
-          />
+
+        <div className="pt-1 border-t border-[#bdc0c4]/30 flex items-center justify-between gap-2">
+          <span
+            className={cn(
+              "text-xs truncate",
+              isSelected ? "text-[#f0f8ff]/75" : "text-[#808080]"
+            )}
+          >
+            by {archive.writer}
+          </span>
+          <div className="flex items-center gap-1 shrink-0 tabular-nums">
+            <StarRating
+              value={archive.rating}
+              size={13}
+              activeColor="#ffb400"
+              inactiveColor={
+                isSelected ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.15)"
+              }
+            />
+          </div>
         </div>
       </div>
     </button>
