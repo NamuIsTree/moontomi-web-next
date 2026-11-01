@@ -1,19 +1,28 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/client";
-
-const ADMIN_COOKIE_NAME = "moontomi_admin_session";
-const ADMIN_COOKIE_VALUE = "authenticated_moontomi_admin";
+import {
+  ADMIN_COOKIE_NAME,
+  verifyAdminSessionToken,
+} from "@/lib/admin-session";
 
 export async function POST(request: Request) {
   try {
     const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
+    const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
 
-    if (sessionCookie !== ADMIN_COOKIE_VALUE) {
+    if (!(await verifyAdminSessionToken(token))) {
       return NextResponse.json(
         { ok: false, message: "관리자 로그인이 필요합니다." },
         { status: 401 }
+      );
+    }
+
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminPassword) {
+      return NextResponse.json(
+        { ok: false, message: "서버에 ADMIN_PASSWORD 환경변수가 설정되지 않았습니다." },
+        { status: 500 }
       );
     }
 
@@ -30,7 +39,7 @@ export async function POST(request: Request) {
 
     const supabase = createClient();
     const { data, error } = await supabase.rpc("admin_action", {
-      p_password: "88888888",
+      p_password: adminPassword,
       p_action: action,
       p_payload: payload,
     });

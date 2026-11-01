@@ -1,15 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import {
+  ADMIN_COOKIE_NAME,
+  verifyAdminSessionToken,
+} from "@/lib/admin-session";
 
-const ADMIN_COOKIE_NAME = "moontomi_admin_session";
-const ADMIN_COOKIE_VALUE = "authenticated_moontomi_admin";
-
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const host = (request.headers.get("host") || "").toLowerCase();
   const isAdminHost = host.startsWith("admin.");
-  const isAuthenticated =
-    request.cookies.get(ADMIN_COOKIE_NAME)?.value === ADMIN_COOKIE_VALUE;
+
+  // Only pay the HMAC cost on admin-related requests
+  const needsAuthCheck =
+    isAdminHost || pathname.startsWith("/admin") || pathname === "/login";
+  const isAuthenticated = needsAuthCheck
+    ? await verifyAdminSessionToken(request.cookies.get(ADMIN_COOKIE_NAME)?.value)
+    : false;
 
   // Allow API routes and static assets through untouched
   if (
