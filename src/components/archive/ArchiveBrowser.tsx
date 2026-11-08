@@ -372,11 +372,8 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
           </div>
 
           {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center gap-3 text-center border border-[#bdc0c4]/40 rounded-[7px] bg-white">
+            <div className="py-20 flex items-center justify-center border border-[#bdc0c4]/40 rounded-[7px] bg-white">
               <Loader2 className="w-8 h-8 animate-spin text-[#ff8080]" />
-              <p className="text-sm font-bold text-[#242d3c]">
-                아카이브 목록을 불러오는 중입니다...
-              </p>
             </div>
           ) : viewMode === "list" ? (
             <div className="space-y-2.5">

@@ -399,11 +399,8 @@ export default function LecturesPage() {
       </div>
 
       {loading ? (
-        <div className="py-20 flex flex-col items-center justify-center gap-3 text-center">
+        <div className="py-20 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#ff8080]" />
-          <p className="text-sm font-bold text-[#242d3c]">
-            음평회 목록을 불러오는 중입니다...
-          </p>
         </div>
       ) : (
         <div className="divide-y divide-[#bdc0c4]/50">

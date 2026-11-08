@@ -69,11 +69,8 @@ export default function HomePage() {
   if (initialLoading) {
     return (
       <PageContainer width="wide">
-        <div className="min-h-[65vh] flex flex-col items-center justify-center gap-3 text-center">
+        <div className="min-h-[65vh] flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#ff8080]" />
-          <p className="text-sm font-bold text-[#242d3c]">
-            홈 화면을 불러오는 중입니다...
-          </p>
         </div>
       </PageContainer>
     );
