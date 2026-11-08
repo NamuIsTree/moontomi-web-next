@@ -150,6 +150,10 @@ export function ArchiveDetailBanner({
                 </>
               )}
             </button>
+
+            <span className="lg:hidden text-[11px] font-nohemi text-[#f0f8ff]/70 tabular-nums">
+              {selected.date}
+            </span>
           </div>
 
           <div className="flex flex-wrap gap-1">

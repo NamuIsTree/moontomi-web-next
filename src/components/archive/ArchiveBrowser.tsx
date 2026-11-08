@@ -18,12 +18,18 @@ interface ArchiveBrowserProps {
   initialArchiveId?: number;
 }
 
-const RATING_FILTER_OPTIONS = [
-  { label: "전체 별점", min: 0 },
-  { label: "4.5점 이상", min: 45 },
-  { label: "4.0점 이상", min: 40 },
-  { label: "3.5점 이상", min: 35 },
-  { label: "3.0점 이상", min: 30 },
+const RATING_STEP_OPTIONS = [
+  { label: "0.0점", value: 0 },
+  { label: "0.5점", value: 5 },
+  { label: "1.0점", value: 10 },
+  { label: "1.5점", value: 15 },
+  { label: "2.0점", value: 20 },
+  { label: "2.5점", value: 25 },
+  { label: "3.0점", value: 30 },
+  { label: "3.5점", value: 35 },
+  { label: "4.0점", value: 40 },
+  { label: "4.5점", value: 45 },
+  { label: "5.0점", value: 50 },
 ] as const;
 
 const PAGE_STEP = 20;
@@ -34,6 +40,7 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [order, setOrder] = useState<"desc" | "asc">("desc");
   const [minRating, setMinRating] = useState<number>(0);
+  const [maxRating, setMaxRating] = useState<number>(50);
   const [typeFilter, setTypeFilter] = useState<"all" | "album" | "single">("all");
 
   // Search input vs committed search query (triggered on Enter or Search button)
@@ -105,8 +112,24 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
   };
 
   const handleMinRatingChange = (nextMin: number) => {
-    if (nextMin === minRating) return;
     setMinRating(nextMin);
+    if (nextMin > maxRating) {
+      setMaxRating(nextMin);
+    }
+    setVisibleCount(PAGE_STEP);
+  };
+
+  const handleMaxRatingChange = (nextMax: number) => {
+    setMaxRating(nextMax);
+    if (nextMax < minRating) {
+      setMinRating(nextMax);
+    }
+    setVisibleCount(PAGE_STEP);
+  };
+
+  const handleResetRatingRange = () => {
+    setMinRating(0);
+    setMaxRating(50);
     setVisibleCount(PAGE_STEP);
   };
 
@@ -130,10 +153,11 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
 
   const filteredAndSortedArchives = useMemo(() => {
     const q = submittedQuery.trim().toLowerCase();
-    const minScore = minRating / 10; // minRating is 0, 30, 35, 40, 45 -> archive.rating is 0.0 ~ 5.0 (or 10.0)
+    const minScore = minRating / 10;
+    const maxScore = maxRating / 10;
 
     const filtered = allArchives.filter((archive) => {
-      if (minRating > 0 && archive.rating < minScore) {
+      if (archive.rating < minScore || archive.rating > maxScore) {
         return false;
       }
       if (typeFilter !== "all" && archive.item.type !== typeFilter) {
@@ -163,7 +187,7 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
     return filtered.sort((a, b) =>
       order === "asc" ? a.id - b.id : b.id - a.id
     );
-  }, [allArchives, minRating, typeFilter, submittedQuery, order]);
+  }, [allArchives, minRating, maxRating, typeFilter, submittedQuery, order]);
 
   const visibleArchives = useMemo(
     () => filteredAndSortedArchives.slice(0, visibleCount),
@@ -248,7 +272,7 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
         {/* Right Column: Filter Toolbar + Archive Catalog (List or Grid) */}
         <div className="w-full lg:flex-1 min-w-0 space-y-3.5 sm:space-y-4">
           {/* Filter & Search Toolbar */}
-          <div className="grid grid-cols-3 sm:grid-cols-12 gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-[7px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60">
+          <div className="grid grid-cols-2 sm:grid-cols-12 gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-[7px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60">
             <div className="col-span-1 sm:col-span-2">
               <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c] mb-1">
                 정렬 기준
@@ -265,24 +289,7 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
               </select>
             </div>
 
-            <div className="col-span-1 sm:col-span-3">
-              <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c] mb-1">
-                별점 필터
-              </label>
-              <select
-                value={minRating}
-                onChange={(e) => handleMinRatingChange(Number(e.target.value))}
-                className="w-full px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
-              >
-                {RATING_FILTER_OPTIONS.map((opt) => (
-                  <option key={opt.min} value={opt.min}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="col-span-1 sm:col-span-2">
+            <div className="col-span-1 sm:col-span-2 sm:order-3">
               <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c] mb-1">
                 유형
               </label>
@@ -301,9 +308,55 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
               </select>
             </div>
 
+            <div className="col-span-2 sm:col-span-4 sm:order-2">
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c]">
+                  별점 범위
+                </label>
+                {(minRating > 0 || maxRating < 50) && (
+                  <button
+                    type="button"
+                    onClick={handleResetRatingRange}
+                    className="text-[11px] font-bold text-[#ff8080] hover:underline cursor-pointer"
+                  >
+                    전체 초기화
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={minRating}
+                  onChange={(e) => handleMinRatingChange(Number(e.target.value))}
+                  aria-label="최소 별점"
+                  className="flex-1 min-w-0 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] tabular-nums focus:outline-none focus:border-[#242d3c]"
+                >
+                  {RATING_STEP_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <span className="text-xs font-bold text-[#808080] shrink-0">
+                  ~
+                </span>
+                <select
+                  value={maxRating}
+                  onChange={(e) => handleMaxRatingChange(Number(e.target.value))}
+                  aria-label="최대 별점"
+                  className="flex-1 min-w-0 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] tabular-nums focus:outline-none focus:border-[#242d3c]"
+                >
+                  {RATING_STEP_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <form
               onSubmit={handleSearchSubmit}
-              className="col-span-3 sm:col-span-5"
+              className="col-span-2 sm:col-span-4 sm:order-4"
             >
               <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c] mb-1">
                 아카이브 검색
