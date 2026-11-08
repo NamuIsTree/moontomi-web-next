@@ -77,7 +77,10 @@ export default function ReviewsPage() {
           order,
         });
 
-        setReviews((prev) => (reset ? items : [...prev, ...items]));
+        setReviews((prev) => {
+          const merged = reset ? items : [...prev, ...items];
+          return Array.from(new Map(merged.map((i) => [i.id, i])).values());
+        });
         if (items.length < 10) {
           setComplete(true);
         } else {
