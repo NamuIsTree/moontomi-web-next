@@ -7,6 +7,7 @@ import {
   CirclePlay,
   Users,
   MessageSquare,
+  KeyRound,
   LogOut,
   Plus,
   Pencil,
@@ -30,7 +31,8 @@ type AdminTab =
   | "singles"
   | "archives"
   | "artists_genres"
-  | "moderation";
+  | "moderation"
+  | "members";
 
 const GENRE_CATEGORIES = [
   "POP",
@@ -140,6 +142,13 @@ interface ReviewRow {
   created_at: string | null;
 }
 
+interface MemberRow {
+  member_id: number;
+  name: string;
+  created_at: string | null;
+  modified_at: string | null;
+}
+
 async function runAdminAction(
   action: string,
   payload: Record<string, unknown> = {}
@@ -174,6 +183,7 @@ export default function AdminDashboardPage() {
   const [archives, setArchives] = useState<ArchiveRow[]>([]);
   const [comments, setComments] = useState<CommentRow[]>([]);
   const [reviews, setReviews] = useState<ReviewRow[]>([]);
+  const [members, setMembers] = useState<MemberRow[]>([]);
 
   const showToast = (type: "success" | "error", text: string) => {
     setStatusMsg({ type, text });
@@ -196,6 +206,7 @@ export default function AdminDashboardPage() {
       archivesRes,
       commentsRes,
       reviewsRes,
+      membersRes,
     ] = await Promise.all([
       supabase
         .from("artist")
@@ -243,6 +254,10 @@ export default function AdminDashboardPage() {
         .from("review")
         .select("review_id, title, writer, type, views, created_at")
         .order("review_id", { ascending: false }),
+      supabase
+        .from("member")
+        .select("member_id, name, created_at, modified_at")
+        .order("member_id", { ascending: true }),
     ]);
 
     setArtists((artistsRes.data as unknown as ArtistRow[]) ?? []);
@@ -254,6 +269,7 @@ export default function AdminDashboardPage() {
     setArchives((archivesRes.data as unknown as ArchiveRow[]) ?? []);
     setComments((commentsRes.data as unknown as CommentRow[]) ?? []);
     setReviews((reviewsRes.data as unknown as ReviewRow[]) ?? []);
+    setMembers((membersRes.data as unknown as MemberRow[]) ?? []);
     setLoading(false);
   }, []);
 
@@ -330,6 +346,12 @@ export default function AdminDashboardPage() {
 
   // ==================== 6. MODERATION STATES ====================
   const [commentSearch, setCommentSearch] = useState("");
+
+  // ==================== 7. MEMBER PASSWORD MANAGEMENT STATES ====================
+  const [memberPasswords, setMemberPasswords] = useState<Record<number, string>>({});
+  const [memberShowPw, setMemberShowPw] = useState<Record<number, boolean>>({});
+  const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberPassword, setNewMemberPassword] = useState("");
 
   // Filtered lists
   const filteredLectures = useMemo(() => {
@@ -716,6 +738,12 @@ export default function AdminDashboardPage() {
       label: "한줄평 · 칼럼",
       count: reviews.length,
       icon: MessageSquare,
+    },
+    {
+      id: "members",
+      label: "멤버 · 비밀번호",
+      count: members.length,
+      icon: KeyRound,
     },
   ];
 
@@ -2440,6 +2468,200 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== TAB 7: MEMBERS & PASSWORDS ==================== */}
+        {activeTab === "members" && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left Column: Add New Member */}
+            <div className="lg:col-span-4">
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!newMemberName.trim() || !newMemberPassword.trim()) {
+                    showToast("error", "멤버 이름과 비밀번호를 모두 입력해주세요.");
+                    return;
+                  }
+                  try {
+                    await runAdminAction("create_member", {
+                      name: newMemberName.trim(),
+                      password: newMemberPassword.trim(),
+                    });
+                    showToast("success", `'${newMemberName.trim()}' 멤버가 등록되었습니다.`);
+                    setNewMemberName("");
+                    setNewMemberPassword("");
+                    await loadAllData();
+                  } catch (err) {
+                    showToast(
+                      "error",
+                      err instanceof Error ? err.message : "멤버 등록 실패"
+                    );
+                  }
+                }}
+                className="bg-white rounded-[10px] border border-[#bdc0c4]/70 p-5 space-y-4 shadow-xs"
+              >
+                <div className="border-b border-[#bdc0c4]/50 pb-3">
+                  <h2 className="text-base font-bold text-[#242d3c]">
+                    신규 멤버 등록
+                  </h2>
+                  <p className="text-xs text-[#808080] mt-0.5">
+                    새 멤버 아이디와 로그인 비밀번호를 추가합니다.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#242d3c] mb-1">
+                    대표 아이디 (멤버명)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="예: 홍길동"
+                    value={newMemberName}
+                    onChange={(e) => setNewMemberName(e.target.value)}
+                    className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#242d3c] mb-1">
+                    초기 비밀번호
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="접속에 사용할 비밀번호"
+                    value={newMemberPassword}
+                    onChange={(e) => setNewMemberPassword(e.target.value)}
+                    className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full h-10 rounded-[7px] bg-[#242d3c] hover:bg-[#1b222e] text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4 text-[#ff8080]" />
+                  <span>멤버 추가</span>
+                </button>
+              </form>
+            </div>
+
+            {/* Right Column: Member Password Management */}
+            <div className="lg:col-span-8 bg-white rounded-[10px] border border-[#bdc0c4]/70 p-5 space-y-4 shadow-xs">
+              <div className="border-b border-[#bdc0c4]/50 pb-3">
+                <h2 className="text-base font-bold text-[#242d3c]">
+                  멤버 비밀번호 관리 ({members.length}명)
+                </h2>
+                <p className="text-xs text-[#808080] mt-0.5">
+                  특정 멤버의 비밀번호를 변경하면 해당 멤버가 작성한 기존 한줄평 · 칼럼의 비밀번호 해시도 함께 동기화됩니다.
+                </p>
+              </div>
+
+              <div className="divide-y divide-[#bdc0c4]/40">
+                {members.map((m) => {
+                  const pwVal = memberPasswords[m.member_id] ?? "";
+                  const showPw = Boolean(memberShowPw[m.member_id]);
+                  return (
+                    <div
+                      key={m.member_id}
+                      className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded bg-[#242d3c]/10 text-[#242d3c] font-mono text-xs font-bold">
+                            #{m.member_id}
+                          </span>
+                          <span className="text-sm font-bold text-[#171717]">
+                            {m.name}
+                          </span>
+                        </div>
+                        {m.modified_at && (
+                          <div className="text-[11px] text-[#808080] mt-0.5">
+                            최근 변경: {m.modified_at.slice(0, 10)}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <div className="relative w-full sm:w-56">
+                          <input
+                            type={showPw ? "text" : "password"}
+                            placeholder="새 비밀번호 입력"
+                            value={pwVal}
+                            onChange={(e) =>
+                              setMemberPasswords((prev) => ({
+                                ...prev,
+                                [m.member_id]: e.target.value,
+                              }))
+                            }
+                            className="w-full h-9 pl-3 pr-8 rounded-[7px] border border-[#bdc0c4] text-xs"
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setMemberShowPw((prev) => ({
+                                ...prev,
+                                [m.member_id]: !prev[m.member_id],
+                              }))
+                            }
+                            className="absolute inset-y-0 right-0 px-2.5 flex items-center text-[#808080] hover:text-[#242d3c] cursor-pointer"
+                          >
+                            {showPw ? (
+                              <Eye className="w-3.5 h-3.5" />
+                            ) : (
+                              <EyeOff className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const trimmed = pwVal.trim();
+                            if (!trimmed) {
+                              showToast("error", "변경할 새 비밀번호를 입력해주세요.");
+                              return;
+                            }
+                            if (
+                              !window.confirm(
+                                `'${m.name}' 멤버의 비밀번호를 변경하시겠습니까?`
+                              )
+                            )
+                              return;
+                            try {
+                              await runAdminAction("update_member_password", {
+                                member_id: m.member_id,
+                                password: trimmed,
+                              });
+                              showToast(
+                                "success",
+                                `'${m.name}'님의 비밀번호가 변경되었습니다.`
+                              );
+                              setMemberPasswords((prev) => ({
+                                ...prev,
+                                [m.member_id]: "",
+                              }));
+                              await loadAllData();
+                            } catch (err) {
+                              showToast(
+                                "error",
+                                err instanceof Error
+                                  ? err.message
+                                  : "비밀번호 변경 실패"
+                              );
+                            }
+                          }}
+                          className="h-9 px-3.5 rounded-[7px] bg-[#242d3c] hover:bg-[#1b222e] text-white text-xs font-bold shrink-0 inline-flex items-center gap-1 cursor-pointer"
+                        >
+                          <Check className="w-3.5 h-3.5 text-[#ff8080]" />
+                          <span>비밀번호 변경</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

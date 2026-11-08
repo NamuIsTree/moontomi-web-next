@@ -2,9 +2,11 @@
 
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Eye, FilePenLine } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { TiptapReviewEditor } from "@/components/review/TiptapReviewEditor";
+import { useMemberAuth } from "@/context/MemberAuthContext";
 import { fetchReviewById } from "@/services/review.service";
 import type { ReviewDetail } from "@/types/domain";
 
@@ -15,6 +17,8 @@ export default function ReviewDetailPage({
 }) {
   const { id } = use(params);
   const reviewId = Number(id);
+  const router = useRouter();
+  const { member, openLoginModal } = useMemberAuth();
   const [review, setReview] = useState<ReviewDetail | null>(null);
 
   useEffect(() => {
@@ -32,6 +36,34 @@ export default function ReviewDetailPage({
     );
   }
 
+  const canShowEdit =
+    !member ||
+    !review.member_id ||
+    member.member_id === review.member_id;
+
+  const handleEditReviewClick = () => {
+    if (member) {
+      if (review.member_id && member.member_id !== review.member_id) {
+        alert("본인이 작성한 칼럼만 수정할 수 있습니다.");
+        return;
+      }
+      router.push(`/review/${review.id}/edit`);
+      return;
+    }
+
+    openLoginModal({
+      title: "원고 수정 — 멤버 인증",
+      subtitle: "본인이 작성한 원고를 수정하려면 비밀번호를 입력해주세요.",
+      onSuccess: (loggedIn) => {
+        if (review.member_id && loggedIn.member_id !== review.member_id) {
+          alert("본인이 작성한 칼럼만 수정할 수 있습니다.");
+          return;
+        }
+        router.push(`/review/${review.id}/edit`);
+      },
+    });
+  };
+
   return (
     <PageContainer width="reading" className="space-y-8">
       {/* Top Bar */}
@@ -44,13 +76,16 @@ export default function ReviewDetailPage({
           <span>칼럼 목록으로</span>
         </Link>
 
-        <Link
-          href={`/review/${review.id}/edit`}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[7px] border border-[#bdc0c4] text-xs font-bold text-[#242d3c] hover:bg-[#f3f3f3] transition-colors"
-        >
-          <FilePenLine className="w-3.5 h-3.5 text-[#ff8080]" />
-          <span>원고 수정</span>
-        </Link>
+        {canShowEdit && (
+          <button
+            type="button"
+            onClick={handleEditReviewClick}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[7px] border border-[#bdc0c4] text-xs font-bold text-[#242d3c] hover:bg-[#f3f3f3] transition-colors cursor-pointer"
+          >
+            <FilePenLine className="w-3.5 h-3.5 text-[#ff8080]" />
+            <span>원고 수정</span>
+          </button>
+        )}
       </div>
 
       {/* Editorial Article Header */}

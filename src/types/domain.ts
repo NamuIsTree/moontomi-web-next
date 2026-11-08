@@ -70,9 +70,15 @@ export interface LectureDetail {
   archive: { id: number } | null;
 }
 
+export interface MemberPublicInfo {
+  member_id: number;
+  name: string;
+}
+
 export interface LectureCommentItem {
   id: number;
   writer: string;
+  member_id?: number | null;
   date: string | null;
   rating: number; // 0.0 ~ 10.0 scale
   bests: string[];
@@ -83,6 +89,7 @@ export interface LookupCommentItem {
   id: number;
   lecture_id: number;
   writer: string;
+  member_id?: number | null;
   album: {
     title: string;
     image: string;
@@ -98,6 +105,7 @@ export interface ReviewListItem {
   description: string;
   views: number;
   writer: string;
+  member_id?: number | null;
   type: string;
   created_at: string;
 }

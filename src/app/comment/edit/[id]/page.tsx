@@ -18,6 +18,7 @@ export default function EditCommentPage({
   const [lecture, setLecture] = useState<LectureDetail | null>(null);
   const [initialData, setInitialData] = useState<{
     writer: string;
+    member_id: number | null;
     rating: number;
     bests: [string, string, string];
     comment: string;
@@ -29,6 +30,7 @@ export default function EditCommentPage({
       if (!commentData) return;
       setInitialData({
         writer: commentData.writer,
+        member_id: commentData.member_id ?? null,
         rating: Math.round(commentData.rating * 10),
         bests: [
           commentData.bests[0] ?? "",
@@ -48,6 +50,7 @@ export default function EditCommentPage({
           mode="edit"
           lecture={lecture}
           commentId={commentId}
+          commentMemberId={initialData.member_id}
           initialWriter={initialData.writer}
           initialRating={initialData.rating}
           initialBests={initialData.bests}

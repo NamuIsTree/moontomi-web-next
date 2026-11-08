@@ -9,7 +9,10 @@ import {
   Disc3,
   History,
   CirclePlay,
+  KeyRound,
+  UserCheck,
 } from "lucide-react";
+import { useMemberAuth } from "@/context/MemberAuthContext";
 import { cn } from "@/lib/utils";
 
 export const NAV_ITEMS = [
@@ -24,6 +27,7 @@ export function AppHeader() {
   const [shrink, setShrink] = useState(false);
   const [hovered, setHovered] = useState(false);
   const pathname = usePathname();
+  const { member, openLoginModal } = useMemberAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,6 +66,32 @@ export function AppHeader() {
             </span>
           </span>
         </Link>
+
+        {/* Top-Right Member Login / Status Button */}
+        <button
+          type="button"
+          onClick={() => openLoginModal()}
+          className={cn(
+            "absolute right-3 sm:right-6 inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full font-sans text-xs font-bold border transition-all cursor-pointer",
+            member
+              ? "bg-white/10 hover:bg-white/20 border-[#ff8080]/60 text-[#f0f8ff]"
+              : "bg-white/10 hover:bg-white/20 border-white/20 text-[#f0f8ff]/90"
+          )}
+        >
+          {member ? (
+            <>
+              <UserCheck className="w-3.5 h-3.5 text-[#ff8080] shrink-0" />
+              <span className="max-w-[72px] sm:max-w-[120px] truncate">
+                {member.name}
+              </span>
+            </>
+          ) : (
+            <>
+              <KeyRound className="w-3.5 h-3.5 text-[#ff8080] shrink-0" />
+              <span>로그인</span>
+            </>
+          )}
+        </button>
       </header>
 
       {/* Desktop Left Rail Navigation */}
@@ -152,14 +182,41 @@ export function AppHeader() {
           </nav>
         </div>
 
-        <div
-          className={cn(
-            "px-5 py-4 border-t border-[#f3f3f3] text-xs text-[#808080] whitespace-nowrap transition-opacity duration-200",
-            hovered ? "opacity-100" : "opacity-0"
-          )}
-        >
-          <div className="font-bold text-[#242d3c]">대중 음악의 이해</div>
-          <div className="mt-0.5">Since Saturday Listening Club</div>
+        <div className="border-t border-[#f3f3f3] p-2 space-y-2">
+          <button
+            type="button"
+            onClick={() => openLoginModal()}
+            className="w-full flex items-center gap-4 px-3.5 py-2.5 rounded-[7px] text-sm font-sans text-[#242d3c] hover:bg-[#f3f3f3] transition-colors cursor-pointer text-left"
+          >
+            {member ? (
+              <UserCheck className="w-5 h-5 shrink-0 text-[#ff8080]" />
+            ) : (
+              <KeyRound className="w-5 h-5 shrink-0 text-[#242d3c]" />
+            )}
+            <div
+              className={cn(
+                "overflow-hidden whitespace-nowrap transition-opacity duration-200 leading-tight",
+                hovered ? "opacity-100" : "opacity-0"
+              )}
+            >
+              <div className="font-bold">
+                {member ? member.name : "멤버 로그인"}
+              </div>
+              <div className="text-xs font-normal text-[#808080] mt-0.5">
+                {member ? "접속 중 · 클릭하여 전환" : "비밀번호로 접속"}
+              </div>
+            </div>
+          </button>
+
+          <div
+            className={cn(
+              "px-3.5 py-2 text-xs text-[#808080] whitespace-nowrap transition-opacity duration-200",
+              hovered ? "opacity-100" : "opacity-0"
+            )}
+          >
+            <div className="font-bold text-[#242d3c]">대중 음악의 이해</div>
+            <div className="mt-0.5">Since Saturday Listening Club</div>
+          </div>
         </div>
       </aside>
 

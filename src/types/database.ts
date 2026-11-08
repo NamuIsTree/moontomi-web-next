@@ -164,6 +164,7 @@ export type Database = {
           comment_id: number
           created_at: string | null
           lecture_id: number
+          member_id: number | null
           modified_at: string | null
           password: string
           picks: Json
@@ -175,6 +176,7 @@ export type Database = {
           comment_id?: number
           created_at?: string | null
           lecture_id: number
+          member_id?: number | null
           modified_at?: string | null
           password: string
           picks?: Json
@@ -186,6 +188,7 @@ export type Database = {
           comment_id?: number
           created_at?: string | null
           lecture_id?: number
+          member_id?: number | null
           modified_at?: string | null
           password?: string
           picks?: Json
@@ -200,6 +203,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "lecture"
             referencedColumns: ["lecture_id"]
+          },
+          {
+            foreignKeyName: "comment_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "member"
+            referencedColumns: ["member_id"]
           },
         ]
       }
@@ -272,12 +282,37 @@ export type Database = {
           },
         ]
       }
+      member: {
+        Row: {
+          created_at: string | null
+          member_id: number
+          modified_at: string | null
+          name: string
+          password?: string
+        }
+        Insert: {
+          created_at?: string | null
+          member_id?: number
+          modified_at?: string | null
+          name: string
+          password: string
+        }
+        Update: {
+          created_at?: string | null
+          member_id?: number
+          modified_at?: string | null
+          name?: string
+          password?: string
+        }
+        Relationships: []
+      }
       review: {
         Row: {
           content: string
           created_at: string | null
           description: string
           image_id: string
+          member_id: number | null
           modified_at: string | null
           password: string
           review_id: number
@@ -291,6 +326,7 @@ export type Database = {
           created_at?: string | null
           description: string
           image_id: string
+          member_id?: number | null
           modified_at?: string | null
           password: string
           review_id?: number
@@ -304,6 +340,7 @@ export type Database = {
           created_at?: string | null
           description?: string
           image_id?: string
+          member_id?: number | null
           modified_at?: string | null
           password?: string
           review_id?: number
@@ -312,7 +349,15 @@ export type Database = {
           views?: number
           writer?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "review_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "member"
+            referencedColumns: ["member_id"]
+          },
+        ]
       }
       season: {
         Row: {
@@ -482,12 +527,18 @@ export type Database = {
         Args: {
           p_content: string
           p_description: string
-          p_image_id: string
+          p_image_id?: string
           p_password: string
           p_review_id: number
           p_title: string
           p_type: string
           p_writer: string
+        }
+        Returns: Json
+      }
+      verify_member_login: {
+        Args: {
+          p_password: string
         }
         Returns: Json
       }

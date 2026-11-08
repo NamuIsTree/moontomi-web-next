@@ -16,7 +16,7 @@ export async function fetchReviewList(params: {
   let query = supabase
     .from("review")
     .select(
-      "review_id, title, writer, type, description, image_id, views, created_at"
+      "review_id, title, writer, member_id, type, description, image_id, views, created_at"
     );
 
   if (sortBy === "view") {
@@ -37,6 +37,7 @@ export async function fetchReviewList(params: {
     description: row.description,
     views: row.views,
     writer: row.writer,
+    member_id: row.member_id ?? null,
     type: row.type,
     created_at: row.created_at ? row.created_at.slice(0, 10) : "",
   }));
@@ -90,7 +91,7 @@ export async function fetchReviewById(
   const { data, error } = await supabase
     .from("review")
     .select(
-      "review_id, title, writer, type, description, content, image_id, views, created_at"
+      "review_id, title, writer, member_id, type, description, content, image_id, views, created_at"
     )
     .eq("review_id", reviewId)
     .maybeSingle();
@@ -101,6 +102,7 @@ export async function fetchReviewById(
     id: data.review_id,
     title: data.title,
     writer: data.writer,
+    member_id: data.member_id ?? null,
     type: data.type,
     description: data.description,
     content: data.content,

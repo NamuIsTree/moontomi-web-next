@@ -26,6 +26,7 @@ export default function EditReviewPage({
         <ReviewEditorForm
           mode="edit"
           reviewId={review.id}
+          reviewMemberId={review.member_id ?? null}
           initialTitle={review.title}
           initialWriter={review.writer}
           initialType={review.type}

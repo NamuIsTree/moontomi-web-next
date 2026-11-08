@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { AppFooter } from "@/components/layout/AppFooter";
+import { MemberAuthProvider } from "@/context/MemberAuthContext";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -34,10 +35,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <>
+    <MemberAuthProvider>
       <AppHeader />
       <main className="flex-1 pt-[90px] md:pl-[75px] w-full">{children}</main>
       <AppFooter />
-    </>
+    </MemberAuthProvider>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ChevronDown,
@@ -15,6 +16,7 @@ import { PageContainer } from "@/components/layout/PageContainer";
 import { SeasonChip, GenreChipList } from "@/components/ui/GenreChipList";
 import { StarRating } from "@/components/ui/StarRating";
 import { LectureCommentCard } from "@/components/lecture/LectureCommentCard";
+import { useMemberAuth } from "@/context/MemberAuthContext";
 import {
   fetchLectureById,
   fetchLectureComments,
@@ -30,6 +32,8 @@ export default function LectureDetailPage({
 }) {
   const { id } = use(params);
   const lectureId = Number(id);
+  const router = useRouter();
+  const { requireMemberAuth } = useMemberAuth();
 
   const [lecture, setLecture] = useState<LectureDetail | null>(null);
   const [comments, setComments] = useState<LectureCommentItem[]>([]);
@@ -346,13 +350,23 @@ export default function LectureDetailPage({
 
         {/* Post Your Comment Button */}
         <div className="pt-2">
-          <Link
-            href={`/comment/create/${lecture.id}`}
-            className="w-full h-[88px] rounded-[20px] border border-[#bdc0c4] bg-[#f3f3f3] hover:border-[#242d3c] hover:bg-[#242d3c] text-[#242d3c] hover:text-[#f0f8ff] transition-colors flex items-center justify-center gap-2.5 font-bold text-sm"
+          <button
+            type="button"
+            onClick={() =>
+              requireMemberAuth(
+                () => router.push(`/comment/create/${lecture.id}`),
+                {
+                  title: "한줄평 작성 — 멤버 인증",
+                  subtitle:
+                    "한줄평을 남기려면 멤버 비밀번호를 입력해주세요.",
+                }
+              )
+            }
+            className="w-full h-[88px] rounded-[20px] border border-[#bdc0c4] bg-[#f3f3f3] hover:border-[#242d3c] hover:bg-[#242d3c] text-[#242d3c] hover:text-[#f0f8ff] transition-colors flex items-center justify-center gap-2.5 font-bold text-sm cursor-pointer"
           >
             <SquarePen className="w-5 h-5 text-[#ff8080]" />
             <span>POST YOUR COMMENT</span>
-          </Link>
+          </button>
         </div>
       </section>
     </PageContainer>

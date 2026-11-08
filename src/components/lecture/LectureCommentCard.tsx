@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronDown, FilePenLine } from "lucide-react";
 import { StarRating } from "@/components/ui/StarRating";
+import { useMemberAuth } from "@/context/MemberAuthContext";
 import type { LectureCommentItem } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
@@ -18,10 +19,40 @@ export function LectureCommentCard({
   comment,
   isLectureOpen,
 }: LectureCommentCardProps) {
+  const router = useRouter();
+  const { member, openLoginModal } = useMemberAuth();
   const [revealed, setRevealed] = useState(isLectureOpen);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const prevLectureOpenRef = useRef(isLectureOpen);
   const unlockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const canShowEdit =
+    !member ||
+    !comment.member_id ||
+    member.member_id === comment.member_id;
+
+  const handleEditClick = () => {
+    if (member) {
+      if (comment.member_id && member.member_id !== comment.member_id) {
+        alert("본인이 작성한 한줄평만 수정할 수 있습니다.");
+        return;
+      }
+      router.push(`/comment/edit/${comment.id}`);
+      return;
+    }
+
+    openLoginModal({
+      title: "한줄평 수정 — 멤버 인증",
+      subtitle: "본인이 작성한 한줄평을 수정하려면 비밀번호를 입력해주세요.",
+      onSuccess: (loggedIn) => {
+        if (comment.member_id && loggedIn.member_id !== comment.member_id) {
+          alert("본인이 작성한 한줄평만 수정할 수 있습니다.");
+          return;
+        }
+        router.push(`/comment/edit/${comment.id}`);
+      },
+    });
+  };
 
   useEffect(() => {
     // If the lecture transitions from unopened -> opened live on the page,
@@ -76,13 +107,16 @@ export function LectureCommentCard({
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
-          <Link
-            href={`/comment/edit/${comment.id}`}
-            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#242d3c] hover:bg-[#f3f3f3] rounded-[7px] transition-colors"
-          >
-            <FilePenLine className="w-3.5 h-3.5 text-[#ff8080]" />
-            <span>수정</span>
-          </Link>
+          {canShowEdit && (
+            <button
+              type="button"
+              onClick={handleEditClick}
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#242d3c] hover:bg-[#f3f3f3] rounded-[7px] transition-colors cursor-pointer"
+            >
+              <FilePenLine className="w-3.5 h-3.5 text-[#ff8080]" />
+              <span>수정</span>
+            </button>
+          )}
 
           {!isLectureOpen && (
             <button

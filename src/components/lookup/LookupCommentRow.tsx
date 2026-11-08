@@ -17,13 +17,13 @@ export function LookupCommentRow({ index, comment }: LookupCommentRowProps) {
         <div className="flex-1 min-w-0 space-y-1.5">
           {/* Top Metadata: Rank, Session Badge, Album Title */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-xs font-bold text-[#808080] tabular-nums">
+            <span className="font-mono text-xs font-bold text-[#808080] tabular-nums shrink-0">
               #{index}
             </span>
-            <span className="px-2 py-0.5 rounded-[7px] bg-[#242d3c] text-[#f0f8ff] text-xs font-bold tabular-nums">
+            <span className="px-2 py-0.5 rounded-[7px] bg-[#242d3c] text-[#f0f8ff] text-xs font-bold tabular-nums shrink-0">
               {comment.lecture_id}회
             </span>
-            <span className="text-sm sm:text-base font-bold italic text-[#171717] group-hover:text-[#242d3c] truncate transition-colors">
+            <span className="text-sm sm:text-base font-bold italic text-[#171717] group-hover:text-[#242d3c] truncate pr-1.5 transition-colors">
               {comment.album.title}
             </span>
           </div>

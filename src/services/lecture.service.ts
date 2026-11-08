@@ -232,7 +232,7 @@ export async function fetchLectureComments(
 
   const { data, error } = await supabase
     .from("comment")
-    .select("comment_id, writer, rating, picks, text, created_at")
+    .select("comment_id, writer, member_id, rating, picks, text, created_at")
     .eq("lecture_id", lectureId)
     .order("comment_id", { ascending: true });
 
@@ -245,6 +245,7 @@ export async function fetchLectureComments(
     return {
       id: row.comment_id,
       writer: row.writer,
+      member_id: row.member_id ?? null,
       date: row.created_at ? row.created_at.slice(0, 10) : null,
       rating: row.rating / 10,
       bests: pickIndices.map((idx) => tracks[idx] ?? "").filter(Boolean),

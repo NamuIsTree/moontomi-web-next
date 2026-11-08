@@ -6,6 +6,7 @@ export async function fetchCommentById(commentId: number): Promise<{
   id: number;
   lecture_id: number;
   writer: string;
+  member_id: number | null;
   rating: number; // 0 ~ 10 scale
   bests: string[];
   comment: string;
@@ -19,6 +20,7 @@ export async function fetchCommentById(commentId: number): Promise<{
       comment_id,
       lecture_id,
       writer,
+      member_id,
       rating,
       picks,
       text,
@@ -46,6 +48,7 @@ export async function fetchCommentById(commentId: number): Promise<{
     id: data.comment_id,
     lecture_id: data.lecture_id,
     writer: data.writer,
+    member_id: data.member_id ?? null,
     rating: data.rating / 10,
     bests: [
       tracks[pickIndices[0]] ?? "",
@@ -100,6 +103,55 @@ export async function updateComment(params: {
   if (error) {
     throw new Error(error.message || "비밀번호가 틀렸거나 수정에 실패했습니다.");
   }
+}
+
+export async function searchCommentsByMembers(
+  memberIds: number[]
+): Promise<LookupCommentItem[]> {
+  if (memberIds.length === 0) return [];
+
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("comment")
+    .select(
+      `
+      comment_id,
+      lecture_id,
+      writer,
+      member_id,
+      rating,
+      text,
+      lecture:lecture_id!inner(
+        lecture_id,
+        rating,
+        album:album_id(title, image_id)
+      )
+    `
+    )
+    .not("lecture.rating", "is", null)
+    .in("member_id", memberIds);
+
+  if (error || !data) return [];
+
+  return data.map((row) => {
+    const lecture = row.lecture as unknown as {
+      album: { title: string; image_id: string } | null;
+    };
+
+    return {
+      id: row.comment_id,
+      lecture_id: row.lecture_id,
+      writer: row.writer,
+      member_id: row.member_id ?? null,
+      album: {
+        title: lecture?.album?.title ?? "",
+        image: getImageUrl(lecture?.album?.image_id),
+      },
+      rating: row.rating / 10,
+      text: row.text,
+    };
+  });
 }
 
 export async function searchCommentsByWriters(

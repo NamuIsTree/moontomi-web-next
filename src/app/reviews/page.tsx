@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowDown,
   ArrowUp,
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/SortToggleGroup";
 import { InfiniteScrollSentinel } from "@/components/ui/InfiniteScrollSentinel";
 import { ReviewListCard } from "@/components/review/ReviewListCard";
+import { useMemberAuth } from "@/context/MemberAuthContext";
 import { fetchReviewList } from "@/services/review.service";
 import type { ReviewListItem } from "@/types/domain";
 import { cn } from "@/lib/utils";
@@ -53,6 +54,8 @@ const CATEGORY_FILTERS = ["전체", "칼럼", "결산", "잡설"] as const;
 type CategoryFilter = (typeof CATEGORY_FILTERS)[number];
 
 export default function ReviewsPage() {
+  const router = useRouter();
+  const { requireMemberAuth } = useMemberAuth();
   const [selectedSort, setSelectedSort] = useState<ReviewSortId>("id-desc");
   const [selectedCategory, setSelectedCategory] =
     useState<CategoryFilter>("전체");
@@ -120,13 +123,19 @@ export default function ReviewsPage() {
           </p>
         </div>
 
-        <Link
-          href="/review/create"
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[7px] bg-[#242d3c] hover:bg-[#242d3c]/90 text-[#f0f8ff] text-xs sm:text-sm font-bold transition-colors shrink-0"
+        <button
+          type="button"
+          onClick={() =>
+            requireMemberAuth(() => router.push("/review/create"), {
+              title: "원고 투고 — 멤버 인증",
+              subtitle: "칼럼/에세이를 투고하려면 멤버 비밀번호를 입력해주세요.",
+            })
+          }
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[7px] bg-[#242d3c] hover:bg-[#242d3c]/90 text-[#f0f8ff] text-xs sm:text-sm font-bold transition-colors shrink-0 cursor-pointer"
         >
           <SquarePen className="w-4 h-4 text-[#ff8080]" />
           <span>원고 투고하기</span>
-        </Link>
+        </button>
       </header>
 
       {/* Category Filter Tabs */}

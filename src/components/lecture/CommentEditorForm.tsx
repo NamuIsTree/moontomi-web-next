@@ -1,41 +1,39 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, EyeOff, Loader2, Smile } from "lucide-react";
+import { EmojiStyle, Theme, type EmojiClickData } from "emoji-picker-react";
+import { ArrowLeft, KeyRound, Loader2, Smile, UserCheck } from "lucide-react";
 import { SeasonChip, GenreChipList } from "@/components/ui/GenreChipList";
 import { StarRating } from "@/components/ui/StarRating";
+import { useMemberAuth } from "@/context/MemberAuthContext";
 import {
   createComment,
   updateComment,
 } from "@/services/comment.service";
 import type { LectureDetail } from "@/types/domain";
 
+const EmojiPicker = dynamic(() => import("emoji-picker-react"), {
+  ssr: false,
+});
+
 interface CommentEditorFormProps {
   mode: "create" | "edit";
   lecture: LectureDetail;
   commentId?: number;
+  commentMemberId?: number | null;
   initialWriter?: string;
   initialRating?: number; // 0 ~ 100
   initialBests?: [string, string, string];
   initialComment?: string;
 }
 
-const PASSWORD_PATTERN =
-  /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
-
 const BEST_TRACK_META = [
   { label: "베스트 트랙 1위 (GOLD)", color: "#ffb400" },
   { label: "베스트 트랙 2위 (SILVER)", color: "#4a4f5a" },
   { label: "베스트 트랙 3위 (BRONZE)", color: "#6e3732" },
-];
-
-const QUICK_EMOJIS = [
-  "👍", "🔥", "❤️", "❤️‍🔥", "🎧", "🎵", "🎶", "🎸", "🎹", "🥁",
-  "🎷", "🎺", "🎻", "🎤", "💿", "✨", "🌟", "🏆", "👑", "💯",
-  "🥰", "😍", "🤩", "😎", "🥹", "😭", "🤯", "🤔", "😴", "🙏",
-  "👏", "🙌", "🤘", "💃", "🕺", "☕️", "🍺", "🍷", "🏖️", "🌙",
 ];
 
 function getRatingSliderColor(rating: number): string {
@@ -50,15 +48,15 @@ export function CommentEditorForm({
   mode,
   lecture,
   commentId,
+  commentMemberId = null,
   initialWriter = "",
   initialRating = 70,
   initialBests = ["", "", ""],
   initialComment = "",
 }: CommentEditorFormProps) {
   const router = useRouter();
+  const { member, ready, openLoginModal } = useMemberAuth();
   const [writer, setWriter] = useState(initialWriter);
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [rating, setRating] = useState(initialRating);
   const [bests, setBests] = useState<[string, string, string]>(initialBests);
   const [comment, setComment] = useState(initialComment);
@@ -66,6 +64,36 @@ export function CommentEditorForm({
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const commentTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-fill writer with logged-in member's representative name when creating
+  useEffect(() => {
+    if (mode === "create" && member && !writer) {
+      setWriter(member.name);
+    }
+  }, [mode, member, writer]);
+
+  // Prompt login if not logged in
+  useEffect(() => {
+    if (!ready) return;
+    if (!member) {
+      openLoginModal({
+        title:
+          mode === "create"
+            ? "한줄평 작성 — 멤버 인증"
+            : "한줄평 수정 — 멤버 인증",
+        subtitle:
+          mode === "create"
+            ? "한줄평을 남기려면 멤버 비밀번호를 입력해주세요."
+            : "본인이 작성한 한줄평을 수정하려면 비밀번호를 입력해주세요.",
+      });
+    }
+  }, [ready, member, mode, openLoginModal]);
+
+  const isNotOwner =
+    mode === "edit" &&
+    member !== null &&
+    commentMemberId !== null &&
+    member.member_id !== commentMemberId;
 
   const handleInsertEmoji = (emoji: string) => {
     const textarea = commentTextareaRef.current;
@@ -100,18 +128,21 @@ export function CommentEditorForm({
     e.preventDefault();
     setErrorMessage(null);
 
+    if (!member) {
+      openLoginModal({
+        title: "멤버 인증이 필요합니다",
+        subtitle: "한줄평을 제출하려면 멤버 비밀번호를 입력해주세요.",
+      });
+      return;
+    }
+
+    if (isNotOwner) {
+      setErrorMessage("본인이 작성한 한줄평만 수정할 수 있습니다.");
+      return;
+    }
+
     if (!writer.trim()) {
       setErrorMessage("닉네임을 입력해주세요.");
-      return;
-    }
-    if (!password) {
-      setErrorMessage("비밀번호를 입력해주세요.");
-      return;
-    }
-    if (!PASSWORD_PATTERN.test(password)) {
-      setErrorMessage(
-        "비밀번호는 알파벳 대소문자, 숫자, 특수문자만 사용할 수 있습니다."
-      );
       return;
     }
 
@@ -126,7 +157,7 @@ export function CommentEditorForm({
           lectureId: lecture.id,
           rating,
           writer: writer.trim(),
-          password,
+          password: member.password,
           picks,
           text: comment,
         });
@@ -134,7 +165,7 @@ export function CommentEditorForm({
         await updateComment({
           commentId,
           rating,
-          password,
+          password: member.password,
           picks,
           text: comment,
         });
@@ -198,6 +229,36 @@ export function CommentEditorForm({
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Logged-in Member Status Bar */}
+        <div className="p-3 rounded-[10px] bg-[#242d3c]/5 border border-[#242d3c]/15 flex items-center justify-between text-xs">
+          {member ? (
+            <div className="flex items-center gap-2 text-[#242d3c]">
+              <UserCheck className="w-4 h-4 text-[#ff8080]" />
+              <span>
+                접속 멤버: <strong className="font-bold">{member.name}</strong>
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-[#808080]">
+              <KeyRound className="w-4 h-4 text-[#ff8080]" />
+              <span>로그인이 필요합니다</span>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => openLoginModal()}
+            className="font-bold text-[#242d3c] hover:text-[#ff8080] underline underline-offset-2 cursor-pointer"
+          >
+            {member ? "계정 전환" : "로그인하기"}
+          </button>
+        </div>
+
+        {isNotOwner && (
+          <div className="p-3.5 rounded-[7px] bg-[#ff8080]/15 border border-[#ff8080] text-sm font-semibold text-[#171717] text-center">
+            본인이 작성한 한줄평만 수정할 수 있습니다. (현재 접속: {member?.name})
+          </div>
+        )}
+
         {errorMessage && (
           <div className="p-3.5 rounded-[7px] bg-[#ff8080]/15 border border-[#ff8080] text-sm font-semibold text-[#171717] text-center">
             {errorMessage}
@@ -206,12 +267,12 @@ export function CommentEditorForm({
 
         <div>
           <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
-            닉네임
+            표시 닉네임 (자유롭게 변경 가능)
           </label>
           <input
             type="text"
             value={writer}
-            readOnly={mode === "edit" || loading}
+            readOnly={mode === "edit" || loading || isNotOwner}
             onChange={(e) => setWriter(e.target.value)}
             placeholder="닉네임 입력"
             className="w-full px-3.5 py-2.5 rounded-[7px] border border-[#bdc0c4] bg-white text-sm read-only:bg-[#f3f3f3] focus:outline-none focus:border-[#242d3c]"
@@ -285,23 +346,27 @@ export function CommentEditorForm({
           <div
             className={`grid transition-[grid-template-rows,opacity,margin] duration-250 ease-out ${
               showEmojiPicker
-                ? "grid-rows-[1fr] opacity-100 mb-2"
+                ? "grid-rows-[1fr] opacity-100 mb-2.5"
                 : "grid-rows-[0fr] opacity-0 mb-0 pointer-events-none"
             }`}
           >
             <div className="overflow-hidden">
-              <div className="p-2.5 rounded-[7px] border border-[#bdc0c4] bg-white shadow-sm grid grid-cols-10 gap-1">
-                {QUICK_EMOJIS.map((emoji) => (
-                  <button
-                    key={emoji}
-                    type="button"
-                    onClick={() => handleInsertEmoji(emoji)}
-                    className="h-8 flex items-center justify-center rounded hover:bg-[#f3f3f3] text-base transition-colors cursor-pointer"
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
+              {showEmojiPicker && (
+                <div className="rounded-[10px] overflow-hidden border border-[#bdc0c4] shadow-sm">
+                  <EmojiPicker
+                    onEmojiClick={(emojiData: EmojiClickData) =>
+                      handleInsertEmoji(emojiData.emoji)
+                    }
+                    theme={Theme.LIGHT}
+                    emojiStyle={EmojiStyle.NATIVE}
+                    searchPlaceHolder="이모지 검색..."
+                    width="100%"
+                    height={340}
+                    lazyLoadEmojis
+                    previewConfig={{ showPreview: false }}
+                  />
+                </div>
+              )}
             </div>
           </div>
           <textarea
@@ -314,39 +379,10 @@ export function CommentEditorForm({
           />
         </div>
 
-        {/* Password Field */}
-        <div>
-          <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
-            비밀번호
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              value={password}
-              readOnly={loading}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="평가 수정 시 사용할 비밀번호"
-              className="w-full pl-3.5 pr-10 py-2.5 rounded-[7px] border border-[#bdc0c4] bg-white text-sm focus:outline-none focus:border-[#242d3c]"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
-              className="absolute inset-y-0 right-0 px-3 flex items-center text-[#808080] hover:text-[#242d3c] cursor-pointer"
-            >
-              {showPassword ? (
-                <Eye className="w-4 h-4" />
-              ) : (
-                <EyeOff className="w-4 h-4" />
-              )}
-            </button>
-          </div>
-        </div>
-
         <div className="pt-3">
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || isNotOwner}
             className="w-full py-3.5 rounded-[7px] bg-[#ff8080] hover:opacity-90 disabled:opacity-50 text-white font-bold text-sm transition-opacity flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
