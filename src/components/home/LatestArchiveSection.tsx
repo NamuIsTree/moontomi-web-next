@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, CirclePlay, Disc3 } from "lucide-react";
 import { HorizontalScrollRail } from "@/components/ui/HorizontalScrollRail";
 import type { ArchivePublicItem } from "@/types/domain";
+import { cn } from "@/lib/utils";
 
 interface LatestArchiveSectionProps {
   archives: ArchivePublicItem[];
@@ -74,8 +75,15 @@ export function LatestArchiveSection({
                     />
 
                     {/* Type Badge (ALBUM / SINGLE) */}
-                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-[7px] bg-[#242d3c]/90 text-[#f0f8ff] text-[10px] sm:text-[11px] font-nohemi font-bold uppercase tracking-wider leading-none">
-                      <Disc3 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#ff8080]" />
+                    <span
+                      className={cn(
+                        "absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-[7px] bg-[#242d3c]/90 border text-[10px] sm:text-[11px] font-nohemi font-bold uppercase tracking-wider leading-none",
+                        entry.item.type === "album"
+                          ? "border-green-400/80 text-green-300"
+                          : "border-orange-400/80 text-orange-300"
+                      )}
+                    >
+                      <Disc3 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                       <span className="translate-y-[1px]">{entry.item.type}</span>
                     </span>
 

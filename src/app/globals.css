@@ -13,6 +13,8 @@
 
 html {
   scroll-behavior: smooth;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 *,
@@ -25,6 +27,7 @@ body {
   font-family: var(--font-line-seed), sans-serif;
   color: #171717;
   background-color: #ffffff;
+  max-width: 100%;
   overflow-x: clip;
   caret-color: transparent;
 }
@@ -81,6 +84,10 @@ textarea:not([readonly]),
   color: #171717;
   text-align: left;
   word-break: keep-all;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .editorial-prose p {
@@ -155,6 +162,9 @@ textarea:not([readonly]),
   border-radius: 4px;
   color: #409eff;
   display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
   font-size: 14px;
   font-weight: 700;
   padding: 0 8px;
@@ -165,6 +175,7 @@ textarea:not([readonly]),
   background-color: #303133;
   color: #d9ecff;
   font-size: 16px;
+  max-width: 100%;
   overflow-x: auto;
   padding: 14px 20px;
   margin: 10px 0;
@@ -191,13 +202,15 @@ textarea:not([readonly]),
   display: inline-block;
   float: none;
   margin: 12px 0;
-  max-width: 100%;
-  height: auto;
+  max-width: 100% !important;
+  height: auto !important;
+  box-sizing: border-box;
 }
 
 .editorial-prose img[data-display="inline"] {
   margin-left: 12px;
   margin-right: 12px;
+  max-width: calc(100% - 24px) !important;
 }
 
 .editorial-prose img[data-display="block"] {
@@ -208,12 +221,22 @@ textarea:not([readonly]),
   float: left;
   margin-left: 0;
   margin-right: 12px;
+  max-width: calc(100% - 12px) !important;
 }
 
 .editorial-prose img[data-display="right"] {
   float: right;
   margin-left: 12px;
   margin-right: 0;
+  max-width: calc(100% - 12px) !important;
+}
+
+@media (max-width: 640px) {
+  .editorial-prose img[data-display="inline"] {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100% !important;
+  }
 }
 
 .editorial-prose iframe {
@@ -255,6 +278,9 @@ textarea:not([readonly]),
 .ProseMirror {
   outline: none;
   min-height: 340px;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .tiptap-readonly .ProseMirror {

@@ -89,13 +89,13 @@ export default function ReviewDetailPage({
       </div>
 
       {/* Editorial Article Header */}
-      <header className="text-center space-y-4 max-w-[700px] mx-auto">
-        <h1 className="font-myeongjo font-extrabold text-2xl sm:text-4xl text-[#171717] leading-snug break-keep">
+      <header className="text-center space-y-4 max-w-[700px] min-w-0 mx-auto">
+        <h1 className="font-myeongjo font-extrabold text-2xl sm:text-4xl text-[#171717] leading-snug break-keep wrap-anywhere">
           &ldquo;{review.title}&rdquo;
         </h1>
 
         {review.description && (
-          <p className="text-sm sm:text-base text-[#808080] leading-relaxed break-keep max-w-[58ch] mx-auto">
+          <p className="text-sm sm:text-base text-[#808080] leading-relaxed break-keep wrap-anywhere max-w-[58ch] mx-auto">
             {review.description}
           </p>
         )}
@@ -128,7 +128,7 @@ export default function ReviewDetailPage({
       </header>
 
       {/* Long-form Editorial Prose (TipTap Readonly Viewer) */}
-      <article className="border-t border-[#bdc0c4]/60 pt-8">
+      <article className="border-t border-[#bdc0c4]/60 pt-8 min-w-0 max-w-full overflow-x-hidden">
         <TiptapReviewEditor content={review.content} editable={false} />
       </article>
     </PageContainer>

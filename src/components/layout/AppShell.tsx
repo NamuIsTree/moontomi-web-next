@@ -37,7 +37,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <MemberAuthProvider>
       <AppHeader />
-      <main className="flex-1 pt-[90px] md:pl-[75px] w-full">{children}</main>
+      <main className="flex-1 min-w-0 max-w-full overflow-x-clip pt-[90px] md:pl-[75px] w-full">
+        {children}
+      </main>
       <AppFooter />
     </MemberAuthProvider>
   );
