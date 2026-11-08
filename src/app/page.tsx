@@ -12,7 +12,7 @@ import {
   fetchTopLectures,
 } from "@/services/lecture.service";
 import { fetchReviewList } from "@/services/review.service";
-import { fetchArchiveList } from "@/services/archive.service";
+import { fetchCuratedArchives } from "@/services/archive.service";
 import type {
   ArchivePublicItem,
   LatestLectureSummary,
@@ -51,13 +51,9 @@ export default function HomePage() {
       .finally(() => {
         setReviewsLoading(false);
       });
-    fetchArchiveList({
-      page: 1,
-      limit: 10,
-      order: "desc",
-    })
+    fetchCuratedArchives(10, 3)
       .then((archives) => {
-        setLatestArchives(archives.slice(0, 10));
+        setLatestArchives(archives);
       })
       .finally(() => {
         setArchivesLoading(false);

@@ -15,12 +15,30 @@ html {
   scroll-behavior: smooth;
 }
 
+*,
+*::before,
+*::after {
+  caret-color: transparent;
+}
+
 body {
   font-family: var(--font-line-seed), sans-serif;
   color: #171717;
   background-color: #ffffff;
   overflow-x: clip;
+  caret-color: transparent;
+}
+
+input:not([readonly]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
+textarea:not([readonly]),
+[contenteditable="true"],
+[contenteditable="true"] * {
   caret-color: #ff8080;
+}
+
+.tiptap-readonly,
+.tiptap-readonly * {
+  caret-color: transparent !important;
 }
 
 ::selection {
@@ -302,4 +320,58 @@ body {
   display: block;
   border: 0;
   border-radius: 7px;
+}
+
+/* Padlock & Unlocking Animations for Unopened Comments */
+@keyframes padlock-wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-7deg);
+  }
+  75% {
+    transform: rotate(7deg);
+  }
+}
+
+@keyframes padlock-shackle-open {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  40% {
+    transform: translateY(-3.5px) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-3.5px) rotate(28deg);
+  }
+}
+
+@keyframes padlock-badge-unlock {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.padlock-shackle {
+  transform-origin: 16.5px 11px;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.padlock-unlocking .padlock-shackle {
+  animation: padlock-shackle-open 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.padlock-unlocking .padlock-badge {
+  animation: padlock-badge-unlock 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.group:hover .padlock-idle {
+  animation: padlock-wiggle 0.45s ease-in-out;
 }

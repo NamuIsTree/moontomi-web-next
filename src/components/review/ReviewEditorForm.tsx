@@ -124,7 +124,7 @@ export function ReviewEditorForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <header className="pb-4 border-b-2 border-[#242d3c]">
-        <h1 className="font-myeongjo font-extrabold text-2xl sm:text-3xl text-[#242d3c]">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#242d3c] tracking-tight">
           {mode === "create" ? "원고 투고하기" : "원고 수정하기"}
         </h1>
         <p className="text-sm text-[#808080] mt-1">

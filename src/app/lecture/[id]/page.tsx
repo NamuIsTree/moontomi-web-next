@@ -5,9 +5,10 @@ import Link from "next/link";
 import {
   ArrowLeft,
   ChevronDown,
-  ChevronUp,
   CirclePlay,
   Disc3,
+  KeyRound,
+  Loader2,
   SquarePen,
 } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -17,8 +18,10 @@ import { LectureCommentCard } from "@/components/lecture/LectureCommentCard";
 import {
   fetchLectureById,
   fetchLectureComments,
+  openLectureWithAdminPassword,
 } from "@/services/lecture.service";
 import type { LectureCommentItem, LectureDetail } from "@/types/domain";
+import { cn } from "@/lib/utils";
 
 export default function LectureDetailPage({
   params,
@@ -33,6 +36,12 @@ export default function LectureDetailPage({
   const [ratingHover, setRatingHover] = useState(false);
   const [showTracks, setShowTracks] = useState(false);
 
+  // Admin Open (make_lecture_public) state
+  const [showOpenForm, setShowOpenForm] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [openingLecture, setOpeningLecture] = useState(false);
+  const [openError, setOpenError] = useState<string | null>(null);
+
   useEffect(() => {
     if (!Number.isFinite(lectureId)) return;
     fetchLectureById(lectureId).then((data) => {
@@ -42,6 +51,51 @@ export default function LectureDetailPage({
       }
     });
   }, [lectureId]);
+
+  const handleOpenLecture = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!lecture || !adminPassword.trim()) {
+      setOpenError("관리자 비밀번호를 입력해 주세요.");
+      return;
+    }
+
+    setOpeningLecture(true);
+    setOpenError(null);
+    try {
+      const { rating } = await openLectureWithAdminPassword(
+        lecture.id,
+        adminPassword.trim()
+      );
+      const updated = await fetchLectureById(lecture.id);
+      if (updated) {
+        setLecture(updated);
+      } else {
+        setLecture((prev) =>
+          prev
+            ? {
+                ...prev,
+                rating,
+                date: prev.date ?? new Date().toISOString().slice(0, 10),
+              }
+            : prev
+        );
+      }
+      setShowOpenForm(false);
+      setAdminPassword("");
+    } catch (err) {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "음평회 오픈 중 오류가 발생했습니다.";
+      setOpenError(
+        msg.includes("관리자 비밀번호")
+          ? "관리자 비밀번호가 일치하지 않습니다."
+          : msg
+      );
+    } finally {
+      setOpeningLecture(false);
+    }
+  };
 
   if (!lecture) {
     return (
@@ -126,12 +180,12 @@ export default function LectureDetailPage({
             />
           </div>
 
-          <div className="flex flex-col items-center justify-center py-4 px-6 bg-white">
+          <div className="flex flex-col items-center justify-center py-4 px-4 sm:px-6 bg-white">
             {lecture.rating !== null ? (
               <div
                 onMouseEnter={() => setRatingHover(true)}
                 onMouseLeave={() => setRatingHover(false)}
-                className="cursor-default select-none text-center tabular-nums"
+                className="cursor-default select-none text-center tabular-nums animate-in fade-in duration-300"
               >
                 <div className="font-lobster text-4xl sm:text-5xl text-[#242d3c]">
                   {ratingHover
@@ -147,16 +201,74 @@ export default function LectureDetailPage({
                 </div>
               </div>
             ) : (
-              <div
-                onMouseEnter={() => setRatingHover(true)}
-                onMouseLeave={() => setRatingHover(false)}
-                className="font-lobster text-4xl sm:text-5xl text-[#242d3c] select-none"
-              >
-                {ratingHover ? "Open!" : "Open?"}
+              <div className="w-full flex flex-col items-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowOpenForm((prev) => !prev);
+                    setOpenError(null);
+                  }}
+                  onMouseEnter={() => setRatingHover(true)}
+                  onMouseLeave={() => setRatingHover(false)}
+                  className="group inline-flex items-center justify-center py-1.5 bg-white cursor-pointer select-none focus:outline-none"
+                  aria-expanded={showOpenForm}
+                >
+                  <span className="font-lobster text-4xl sm:text-5xl text-[#242d3c] group-hover:text-[#ff8080] transition-colors">
+                    {ratingHover || showOpenForm ? "Open!" : "Open?"}
+                  </span>
+                </button>
+
+                {/* Collapsible Admin Password Form */}
+                <div
+                  className={cn(
+                    "w-full max-w-[260px] grid transition-[grid-template-rows,opacity,margin] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                    showOpenForm
+                      ? "grid-rows-[1fr] opacity-100 mt-5 mb-2"
+                      : "grid-rows-[0fr] opacity-0 mt-0 mb-0 pointer-events-none"
+                  )}
+                >
+                  <div className="overflow-hidden">
+                    <form
+                      onSubmit={handleOpenLecture}
+                      className="p-3.5 rounded-[12px] bg-[#f3f3f3]/80 border border-[#bdc0c4]/80 space-y-2.5 text-left"
+                    >
+                      <label className="flex items-center gap-1.5 text-[11px] font-bold text-[#242d3c]">
+                        <KeyRound className="w-3 h-3 text-[#ff8080]" />
+                        <span>관리자 비밀번호로 평점 공개</span>
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="password"
+                          value={adminPassword}
+                          onChange={(e) => setAdminPassword(e.target.value)}
+                          placeholder="Admin Password"
+                          disabled={openingLecture}
+                          className="w-full min-w-0 px-2.5 py-1.5 rounded-[7px] border border-[#bdc0c4] bg-white text-xs text-[#171717] focus:outline-none focus:border-[#242d3c]"
+                        />
+                        <button
+                          type="submit"
+                          disabled={openingLecture}
+                          className="shrink-0 px-3 py-1.5 rounded-[7px] bg-[#242d3c] hover:bg-[#242d3c]/90 disabled:opacity-50 text-[#f0f8ff] text-xs font-bold transition-colors inline-flex items-center gap-1 cursor-pointer"
+                        >
+                          {openingLecture ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-[#ff8080]" />
+                          ) : (
+                            <span>OPEN</span>
+                          )}
+                        </button>
+                      </div>
+                      {openError && (
+                        <p className="text-[11px] font-semibold text-[#ff5252] break-keep">
+                          {openError}
+                        </p>
+                      )}
+                    </form>
+                  </div>
+                </div>
               </div>
             )}
 
-            <div className="pt-3 text-xs font-bold text-[#808080] tabular-nums">
+            <div className="pt-4 text-xs font-bold text-[#808080] tabular-nums">
               총 {comments.length}명의 멤버 참여
             </div>
           </div>
@@ -169,34 +281,45 @@ export default function LectureDetailPage({
           <button
             type="button"
             onClick={() => setShowTracks((prev) => !prev)}
+            aria-expanded={showTracks}
             className="w-full flex items-center justify-between px-2 py-1 text-xs sm:text-sm font-bold text-[#242d3c] hover:text-[#ff8080] transition-colors cursor-pointer"
           >
             <span className="inline-flex items-center gap-2">
               <Disc3 className="w-4 h-4 text-[#ff8080]" />
               <span>수록곡 트랙리스트 ({lecture.tracks.length}곡)</span>
             </span>
-            {showTracks ? (
-              <ChevronUp className="w-4 h-4" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
-            )}
+            <ChevronDown
+              className={cn(
+                "w-4 h-4 transition-transform duration-300 ease-out",
+                showTracks ? "rotate-180" : "rotate-0"
+              )}
+            />
           </button>
 
-          {showTracks && (
-            <ol className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 pt-3 px-2 text-xs sm:text-sm text-[#171717]">
-              {lecture.tracks.map((track, idx) => (
-                <li
-                  key={`${track}-${idx}`}
-                  className="flex items-baseline gap-2.5 py-1 border-b border-[#f3f3f3] last:border-b-0"
-                >
-                  <span className="font-mono text-xs font-bold text-[#808080] tabular-nums w-6 shrink-0">
-                    {String(idx + 1).padStart(2, "0")}.
-                  </span>
-                  <span className="break-keep">{track}</span>
-                </li>
-              ))}
-            </ol>
-          )}
+          <div
+            className={cn(
+              "grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+              showTracks
+                ? "grid-rows-[1fr] opacity-100"
+                : "grid-rows-[0fr] opacity-0 pointer-events-none"
+            )}
+          >
+            <div className="overflow-hidden">
+              <ol className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 pt-3 px-2 text-xs sm:text-sm text-[#171717]">
+                {lecture.tracks.map((track, idx) => (
+                  <li
+                    key={`${track}-${idx}`}
+                    className="flex items-baseline gap-2.5 py-1 border-b border-[#f3f3f3] last:border-b-0"
+                  >
+                    <span className="font-mono text-xs font-bold text-[#808080] tabular-nums w-6 shrink-0">
+                      {String(idx + 1).padStart(2, "0")}.
+                    </span>
+                    <span className="break-keep">{track}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
         </section>
       )}
 
@@ -208,7 +331,7 @@ export default function LectureDetailPage({
           </h3>
           {!isLectureOpen && (
             <span className="text-xs font-semibold text-[#808080]">
-              평점 공개 전 (개별 화살표로 미리보기 가능)
+              평점 공개 전 (자물쇠 또는 화살표로 열람 가능)
             </span>
           )}
         </div>

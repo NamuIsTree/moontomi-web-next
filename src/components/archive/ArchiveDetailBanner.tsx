@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Share2, Check, ChevronUp, ChevronDown, Disc3 } from "lucide-react";
+import { Share2, Check, ChevronDown, Disc3 } from "lucide-react";
 import { StarRating } from "@/components/ui/StarRating";
 import type { ArchivePublicItem } from "@/types/domain";
 import { cn } from "@/lib/utils";
@@ -42,7 +42,14 @@ export function ArchiveDetailBanner({
             <span className="font-mono font-bold text-[#ff8080] shrink-0">
               #{String(selected.id).padStart(3, "0")}
             </span>
-            <span className="px-1.5 py-0.2 rounded bg-white/10 font-nohemi font-bold text-[10px] uppercase text-[#f0f8ff] shrink-0">
+            <span
+              className={cn(
+                "inline-flex items-center justify-center px-1.5 pt-[3.5px] pb-[1.5px] rounded-[5px] border font-nohemi font-bold text-[10px] leading-none uppercase tracking-wider shrink-0",
+                selected.item.type === "album"
+                  ? "bg-green-500/20 border-green-400/60 text-green-300"
+                  : "bg-orange-400/20 border-orange-400/60 text-orange-300"
+              )}
+            >
               {selected.item.type}
             </span>
             <span className="truncate min-w-0">by {selected.writer}</span>
@@ -63,14 +70,16 @@ export function ArchiveDetailBanner({
           <button
             type="button"
             onClick={() => setMobileExpanded((prev) => !prev)}
-            className="inline-flex items-center gap-1 px-2 py-1.5 rounded-[7px] bg-white/15 hover:bg-white/25 text-xs font-bold text-[#f0f8ff] cursor-pointer shrink-0"
+            aria-expanded={mobileExpanded}
+            className="inline-flex items-center gap-1 px-2 py-1.5 rounded-[7px] bg-white/15 hover:bg-white/25 text-xs font-bold text-[#f0f8ff] cursor-pointer shrink-0 transition-colors"
           >
             <span>{mobileExpanded ? "접기" : "플레이어"}</span>
-            {mobileExpanded ? (
-              <ChevronUp className="w-3.5 h-3.5 text-[#ff8080]" />
-            ) : (
-              <ChevronDown className="w-3.5 h-3.5 text-[#ff8080]" />
-            )}
+            <ChevronDown
+              className={cn(
+                "w-3.5 h-3.5 text-[#ff8080] transition-transform duration-300 ease-out",
+                mobileExpanded ? "rotate-180" : "rotate-0"
+              )}
+            />
           </button>
         </div>
       </div>
@@ -88,13 +97,16 @@ export function ArchiveDetailBanner({
         <span className="shrink-0">{selected.date}</span>
       </div>
 
-      {/* Expanded Details & Player (Always visible on lg+, player-only toggle on mobile) */}
+      {/* Expanded Details & Player (Always visible on lg+, smooth collapse toggle on mobile) */}
       <div
         className={cn(
-          "pt-3 lg:pt-3.5 mt-3 lg:mt-0 border-t border-white/10 lg:border-t-0 space-y-3.5",
-          mobileExpanded ? "block" : "hidden lg:block"
+          "grid transition-[grid-template-rows,opacity,margin,padding] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:block lg:pt-3.5 lg:mt-0 lg:opacity-100",
+          mobileExpanded
+            ? "grid-rows-[1fr] opacity-100 pt-3 mt-3 border-t border-white/10 lg:border-t-0"
+            : "grid-rows-[0fr] opacity-0 pt-0 mt-0 border-t-0 pointer-events-none lg:pointer-events-auto"
         )}
       >
+        <div className="overflow-hidden lg:overflow-visible space-y-3.5">
         {/* Album Cover (Desktop lg+ only — mobile already has thumbnail in compact bar) */}
         <div className="hidden lg:flex justify-center">
           <img
@@ -104,19 +116,19 @@ export function ArchiveDetailBanner({
           />
         </div>
 
-        {/* Type Badge + Share + Genres */}
+        {/* Type Badge (Desktop lg+ only) + Share + Genres */}
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span
               className={cn(
-                "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-xs font-nohemi font-bold uppercase tracking-wider bg-black/35",
+                "hidden lg:inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs leading-none font-nohemi font-bold uppercase tracking-wider bg-black/35",
                 selected.item.type === "album"
                   ? "border-green-400 text-green-300"
                   : "border-orange-400 text-orange-300"
               )}
             >
               <Disc3 className="w-3 h-3" />
-              <span>{selected.item.type.toUpperCase()}</span>
+              <span className="translate-y-[1px]">{selected.item.type.toUpperCase()}</span>
             </span>
 
             <button
@@ -200,6 +212,7 @@ export function ArchiveDetailBanner({
               ) : null}
             </div>
           )}
+        </div>
       </div>
     </div>
   );

@@ -41,7 +41,7 @@ export function ArchiveListItem({
         </span>
         <span
           className={cn(
-            "mt-1 px-1.5 py-0.5 rounded-[7px] text-xs font-nohemi font-bold uppercase tracking-wider",
+            "mt-1 inline-flex items-center justify-center px-1.5 pt-[3.5px] pb-[1.5px] rounded-[7px] text-xs leading-none font-nohemi font-bold uppercase tracking-wider",
             archive.item.type === "album"
               ? isSelected
                 ? "bg-green-500/20 text-green-300"
@@ -88,7 +88,21 @@ export function ArchiveListItem({
               isSelected ? "text-[#ff8080]" : "text-[#808080]"
             )}
           >
-            #{archive.id}
+            #{String(archive.id).padStart(3, "0")}
+          </span>
+          <span
+            className={cn(
+              "sm:hidden inline-flex items-center justify-center px-1.5 pt-[3.5px] pb-[1.5px] rounded-[5px] text-[10px] leading-none font-nohemi font-bold uppercase tracking-wider shrink-0 border",
+              archive.item.type === "album"
+                ? isSelected
+                  ? "bg-green-500/20 text-green-300 border-green-400/50"
+                  : "bg-green-600/10 text-green-700 border-green-600/30"
+                : isSelected
+                  ? "bg-orange-400/20 text-orange-300 border-orange-400/50"
+                  : "bg-orange-500/10 text-orange-700 border-orange-500/30"
+            )}
+          >
+            {archive.item.type === "album" ? "ALB" : "SGL"}
           </span>
           <div
             className={cn(

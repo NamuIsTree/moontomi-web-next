@@ -9,7 +9,11 @@ interface RawItemRelation {
   image_id: string;
   release: string;
   links: ExternalLinks | null;
-  artist: { name: string } | null;
+  artist: {
+    name: string;
+    name_en?: string | null;
+    pronounce?: string | null;
+  } | null;
   album_genre?: { genre: GenreInfo }[];
   single_genre?: { genre: GenreInfo }[];
 }
@@ -45,6 +49,8 @@ function mapArchiveRow(row: {
       title: target.title,
       image: getImageUrl(target.image_id),
       artist: target.artist?.name ?? "",
+      artist_en: target.artist?.name_en ?? null,
+      artist_pronounce: target.artist?.pronounce ?? null,
       release: target.release,
       genres,
       links: target.links ?? null,
@@ -63,7 +69,7 @@ const ARCHIVE_SELECT_QUERY = `
     image_id,
     release,
     links,
-    artist:artist_id(name),
+    artist:artist_id(name, name_en, pronounce),
     album_genre(genre:genre_id(genre_id, category, name))
   ),
   single(
@@ -72,7 +78,7 @@ const ARCHIVE_SELECT_QUERY = `
     image_id,
     release,
     links,
-    artist:artist_id(name),
+    artist:artist_id(name, name_en, pronounce),
     single_genre(genre:genre_id(genre_id, category, name))
   )
 `;
@@ -127,4 +133,38 @@ export async function fetchArchiveById(
   if (error || !data) return null;
 
   return mapArchiveRow(data as unknown as Parameters<typeof mapArchiveRow>[0]);
+}
+
+export async function fetchCuratedArchives(
+  totalCount = 10,
+  latestCount = 3
+): Promise<ArchivePublicItem[]> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("archive")
+    .select(ARCHIVE_SELECT_QUERY)
+    .order("archive_id", { ascending: false })
+    .limit(1000);
+
+  if (error || !data) return [];
+
+  const allItems = data
+    .map((row) =>
+      mapArchiveRow(row as unknown as Parameters<typeof mapArchiveRow>[0])
+    )
+    .filter((item): item is ArchivePublicItem => item !== null);
+
+  const latestItems = allItems.slice(0, latestCount);
+  const remaining = allItems.slice(latestCount);
+
+  for (let i = remaining.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
+  }
+
+  const randomCount = Math.max(0, totalCount - latestItems.length);
+  const randomItems = remaining.slice(0, randomCount);
+
+  return [...latestItems, ...randomItems];
 }

@@ -49,11 +49,18 @@ export function AppHeader() {
           <span className="tracking-wide group-hover:text-[#ff8080] transition-colors">
             MOONTOMI
           </span>
-          {!shrink && (
-            <span className="mt-1 text-xs sm:text-[15px] font-semibold font-sans text-[#f0f8ff]/85 tracking-tight">
+          <span
+            className={cn(
+              "grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out",
+              shrink
+                ? "grid-rows-[0fr] opacity-0 mt-0"
+                : "grid-rows-[1fr] opacity-100 mt-1"
+            )}
+          >
+            <span className="overflow-hidden text-xs sm:text-[15px] font-semibold font-sans text-[#f0f8ff]/85 tracking-tight">
               문형규의 토요일, 음악에 미치는 날
             </span>
-          )}
+          </span>
         </Link>
       </header>
 

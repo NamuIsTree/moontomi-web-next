@@ -74,9 +74,9 @@ export function LatestArchiveSection({
                     />
 
                     {/* Type Badge (ALBUM / SINGLE) */}
-                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-[7px] bg-[#242d3c]/90 text-[#f0f8ff] text-[10px] sm:text-[11px] font-nohemi font-bold uppercase tracking-wider">
+                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-[7px] bg-[#242d3c]/90 text-[#f0f8ff] text-[10px] sm:text-[11px] font-nohemi font-bold uppercase tracking-wider leading-none">
                       <Disc3 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#ff8080]" />
-                      <span>{entry.item.type}</span>
+                      <span className="translate-y-[1px]">{entry.item.type}</span>
                     </span>
 
                     {/* Rating Pill */}

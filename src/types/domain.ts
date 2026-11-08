@@ -117,6 +117,8 @@ export interface ArchivePublicItem {
     title: string;
     image: string;
     artist: string;
+    artist_en?: string | null;
+    artist_pronounce?: string | null;
     release: string;
     genres: GenreInfo[];
     links: ExternalLinks | null;

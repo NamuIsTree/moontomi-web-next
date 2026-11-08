@@ -252,3 +252,27 @@ export async function fetchLectureComments(
     };
   });
 }
+
+export async function openLectureWithAdminPassword(
+  lectureId: number,
+  password: string
+): Promise<{ rating: number }> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.rpc("admin_action", {
+    p_password: password,
+    p_action: "make_lecture_public",
+    p_payload: { lecture_id: lectureId },
+  });
+
+  if (error) {
+    throw new Error(error.message || "관리자 비밀번호가 일치하지 않습니다.");
+  }
+
+  const rawRating =
+    typeof (data as { rating?: unknown })?.rating === "number"
+      ? ((data as { rating: number }).rating / 1000)
+      : 0;
+
+  return { rating: rawRating };
+}

@@ -498,8 +498,13 @@ export default function AdminDashboardPage() {
   const handleSaveAlbum = async (e: React.FormEvent) => {
     e.preventDefault();
     const artistId = albumArtistId || artists[0]?.artist_id;
-    if (!albumTitle.trim() || !artistId || !albumRelease.trim()) {
-      showToast("error", "앨범 제목, 아티스트, 발매일은 필수입니다.");
+    const releaseYear = albumRelease.trim();
+    if (!albumTitle.trim() || !artistId || !releaseYear) {
+      showToast("error", "앨범 제목, 아티스트, 출시 연도(yyyy)는 필수입니다.");
+      return;
+    }
+    if (!/^\d{4}$/.test(releaseYear)) {
+      showToast("error", "앨범 출시 일자는 4자리 연도(yyyy) 형식으로 입력해 주세요.");
       return;
     }
 
@@ -514,7 +519,7 @@ export default function AdminDashboardPage() {
         title: albumTitle,
         artist_id: artistId,
         image_id: albumImageId,
-        release: albumRelease,
+        release: releaseYear,
         tracks,
         genre_ids: albumGenreIds,
         links: {
@@ -551,8 +556,13 @@ export default function AdminDashboardPage() {
   const handleSaveSingle = async (e: React.FormEvent) => {
     e.preventDefault();
     const artistId = singleArtistId || artists[0]?.artist_id;
-    if (!singleTitle.trim() || !artistId || !singleRelease.trim()) {
-      showToast("error", "싱글 제목, 아티스트, 발매일은 필수입니다.");
+    const releaseYear = singleRelease.trim();
+    if (!singleTitle.trim() || !artistId || !releaseYear) {
+      showToast("error", "싱글 제목, 아티스트, 출시 연도(yyyy)는 필수입니다.");
+      return;
+    }
+    if (!/^\d{4}$/.test(releaseYear)) {
+      showToast("error", "싱글 출시 일자는 4자리 연도(yyyy) 형식으로 입력해 주세요.");
       return;
     }
 
@@ -562,7 +572,7 @@ export default function AdminDashboardPage() {
         title: singleTitle,
         artist_id: artistId,
         image_id: singleImageId,
-        release: singleRelease,
+        release: releaseYear,
         genre_ids: singleGenreIds,
         links: {
           youtube: singleYoutube.trim() || null,
@@ -1212,13 +1222,19 @@ export default function AdminDashboardPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-[#242d3c] mb-1">
-                    발매일 *
+                    출시 연도 (yyyy) *
                   </label>
                   <input
-                    type="date"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="\d{4}"
+                    maxLength={4}
                     required
                     value={albumRelease}
-                    onChange={(e) => setAlbumRelease(e.target.value)}
+                    onChange={(e) =>
+                      setAlbumRelease(e.target.value.replace(/\D/g, "").slice(0, 4))
+                    }
+                    placeholder="예: 2024"
                     className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs"
                   />
                 </div>
@@ -1522,13 +1538,19 @@ export default function AdminDashboardPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-[#242d3c] mb-1">
-                    발매일 *
+                    출시 연도 (yyyy) *
                   </label>
                   <input
-                    type="date"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="\d{4}"
+                    maxLength={4}
                     required
                     value={singleRelease}
-                    onChange={(e) => setSingleRelease(e.target.value)}
+                    onChange={(e) =>
+                      setSingleRelease(e.target.value.replace(/\D/g, "").slice(0, 4))
+                    }
+                    placeholder="예: 2024"
                     className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs"
                   />
                 </div>

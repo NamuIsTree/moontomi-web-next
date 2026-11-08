@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { LayoutGrid, LayoutList, Search } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { LayoutGrid, LayoutList, Loader2, Search, X } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { InfiniteScrollSentinel } from "@/components/ui/InfiniteScrollSentinel";
 import { ArchiveDetailBanner } from "@/components/archive/ArchiveDetailBanner";
@@ -26,17 +26,22 @@ const RATING_FILTER_OPTIONS = [
   { label: "3.0점 이상", min: 30 },
 ] as const;
 
+const PAGE_STEP = 20;
+
 export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
-  const [archives, setArchives] = useState<ArchivePublicItem[]>([]);
+  const [allArchives, setAllArchives] = useState<ArchivePublicItem[]>([]);
   const [selected, setSelected] = useState<ArchivePublicItem | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [order, setOrder] = useState<"desc" | "asc">("desc");
   const [minRating, setMinRating] = useState<number>(0);
   const [typeFilter, setTypeFilter] = useState<"all" | "album" | "single">("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const [complete, setComplete] = useState(false);
-  const [loading, setLoading] = useState(false);
+
+  // Search input vs committed search query (triggered on Enter or Search button)
+  const [searchInput, setSearchInput] = useState("");
+  const [submittedQuery, setSubmittedQuery] = useState("");
+
+  const [visibleCount, setVisibleCount] = useState<number>(PAGE_STEP);
+  const [loading, setLoading] = useState(true);
   const [headerShrunk, setHeaderShrunk] = useState(false);
 
   useEffect(() => {
@@ -51,82 +56,121 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
   }, []);
 
   useEffect(() => {
-    if (initialArchiveId && Number.isFinite(initialArchiveId)) {
-      fetchArchiveById(initialArchiveId).then((item) => {
-        if (item) setSelected(item);
+    let mounted = true;
+    setLoading(true);
+
+    fetchArchiveList({
+      page: 1,
+      limit: 1000,
+      order: "desc",
+      minRating: 0,
+      maxRating: 1000,
+    })
+      .then((items) => {
+        if (!mounted) return;
+        // Deduplicate by archive.id to guarantee unique keys
+        const uniqueItems = Array.from(
+          new Map(items.map((item) => [item.id, item])).values()
+        );
+        setAllArchives(uniqueItems);
+
+        if (initialArchiveId && Number.isFinite(initialArchiveId)) {
+          const found = uniqueItems.find((it) => it.id === initialArchiveId);
+          if (found) {
+            setSelected(found);
+          } else {
+            fetchArchiveById(initialArchiveId).then((single) => {
+              if (mounted && single) setSelected(single);
+            });
+          }
+        } else if (uniqueItems.length > 0) {
+          setSelected((prev) => prev ?? uniqueItems[0]);
+        }
+      })
+      .finally(() => {
+        if (mounted) {
+          setLoading(false);
+        }
       });
-    }
+
+    return () => {
+      mounted = false;
+    };
   }, [initialArchiveId]);
-
-  const loadMore = useCallback(
-    async (
-      targetPage: number,
-      targetOrder: "desc" | "asc",
-      targetMinRating: number,
-      selectFirst = false,
-      reset = false
-    ) => {
-      setLoading(true);
-      try {
-        const items = await fetchArchiveList({
-          page: targetPage,
-          limit: 20,
-          order: targetOrder,
-          minRating: targetMinRating,
-          maxRating: 1000,
-        });
-
-        setArchives((prev) => (reset ? items : [...prev, ...items]));
-
-        if (selectFirst && items.length > 0 && !initialArchiveId) {
-          setSelected((prev) => prev ?? items[0]);
-        }
-
-        if (items.length < 20) {
-          setComplete(true);
-        } else {
-          setPage(targetPage + 1);
-        }
-      } finally {
-        setLoading(false);
-      }
-    },
-    [initialArchiveId]
-  );
 
   const handleOrderChange = (nextOrder: "desc" | "asc") => {
     if (nextOrder === order) return;
     setOrder(nextOrder);
-    setArchives([]);
-    setPage(1);
-    setComplete(false);
-    loadMore(1, nextOrder, minRating, false, true);
+    setVisibleCount(PAGE_STEP);
   };
 
   const handleMinRatingChange = (nextMin: number) => {
     if (nextMin === minRating) return;
     setMinRating(nextMin);
-    setArchives([]);
-    setPage(1);
-    setComplete(false);
-    loadMore(1, order, nextMin, false, true);
+    setVisibleCount(PAGE_STEP);
   };
 
-  const visibleArchives = useMemo(() => {
-    return archives.filter((archive) => {
+  const handleTypeFilterChange = (nextType: "all" | "album" | "single") => {
+    if (nextType === typeFilter) return;
+    setTypeFilter(nextType);
+    setVisibleCount(PAGE_STEP);
+  };
+
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setSubmittedQuery(searchInput.trim());
+    setVisibleCount(PAGE_STEP);
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput("");
+    setSubmittedQuery("");
+    setVisibleCount(PAGE_STEP);
+  };
+
+  const filteredAndSortedArchives = useMemo(() => {
+    const q = submittedQuery.trim().toLowerCase();
+    const minScore = minRating / 10; // minRating is 0, 30, 35, 40, 45 -> archive.rating is 0.0 ~ 5.0 (or 10.0)
+
+    const filtered = allArchives.filter((archive) => {
+      if (minRating > 0 && archive.rating < minScore) {
+        return false;
+      }
       if (typeFilter !== "all" && archive.item.type !== typeFilter) {
         return false;
       }
-      if (searchQuery.trim()) {
-        const q = searchQuery.trim().toLowerCase();
+      if (q) {
         const inTitle = archive.item.title.toLowerCase().includes(q);
         const inArtist = archive.item.artist.toLowerCase().includes(q);
+        const inArtistEn = (archive.item.artist_en ?? "")
+          .toLowerCase()
+          .includes(q);
+        const inArtistPronounce = (archive.item.artist_pronounce ?? "")
+          .toLowerCase()
+          .includes(q);
         const inWriter = archive.writer.toLowerCase().includes(q);
-        return inTitle || inArtist || inWriter;
+        return (
+          inTitle ||
+          inArtist ||
+          inArtistEn ||
+          inArtistPronounce ||
+          inWriter
+        );
       }
       return true;
     });
-  }, [archives, typeFilter, searchQuery]);
+
+    return filtered.sort((a, b) =>
+      order === "asc" ? a.id - b.id : b.id - a.id
+    );
+  }, [allArchives, minRating, typeFilter, submittedQuery, order]);
+
+  const visibleArchives = useMemo(
+    () => filteredAndSortedArchives.slice(0, visibleCount),
+    [filteredAndSortedArchives, visibleCount]
+  );
+
+  const complete = visibleCount >= filteredAndSortedArchives.length;
 
   return (
     <PageContainer width="wide" className="space-y-6">
@@ -204,8 +248,8 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
         {/* Right Column: Filter Toolbar + Archive Catalog (List or Grid) */}
         <div className="w-full lg:flex-1 min-w-0 space-y-3.5 sm:space-y-4">
           {/* Filter & Search Toolbar */}
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-[7px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60">
-            <div>
+          <div className="grid grid-cols-3 sm:grid-cols-12 gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-[7px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60">
+            <div className="col-span-1 sm:col-span-2">
               <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c] mb-1">
                 정렬 기준
               </label>
@@ -214,21 +258,21 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
                 onChange={(e) =>
                   handleOrderChange(e.target.value as "desc" | "asc")
                 }
-                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+                className="w-full px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
               >
                 <option value="desc">최신순</option>
                 <option value="asc">초기순</option>
               </select>
             </div>
 
-            <div>
+            <div className="col-span-1 sm:col-span-3">
               <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c] mb-1">
                 별점 필터
               </label>
               <select
                 value={minRating}
                 onChange={(e) => handleMinRatingChange(Number(e.target.value))}
-                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+                className="w-full px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
               >
                 {RATING_FILTER_OPTIONS.map((opt) => (
                   <option key={opt.min} value={opt.min}>
@@ -238,16 +282,18 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
               </select>
             </div>
 
-            <div>
+            <div className="col-span-1 sm:col-span-2">
               <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c] mb-1">
                 유형
               </label>
               <select
                 value={typeFilter}
                 onChange={(e) =>
-                  setTypeFilter(e.target.value as "all" | "album" | "single")
+                  handleTypeFilterChange(
+                    e.target.value as "all" | "album" | "single"
+                  )
                 }
-                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
+                className="w-full px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm font-semibold text-[#242d3c] focus:outline-none focus:border-[#242d3c]"
               >
                 <option value="all">전체</option>
                 <option value="album">ALBUM</option>
@@ -255,24 +301,84 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
               </select>
             </div>
 
-            <div className="col-span-3 sm:col-span-1">
+            <form
+              onSubmit={handleSearchSubmit}
+              className="col-span-3 sm:col-span-5"
+            >
               <label className="block text-[11px] sm:text-xs font-bold text-[#242d3c] mb-1">
-                빠른 검색
+                아카이브 검색
               </label>
-              <div className="relative">
-                <Search className="w-3.5 h-3.5 text-[#808080] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="곡 · 아티스트 · 추천인 검색"
-                  className="w-full pl-8 pr-3 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm text-[#171717] focus:outline-none focus:border-[#242d3c]"
-                />
+              <div className="flex items-center gap-1.5">
+                <div className="relative flex-1 min-w-0">
+                  <Search className="w-3.5 h-3.5 text-[#808080] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    placeholder="곡 · 아티스트(한/영/발음) · 추천인"
+                    className="w-full pl-8 pr-7 py-1.5 sm:py-2 rounded-[7px] border border-[#bdc0c4] bg-white text-xs sm:text-sm text-[#171717] focus:outline-none focus:border-[#242d3c]"
+                  />
+                  {searchInput && (
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      aria-label="검색어 지우기"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-[#808080] hover:text-[#242d3c] cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  className="shrink-0 px-3 py-1.5 sm:py-2 rounded-[7px] bg-[#242d3c] hover:bg-[#242d3c]/90 text-[#f0f8ff] text-xs sm:text-sm font-bold transition-colors cursor-pointer"
+                >
+                  검색
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Search Result Banner ("~에 대한 검색 결과입니다.") with Smooth Collapse Transition */}
+          <div
+            className={cn(
+              "grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+              submittedQuery
+                ? "grid-rows-[1fr] opacity-100"
+                : "grid-rows-[0fr] opacity-0 pointer-events-none"
+            )}
+          >
+            <div className="overflow-hidden">
+              <div className="flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-[7px] bg-[#242d3c]/5 border border-[#242d3c]/15 text-xs sm:text-sm text-[#242d3c]">
+                <div className="min-w-0 truncate">
+                  <strong className="font-bold text-[#ff8080]">
+                    “{submittedQuery}”
+                  </strong>
+                  <span>에 대한 검색 결과입니다. </span>
+                  <span className="font-bold tabular-nums text-[#808080]">
+                    ({filteredAndSortedArchives.length}건)
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="shrink-0 inline-flex items-center gap-1 text-xs font-bold text-[#808080] hover:text-[#242d3c] cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span>검색 해제</span>
+                </button>
               </div>
             </div>
           </div>
 
-          {viewMode === "list" ? (
+          {loading ? (
+            <div className="py-20 flex flex-col items-center justify-center gap-3 text-center border border-[#bdc0c4]/40 rounded-[7px] bg-white">
+              <Loader2 className="w-8 h-8 animate-spin text-[#ff8080]" />
+              <p className="text-sm font-bold text-[#242d3c]">
+                아카이브 목록을 불러오는 중입니다...
+              </p>
+            </div>
+          ) : viewMode === "list" ? (
             <div className="space-y-2.5">
               {visibleArchives.map((archive) => (
                 <ArchiveListItem
@@ -296,16 +402,16 @@ export function ArchiveBrowser({ initialArchiveId }: ArchiveBrowserProps) {
             </div>
           )}
 
-          {!loading && visibleArchives.length === 0 && complete && (
+          {!loading && filteredAndSortedArchives.length === 0 && (
             <div className="py-16 text-center text-sm text-[#808080] border border-[#bdc0c4]/50 rounded-[7px]">
               조건에 일치하는 아카이브가 없습니다.
             </div>
           )}
 
           <InfiniteScrollSentinel
-            disabled={complete}
+            disabled={complete || loading}
             loading={loading}
-            onIntersect={() => loadMore(page, order, minRating, page === 1)}
+            onIntersect={() => setVisibleCount((prev) => prev + PAGE_STEP)}
           />
         </div>
       </div>

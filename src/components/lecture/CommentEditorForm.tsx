@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Loader2, Smile } from "lucide-react";
 import { SeasonChip, GenreChipList } from "@/components/ui/GenreChipList";
 import { StarRating } from "@/components/ui/StarRating";
 import {
@@ -31,6 +31,13 @@ const BEST_TRACK_META = [
   { label: "베스트 트랙 3위 (BRONZE)", color: "#6e3732" },
 ];
 
+const QUICK_EMOJIS = [
+  "👍", "🔥", "❤️", "❤️‍🔥", "🎧", "🎵", "🎶", "🎸", "🎹", "🥁",
+  "🎷", "🎺", "🎻", "🎤", "💿", "✨", "🌟", "🏆", "👑", "💯",
+  "🥰", "😍", "🤩", "😎", "🥹", "😭", "🤯", "🤔", "😴", "🙏",
+  "👏", "🙌", "🤘", "💃", "🕺", "☕️", "🍺", "🍷", "🏖️", "🌙",
+];
+
 function getRatingSliderColor(rating: number): string {
   if (rating < 30) return "#3f51b5";
   if (rating < 50) return "#009688";
@@ -55,8 +62,27 @@ export function CommentEditorForm({
   const [rating, setRating] = useState(initialRating);
   const [bests, setBests] = useState<[string, string, string]>(initialBests);
   const [comment, setComment] = useState(initialComment);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const commentTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleInsertEmoji = (emoji: string) => {
+    const textarea = commentTextareaRef.current;
+    if (textarea) {
+      const start = textarea.selectionStart ?? comment.length;
+      const end = textarea.selectionEnd ?? comment.length;
+      const next = comment.slice(0, start) + emoji + comment.slice(end);
+      setComment(next);
+      requestAnimationFrame(() => {
+        textarea.focus();
+        const cursor = start + emoji.length;
+        textarea.setSelectionRange(cursor, cursor);
+      });
+    } else {
+      setComment((prev) => prev + emoji);
+    }
+  };
 
   const handleBestChange = (index: 0 | 1 | 2, value: string) => {
     setBests((prev) => {
@@ -241,11 +267,45 @@ export function CommentEditorForm({
         ))}
 
         {/* Comment Textarea */}
-        <div>
-          <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
-            한줄평
-          </label>
+        <div className="relative">
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-xs font-bold text-[#242d3c]">
+              한줄평
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowEmojiPicker((prev) => !prev)}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-[7px] text-xs font-semibold text-[#242d3c] hover:bg-[#f3f3f3] transition-colors cursor-pointer"
+              aria-label="이모지 선택"
+            >
+              <Smile className="w-4 h-4 text-[#ff8080]" />
+              <span>이모지</span>
+            </button>
+          </div>
+          <div
+            className={`grid transition-[grid-template-rows,opacity,margin] duration-250 ease-out ${
+              showEmojiPicker
+                ? "grid-rows-[1fr] opacity-100 mb-2"
+                : "grid-rows-[0fr] opacity-0 mb-0 pointer-events-none"
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="p-2.5 rounded-[7px] border border-[#bdc0c4] bg-white shadow-sm grid grid-cols-10 gap-1">
+                {QUICK_EMOJIS.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    onClick={() => handleInsertEmoji(emoji)}
+                    className="h-8 flex items-center justify-center rounded hover:bg-[#f3f3f3] text-base transition-colors cursor-pointer"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
           <textarea
+            ref={commentTextareaRef}
             rows={4}
             value={comment}
             onChange={(e) => setComment(e.target.value)}

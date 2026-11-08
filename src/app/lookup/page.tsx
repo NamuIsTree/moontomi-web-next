@@ -129,35 +129,44 @@ export default function LookupPage() {
         </div>
 
         {/* Active Pattern Chips */}
-        {patterns.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 pt-1">
-            {patterns.map((ptn, idx) => (
-              <span
-                key={`${ptn}-${idx}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#242d3c] text-xs font-bold text-[#f0f8ff]"
-              >
-                <span>{ptn}</span>
+        <div
+          className={cn(
+            "grid transition-[grid-template-rows,opacity] duration-250 ease-out",
+            patterns.length > 0
+              ? "grid-rows-[1fr] opacity-100"
+              : "grid-rows-[0fr] opacity-0 pointer-events-none"
+          )}
+        >
+          <div className="overflow-hidden">
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              {patterns.map((ptn, idx) => (
+                <span
+                  key={`${ptn}-${idx}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#242d3c] text-xs font-bold text-[#f0f8ff]"
+                >
+                  <span>{ptn}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemovePattern(idx)}
+                    aria-label={`${ptn} 제거`}
+                    className="text-[#f0f8ff]/80 hover:text-[#ff8080] cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              ))}
+              {patterns.length > 1 && (
                 <button
                   type="button"
-                  onClick={() => handleRemovePattern(idx)}
-                  aria-label={`${ptn} 제거`}
-                  className="text-[#f0f8ff]/80 hover:text-[#ff8080] cursor-pointer"
+                  onClick={handleClearAll}
+                  className="text-xs font-semibold text-[#808080] hover:text-[#242d3c] underline underline-offset-2 px-2 py-1 cursor-pointer"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  모두 지우기
                 </button>
-              </span>
-            ))}
-            {patterns.length > 1 && (
-              <button
-                type="button"
-                onClick={handleClearAll}
-                className="text-xs font-semibold text-[#808080] hover:text-[#242d3c] underline underline-offset-2 px-2 py-1 cursor-pointer"
-              >
-                모두 지우기
-              </button>
-            )}
+              )}
+            </div>
           </div>
-        )}
+        </div>
       </section>
 
       {/* Summary Statistics & Sort Controls */}

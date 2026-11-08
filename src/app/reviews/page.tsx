@@ -109,7 +109,7 @@ export default function ReviewsPage() {
       {/* Magazine Masthead */}
       <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-5 mb-5 border-b-2 border-[#242d3c]">
         <div>
-          <h1 className="font-myeongjo font-extrabold text-2xl sm:text-3xl text-[#242d3c] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#242d3c] tracking-tight">
             칼럼 &amp; 에세이
           </h1>
           <p className="text-sm text-[#808080] mt-1">

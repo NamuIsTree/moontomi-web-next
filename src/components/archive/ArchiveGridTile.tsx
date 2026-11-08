@@ -38,7 +38,7 @@ export function ArchiveGridTile({
         <div className="absolute top-2 left-2 right-2 flex items-center justify-between">
           <span
             className={cn(
-              "px-1.5 sm:px-2 py-0.5 rounded-full border text-[10px] sm:text-xs font-nohemi font-bold uppercase bg-black/65",
+              "inline-flex items-center justify-center px-1.5 sm:px-2 pt-[3.5px] pb-[1.5px] rounded-full border text-[10px] sm:text-xs leading-none font-nohemi font-bold uppercase bg-black/65",
               archive.item.type === "album"
                 ? "border-green-400 text-green-300"
                 : "border-orange-400 text-orange-300"
