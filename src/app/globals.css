@@ -375,3 +375,16 @@ textarea:not([readonly]),
 .group:hover .padlock-idle {
   animation: padlock-wiggle 0.45s ease-in-out;
 }
+
+@keyframes fade-in-smooth {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in-smooth 0.35s ease-out forwards;
+}

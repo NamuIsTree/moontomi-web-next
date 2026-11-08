@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, Loader2 } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { AlbumRankCarousel } from "@/components/home/AlbumRankCarousel";
 import { LatestLectureBanner } from "@/components/home/LatestLectureBanner";
@@ -27,71 +27,87 @@ export default function HomePage() {
   const [latestLecture, setLatestLecture] =
     useState<LatestLectureSummary | null>(null);
   const [latestReviews, setLatestReviews] = useState<ReviewListItem[]>([]);
-  const [reviewsLoading, setReviewsLoading] = useState(true);
   const [latestArchives, setLatestArchives] = useState<ArchivePublicItem[]>([]);
-  const [archivesLoading, setArchivesLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    fetchTopLectures().then(({ upperTop: upper, lowerTop: lower }) => {
-      setUpperTop(upper);
-      setLowerTop(lower);
-    });
-    fetchLatestLecture().then((latest) => {
-      setLatestLecture(latest);
-    });
-    fetchReviewList({
-      page: 1,
-      limit: 10,
-      sortBy: "id",
-      order: "desc",
-    })
-      .then((reviews) => {
+    let mounted = true;
+    setInitialLoading(true);
+
+    Promise.all([
+      fetchTopLectures().catch(() => ({ upperTop: [], lowerTop: [] })),
+      fetchLatestLecture().catch(() => null),
+      fetchReviewList({
+        page: 1,
+        limit: 10,
+        sortBy: "id",
+        order: "desc",
+      }).catch(() => []),
+      fetchCuratedArchives(10, 3).catch(() => []),
+    ])
+      .then(([topResult, latest, reviews, archives]) => {
+        if (!mounted) return;
+        setUpperTop(topResult.upperTop);
+        setLowerTop(topResult.lowerTop);
+        setLatestLecture(latest);
         setLatestReviews(reviews.slice(0, 10));
-      })
-      .finally(() => {
-        setReviewsLoading(false);
-      });
-    fetchCuratedArchives(10, 3)
-      .then((archives) => {
         setLatestArchives(archives);
       })
       .finally(() => {
-        setArchivesLoading(false);
+        if (mounted) {
+          setInitialLoading(false);
+        }
       });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const topAlbums = reversed ? lowerTop : upperTop;
 
+  if (initialLoading) {
+    return (
+      <PageContainer width="wide">
+        <div className="min-h-[65vh] flex flex-col items-center justify-center gap-3 text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[#ff8080]" />
+          <p className="text-sm font-bold text-[#242d3c]">
+            홈 화면을 불러오는 중입니다...
+          </p>
+        </div>
+      </PageContainer>
+    );
+  }
+
   return (
     <PageContainer width="wide">
-      {topAlbums.length > 0 && (
-        <section className="text-left">
-          <AlbumRankCarousel items={topAlbums} />
-          <div className="flex justify-center pt-3 pb-7">
-            <button
-              type="button"
-              onClick={() => setReversed((prev) => !prev)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[7px] bg-white hover:bg-[#242d3c] text-[#242d3c] hover:text-[#f0f8ff] font-nohemi font-bold text-sm tracking-wider transition-colors cursor-pointer"
-            >
-              <ArrowLeftRight className="w-4 h-4 text-[#ff8080]" />
-              <span>{reversed ? "HALL OF SHAME" : "HALL OF FAME"}</span>
-            </button>
-          </div>
-        </section>
-      )}
+      <div className="animate-fade-in">
+        {topAlbums.length > 0 && (
+          <section className="text-left">
+            <AlbumRankCarousel items={topAlbums} />
+            <div className="flex justify-center pt-3 pb-7">
+              <button
+                type="button"
+                onClick={() => setReversed((prev) => !prev)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[7px] bg-white hover:bg-[#242d3c] text-[#242d3c] hover:text-[#f0f8ff] font-nohemi font-bold text-sm tracking-wider transition-colors cursor-pointer"
+              >
+                <ArrowLeftRight className="w-4 h-4 text-[#ff8080]" />
+                <span>{reversed ? "HALL OF SHAME" : "HALL OF FAME"}</span>
+              </button>
+            </div>
+          </section>
+        )}
 
-      {latestLecture && <LatestLectureBanner album={latestLecture} />}
+        {latestLecture && <LatestLectureBanner album={latestLecture} />}
 
-      <hr className="border-[#bdc0c4]/50 my-8" />
+        <hr className="border-[#bdc0c4]/50 my-8" />
 
-      <NewArrivalsSection reviews={latestReviews} loading={reviewsLoading} />
+        <NewArrivalsSection reviews={latestReviews} loading={false} />
 
-      <hr className="border-[#bdc0c4]/50 my-8" />
+        <hr className="border-[#bdc0c4]/50 my-8" />
 
-      <LatestArchiveSection
-        archives={latestArchives}
-        loading={archivesLoading}
-      />
+        <LatestArchiveSection archives={latestArchives} loading={false} />
+      </div>
     </PageContainer>
   );
 }
