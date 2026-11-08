@@ -11,6 +11,7 @@ import { StarRating } from "@/components/ui/StarRating";
 import { useMemberAuth } from "@/context/MemberAuthContext";
 import {
   createComment,
+  findMemberCommentIdForLecture,
   updateComment,
 } from "@/services/comment.service";
 import type { LectureDetail } from "@/types/domain";
@@ -71,6 +72,26 @@ export function CommentEditorForm({
       setWriter(member.name);
     }
   }, [mode, member, writer]);
+
+  // If in create mode and the logged-in member already has a comment on this lecture,
+  // alert and redirect to the edit page for that comment.
+  useEffect(() => {
+    if (mode !== "create" || !member) return;
+    let cancelled = false;
+    findMemberCommentIdForLecture(lecture.id, member.member_id).then(
+      (existingId) => {
+        if (!cancelled && existingId !== null) {
+          alert(
+            "이미 이 음평회에 작성하신 한줄평이 있어 수정 페이지로 이동합니다."
+          );
+          router.replace(`/comment/edit/${existingId}`);
+        }
+      }
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, member, lecture.id, router]);
 
   // Prompt login if not logged in
   useEffect(() => {

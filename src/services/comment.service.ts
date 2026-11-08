@@ -59,6 +59,23 @@ export async function fetchCommentById(commentId: number): Promise<{
   };
 }
 
+export async function findMemberCommentIdForLecture(
+  lectureId: number,
+  memberId: number
+): Promise<number | null> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("comment")
+    .select("comment_id")
+    .eq("lecture_id", lectureId)
+    .eq("member_id", memberId)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data.comment_id;
+}
+
 export async function createComment(params: {
   lectureId: number;
   rating: number; // 0 ~ 100 integer

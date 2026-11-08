@@ -354,7 +354,19 @@ export default function LectureDetailPage({
             type="button"
             onClick={() =>
               requireMemberAuth(
-                () => router.push(`/comment/create/${lecture.id}`),
+                (loggedInMember) => {
+                  const existingComment = comments.find(
+                    (c) => c.member_id === loggedInMember.member_id
+                  );
+                  if (existingComment) {
+                    alert(
+                      "이미 이 음평회에 작성하신 한줄평이 있어 수정 페이지로 이동합니다."
+                    );
+                    router.push(`/comment/edit/${existingComment.id}`);
+                  } else {
+                    router.push(`/comment/create/${lecture.id}`);
+                  }
+                },
                 {
                   title: "한줄평 작성 — 멤버 인증",
                   subtitle:
