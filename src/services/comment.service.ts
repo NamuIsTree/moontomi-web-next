@@ -102,6 +102,7 @@ export async function createComment(params: {
 
 export async function updateComment(params: {
   commentId: number;
+  writer: string;
   rating: number; // 0 ~ 100 integer
   password: string;
   picks: number[];
@@ -115,6 +116,7 @@ export async function updateComment(params: {
     p_password: params.password,
     p_picks: params.picks,
     p_text: params.text,
+    p_writer: params.writer,
   });
 
   if (error) {

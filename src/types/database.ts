@@ -520,6 +520,7 @@ export type Database = {
           p_picks: Json
           p_rating: number
           p_text: string
+          p_writer?: string
         }
         Returns: Json
       }

@@ -185,6 +185,7 @@ export function CommentEditorForm({
       } else if (commentId !== undefined) {
         await updateComment({
           commentId,
+          writer: writer.trim(),
           rating,
           password: member.password,
           picks,
@@ -293,7 +294,7 @@ export function CommentEditorForm({
           <input
             type="text"
             value={writer}
-            readOnly={mode === "edit" || loading || isNotOwner}
+            readOnly={loading || isNotOwner}
             onChange={(e) => setWriter(e.target.value)}
             placeholder="닉네임 입력"
             className="w-full px-3.5 py-2.5 rounded-[7px] border border-[#bdc0c4] bg-white text-sm read-only:bg-[#f3f3f3] focus:outline-none focus:border-[#242d3c]"
