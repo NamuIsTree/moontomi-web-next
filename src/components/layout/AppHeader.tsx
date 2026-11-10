@@ -66,32 +66,6 @@ export function AppHeader() {
             </span>
           </span>
         </Link>
-
-        {/* Top-Right Member Login / Status Button */}
-        <button
-          type="button"
-          onClick={() => openLoginModal()}
-          className={cn(
-            "absolute right-3 sm:right-6 inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full font-sans text-xs font-bold border transition-all cursor-pointer",
-            member
-              ? "bg-white/10 hover:bg-white/20 border-[#ff8080]/60 text-[#f0f8ff]"
-              : "bg-white/10 hover:bg-white/20 border-white/20 text-[#f0f8ff]/90"
-          )}
-        >
-          {member ? (
-            <>
-              <UserCheck className="w-3.5 h-3.5 text-[#ff8080] shrink-0" />
-              <span className="max-w-[72px] sm:max-w-[120px] truncate">
-                {member.name}
-              </span>
-            </>
-          ) : (
-            <>
-              <KeyRound className="w-3.5 h-3.5 text-[#ff8080] shrink-0" />
-              <span>로그인</span>
-            </>
-          )}
-        </button>
       </header>
 
       {/* Desktop Left Rail Navigation */}
@@ -186,10 +160,16 @@ export function AppHeader() {
           <button
             type="button"
             onClick={() => openLoginModal()}
+            title={member ? `${member.name} (접속 중)` : "멤버 로그인"}
             className="w-full flex items-center gap-4 px-3.5 py-2.5 rounded-[7px] text-sm font-sans text-[#242d3c] hover:bg-[#f3f3f3] transition-colors cursor-pointer text-left"
           >
             {member ? (
-              <UserCheck className="w-5 h-5 shrink-0 text-[#ff8080]" />
+              <span className="relative shrink-0">
+                <UserCheck className="w-5 h-5 text-[#ff8080]" />
+                <span className="
+                  absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#ff8080] ring-2 ring-white
+                " />
+              </span>
             ) : (
               <KeyRound className="w-5 h-5 shrink-0 text-[#242d3c]" />
             )}
@@ -221,7 +201,7 @@ export function AppHeader() {
       </aside>
 
       {/* Mobile Bottom Navigation Bar (< md) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#242d3c] text-[#f0f8ff] border-t border-white/15 grid grid-cols-5 h-[56px]">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#242d3c] text-[#f0f8ff] border-t border-white/15 grid grid-cols-6 h-[56px]">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -238,15 +218,33 @@ export function AppHeader() {
               key={item.path}
               href={item.path}
               className={cn(
-                "flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold transition-colors",
+                "flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold transition-colors px-1",
                 isActive ? "text-[#ff8080]" : "text-[#f0f8ff]/75"
               )}
             >
               <Icon className="w-4 h-4 shrink-0" />
-              <span className="truncate">{item.title}</span>
+              <span className="truncate max-w-full">{item.title}</span>
             </Link>
           );
         })}
+
+        <button
+          type="button"
+          onClick={() => openLoginModal()}
+          className={cn(
+            "flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold transition-colors px-1 cursor-pointer",
+            member ? "text-[#ff8080]" : "text-[#f0f8ff]/75"
+          )}
+        >
+          {member ? (
+            <UserCheck className="w-4 h-4 shrink-0" />
+          ) : (
+            <KeyRound className="w-4 h-4 shrink-0" />
+          )}
+          <span className="truncate max-w-full">
+            {member ? member.name : "로그인"}
+          </span>
+        </button>
       </nav>
     </>
   );

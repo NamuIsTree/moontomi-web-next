@@ -3,13 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, X } from "lucide-react";
+import { Compass, KeyRound, UserCheck, X } from "lucide-react";
+import { useMemberAuth } from "@/context/MemberAuthContext";
 import { NAV_ITEMS } from "./AppHeader";
 import { cn } from "@/lib/utils";
 
 export function AppFooter() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
+  const { member, openLoginModal } = useMemberAuth();
 
   return (
     <>
@@ -97,9 +99,33 @@ export function AppFooter() {
               </nav>
             </div>
 
-            <div className="border-t border-[#f3f3f3] pt-3 text-xs text-[#808080]">
-              <div className="font-bold text-[#242d3c]">대중 음악의 이해</div>
-              <div className="mt-0.5">문형규의 토요일, 음악에 미치는 날</div>
+            <div className="border-t border-[#f3f3f3] pt-3 space-y-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setDrawerOpen(false);
+                  openLoginModal();
+                }}
+                className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-[7px] text-sm text-[#242d3c] hover:bg-[#f3f3f3] transition-colors cursor-pointer text-left"
+              >
+                {member ? (
+                  <UserCheck className="w-5 h-5 shrink-0 text-[#ff8080]" />
+                ) : (
+                  <KeyRound className="w-5 h-5 shrink-0 text-[#242d3c]" />
+                )}
+                <div>
+                  <div className="font-bold">
+                    {member ? member.name : "멤버 로그인"}
+                  </div>
+                  <div className="text-xs font-normal text-[#808080]">
+                    {member ? "접속 중 · 클릭하여 전환" : "비밀번호로 접속"}
+                  </div>
+                </div>
+              </button>
+              <div className="px-3.5 text-xs text-[#808080]">
+                <div className="font-bold text-[#242d3c]">대중 음악의 이해</div>
+                <div className="mt-0.5">문형규의 토요일, 음악에 미치는 날</div>
+              </div>
             </div>
           </div>
         </div>
