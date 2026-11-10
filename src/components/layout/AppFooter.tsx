@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 export function AppFooter() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
-  const { member, openLoginModal } = useMemberAuth();
+  const { member, unreadCount, openLoginModal } = useMemberAuth();
 
   return (
     <>
@@ -108,17 +108,33 @@ export function AppFooter() {
                 }}
                 className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-[7px] text-sm text-[#242d3c] hover:bg-[#f3f3f3] transition-colors cursor-pointer text-left"
               >
-                {member ? (
-                  <UserCheck className="w-5 h-5 shrink-0 text-[#ff8080]" />
-                ) : (
-                  <KeyRound className="w-5 h-5 shrink-0 text-[#242d3c]" />
-                )}
-                <div>
-                  <div className="font-bold">
-                    {member ? member.name : "멤버 로그인"}
+                <span className="relative shrink-0">
+                  {member ? (
+                    <UserCheck className="w-5 h-5 text-[#ff8080]" />
+                  ) : (
+                    <KeyRound className="w-5 h-5 text-[#242d3c]" />
+                  )}
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#ff8080] ring-2 ring-white" />
+                  )}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold flex items-center gap-1.5">
+                    <span className="truncate">
+                      {member ? member.name : "멤버 · 소식"}
+                    </span>
+                    {unreadCount > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full bg-[#ff8080] text-white text-[10px] font-bold leading-none shrink-0">
+                        {unreadCount}
+                      </span>
+                    )}
                   </div>
-                  <div className="text-xs font-normal text-[#808080]">
-                    {member ? "접속 중 · 클릭하여 전환" : "비밀번호로 접속"}
+                  <div className="text-xs font-normal text-[#808080] truncate">
+                    {unreadCount > 0
+                      ? `새 소식 ${unreadCount}건 · 클릭하여 확인`
+                      : member
+                      ? "접속 중 · 클릭하여 열기"
+                      : "소식 확인 · 비밀번호 접속"}
                   </div>
                 </div>
               </button>

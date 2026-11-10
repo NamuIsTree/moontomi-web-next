@@ -27,7 +27,7 @@ export function AppHeader() {
   const [shrink, setShrink] = useState(false);
   const [hovered, setHovered] = useState(false);
   const pathname = usePathname();
-  const { member, openLoginModal } = useMemberAuth();
+  const { member, unreadCount, openLoginModal } = useMemberAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -160,30 +160,45 @@ export function AppHeader() {
           <button
             type="button"
             onClick={() => openLoginModal()}
-            title={member ? `${member.name} (접속 중)` : "멤버 로그인"}
+            title={
+              member
+                ? `${member.name} (새 소식 ${unreadCount}건)`
+                : `멤버 · 최근 소식 (${unreadCount}건)`
+            }
             className="w-full flex items-center gap-4 px-3.5 py-2.5 rounded-[7px] text-sm font-sans text-[#242d3c] hover:bg-[#f3f3f3] transition-colors cursor-pointer text-left"
           >
-            {member ? (
-              <span className="relative shrink-0">
+            <span className="relative shrink-0">
+              {member ? (
                 <UserCheck className="w-5 h-5 text-[#ff8080]" />
-                <span className="
-                  absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#ff8080] ring-2 ring-white
-                " />
-              </span>
-            ) : (
-              <KeyRound className="w-5 h-5 shrink-0 text-[#242d3c]" />
-            )}
+              ) : (
+                <KeyRound className="w-5 h-5 text-[#242d3c]" />
+              )}
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#ff8080] ring-2 ring-white" />
+              )}
+            </span>
             <div
               className={cn(
-                "overflow-hidden whitespace-nowrap transition-opacity duration-200 leading-tight",
+                "overflow-hidden whitespace-nowrap transition-opacity duration-200 leading-tight flex-1 min-w-0",
                 hovered ? "opacity-100" : "opacity-0"
               )}
             >
-              <div className="font-bold">
-                {member ? member.name : "멤버 로그인"}
+              <div className="font-bold flex items-center gap-1.5">
+                <span className="truncate">
+                  {member ? member.name : "멤버 · 소식"}
+                </span>
+                {unreadCount > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-[#ff8080] text-white text-[10px] font-bold leading-none shrink-0">
+                    {unreadCount}
+                  </span>
+                )}
               </div>
-              <div className="text-xs font-normal text-[#808080] mt-0.5">
-                {member ? "접속 중 · 클릭하여 전환" : "비밀번호로 접속"}
+              <div className="text-xs font-normal text-[#808080] mt-0.5 truncate">
+                {unreadCount > 0
+                  ? `새 소식 ${unreadCount}건 · 클릭하여 확인`
+                  : member
+                  ? "접속 중 · 클릭하여 열기"
+                  : "소식 확인 · 비밀번호 접속"}
               </div>
             </div>
           </button>
@@ -236,11 +251,16 @@ export function AppHeader() {
             member ? "text-[#ff8080]" : "text-[#f0f8ff]/75"
           )}
         >
-          {member ? (
-            <UserCheck className="w-4 h-4 shrink-0" />
-          ) : (
-            <KeyRound className="w-4 h-4 shrink-0" />
-          )}
+          <span className="relative inline-flex">
+            {member ? (
+              <UserCheck className="w-4 h-4 shrink-0" />
+            ) : (
+              <KeyRound className="w-4 h-4 shrink-0" />
+            )}
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-[#ff8080] ring-2 ring-[#242d3c]" />
+            )}
+          </span>
           <span className="truncate max-w-full">
             {member ? member.name : "로그인"}
           </span>
