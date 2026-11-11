@@ -192,46 +192,42 @@ export default function LookupPage() {
       {/* Summary Statistics & Sort Controls */}
       <section className="p-4 rounded-[7px] bg-[#f3f3f3]/70 border border-[#bdc0c4]/60 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="text-sm text-[#171717] tabular-nums">
-            {loading ? (
-              <div className="inline-flex items-center gap-2 text-[#808080]">
-                <Loader2 className="w-4 h-4 animate-spin text-[#ff8080]" />
-                <span> 조회 중...</span>
-              </div>
-            ) : stats ? (
-              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                <span>
-                  검색 결과 총{" "}
-                  <strong className="text-[#242d3c] font-bold">
-                    {stats.count}
-                  </strong>
-                  건
+          {(loading || stats || selectedIds.length > 0) && (
+            <div className="text-sm text-[#171717] tabular-nums">
+              {loading ? (
+                <div className="inline-flex items-center gap-2 text-[#808080]">
+                  <Loader2 className="w-4 h-4 animate-spin text-[#ff8080]" />
+                  <span> 조회 중...</span>
+                </div>
+              ) : stats ? (
+                <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                  <span>
+                    검색 결과 총{" "}
+                    <strong className="text-[#242d3c] font-bold">
+                      {stats.count}
+                    </strong>
+                    건
+                  </span>
+                  <span className="text-[#bdc0c4]">|</span>
+                  <span>
+                    평균 평점{" "}
+                    <strong className="font-lobster text-lg text-[#242d3c]">
+                      {stats.avg}
+                    </strong>
+                  </span>
+                  <span className="text-xs text-[#808080]">
+                    (최고 {stats.max} / 최저 {stats.min})
+                  </span>
+                </div>
+              ) : (
+                <span className="text-[#808080] font-semibold">
+                  선택한 멤버의 한줄평 기록이 없습니다.
                 </span>
-                <span className="text-[#bdc0c4]">|</span>
-                <span>
-                  평균 평점{" "}
-                  <strong className="font-lobster text-lg text-[#242d3c]">
-                    {stats.avg}
-                  </strong>
-                </span>
-                <span className="text-xs text-[#808080]">
-                  (최고 {stats.max} / 최저 {stats.min})
-                </span>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={handleOpenModal}
-                className="text-[#808080] hover:text-[#242d3c] font-semibold underline underline-offset-4 cursor-pointer text-left"
-              >
-                {selectedIds.length === 0
-                  ? "상단의 ‘멤버 선택하기’ 버튼을 눌러 조회할 멤버를 선택해주세요."
-                  : "선택한 멤버의 한줄평 기록이 없습니다."}
-              </button>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
-          <div className="inline-flex flex-wrap rounded-[7px] overflow-hidden border border-[#bdc0c4] divide-x divide-[#bdc0c4] bg-white self-start sm:self-auto">
+          <div className="inline-flex flex-wrap rounded-[7px] overflow-hidden border border-[#bdc0c4] divide-x divide-[#bdc0c4] bg-white self-start sm:self-auto sm:ml-auto">
             {SORT_OPTIONS.map((opt) => {
               const active = sortOption === opt;
               return (

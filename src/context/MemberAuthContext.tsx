@@ -638,7 +638,7 @@ export function MemberAuthProvider({
                       새 컨텐츠 알림
                     </span>
                     {unreadCount > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full bg-[#ff8080] text-white text-[10px] font-bold leading-none">
+                      <span className="inline-flex items-center justify-center px-1.5 pt-[3px] pb-[1px] rounded-full bg-[#ff8080] text-white text-[10px] font-bold leading-none">
                         {unreadCount}
                       </span>
                     )}
@@ -681,13 +681,13 @@ export function MemberAuthProvider({
                         type="button"
                         onClick={() => setActiveCategory(tab.key)}
                         className={cn(
-                          "px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors inline-flex items-center gap-1 cursor-pointer",
+                          "px-2.5 pt-[6px] pb-[4px] rounded-full text-[11px] leading-none font-bold transition-colors inline-flex items-center justify-center gap-1 cursor-pointer",
                           isSelected
                             ? "bg-[#242d3c] text-[#f0f8ff]"
                             : "bg-[#f3f3f3] text-[#808080] hover:text-[#242d3c]"
                         )}
                       >
-                        <span>{tab.label}</span>
+                        <span className="translate-y-[0.5px]">{tab.label}</span>
                         {tabUnreadCount > 0 && (
                           <span
                             className={cn(
@@ -737,9 +737,9 @@ export function MemberAuthProvider({
 
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-1.5 mb-0.5">
-                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#242d3c] text-[#f0f8ff] text-[10px] font-bold leading-none">
-                                <CategoryIcon className="w-2.5 h-2.5 text-[#ff8080]" />
-                                {meta.label}
+                              <span className="inline-flex items-center gap-1 px-1.5 pt-[3.5px] pb-[2px] rounded bg-[#242d3c] text-[#f0f8ff] text-[10px] font-bold leading-none">
+                                <CategoryIcon className="w-2.5 h-2.5 text-[#ff8080] shrink-0" />
+                                <span className="translate-y-[0.5px]">{meta.label}</span>
                               </span>
                               {item.date && (
                                 <span className="text-[11px] text-[#808080] font-mono">

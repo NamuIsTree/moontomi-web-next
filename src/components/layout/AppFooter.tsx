@@ -124,7 +124,7 @@ export function AppFooter() {
                       {member ? member.name : "멤버 · 소식"}
                     </span>
                     {unreadCount > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full bg-[#ff8080] text-white text-[10px] font-bold leading-none shrink-0">
+                      <span className="inline-flex items-center justify-center px-1.5 pt-[3px] pb-[1px] rounded-full bg-[#ff8080] text-white text-[10px] font-bold leading-none shrink-0">
                         {unreadCount}
                       </span>
                     )}
