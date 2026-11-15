@@ -25,6 +25,7 @@ import { createClient } from "@/lib/supabase/client";
 import { getImageUrl, cn } from "@/lib/utils";
 import { uploadImageToStorage } from "@/services/storage.service";
 import { StarRatingInput } from "@/components/ui/StarRating";
+import { AdminGenrePicker } from "@/components/admin/AdminGenrePicker";
 
 type AdminTab =
   | "lectures"
@@ -540,6 +541,10 @@ export default function AdminDashboardPage() {
       showToast("error", "앨범 출시 일자는 4자리 연도(yyyy) 형식으로 입력해 주세요.");
       return;
     }
+    if (albumGenreIds.length === 0) {
+      showToast("error", "장르를 최소 1개 이상 선택해 주세요.");
+      return;
+    }
 
     const tracks = albumTracksText
       .split("\n")
@@ -596,6 +601,10 @@ export default function AdminDashboardPage() {
     }
     if (!/^\d{4}$/.test(releaseYear)) {
       showToast("error", "싱글 출시 일자는 4자리 연도(yyyy) 형식으로 입력해 주세요.");
+      return;
+    }
+    if (singleGenreIds.length === 0) {
+      showToast("error", "장르를 최소 1개 이상 선택해 주세요.");
       return;
     }
 
@@ -1455,50 +1464,12 @@ export default function AdminDashboardPage() {
               </div>
 
               {/* Genre Selector */}
-              <div>
-                <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
-                  장르 선택 ({albumGenreIds.length}개 선택됨)
-                </label>
-                <div className="max-h-48 overflow-y-auto p-3 rounded-[7px] border border-[#bdc0c4] bg-[#f9fafb] space-y-2.5">
-                  {GENRE_CATEGORIES.map((cat) => {
-                    const catGenres = genres.filter((g) => g.category === cat);
-                    if (catGenres.length === 0) return null;
-                    return (
-                      <div key={cat}>
-                        <div className="text-[10px] font-bold text-[#808080] mb-1">
-                          {cat}
-                        </div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {catGenres.map((g) => {
-                            const selected = albumGenreIds.includes(g.genre_id);
-                            return (
-                              <button
-                                key={g.genre_id}
-                                type="button"
-                                onClick={() =>
-                                  setAlbumGenreIds((prev) =>
-                                    selected
-                                      ? prev.filter((id) => id !== g.genre_id)
-                                      : [...prev, g.genre_id]
-                                  )
-                                }
-                                className={cn(
-                                  "px-2 py-1 rounded-[5px] text-[11px] font-semibold border transition-colors cursor-pointer",
-                                  selected
-                                    ? "bg-[#242d3c] text-white border-[#242d3c]"
-                                    : "bg-white text-[#242d3c] border-[#bdc0c4] hover:border-[#242d3c]"
-                                )}
-                              >
-                                {g.name}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+              <AdminGenrePicker
+                genres={genres}
+                categories={GENRE_CATEGORIES}
+                selectedIds={albumGenreIds}
+                onChange={setAlbumGenreIds}
+              />
 
               <button
                 type="submit"
@@ -1766,50 +1737,12 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-[#242d3c] mb-1.5">
-                  장르 선택 ({singleGenreIds.length}개 선택됨)
-                </label>
-                <div className="max-h-48 overflow-y-auto p-3 rounded-[7px] border border-[#bdc0c4] bg-[#f9fafb] space-y-2.5">
-                  {GENRE_CATEGORIES.map((cat) => {
-                    const catGenres = genres.filter((g) => g.category === cat);
-                    if (catGenres.length === 0) return null;
-                    return (
-                      <div key={cat}>
-                        <div className="text-[10px] font-bold text-[#808080] mb-1">
-                          {cat}
-                        </div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {catGenres.map((g) => {
-                            const selected = singleGenreIds.includes(g.genre_id);
-                            return (
-                              <button
-                                key={g.genre_id}
-                                type="button"
-                                onClick={() =>
-                                  setSingleGenreIds((prev) =>
-                                    selected
-                                      ? prev.filter((id) => id !== g.genre_id)
-                                      : [...prev, g.genre_id]
-                                  )
-                                }
-                                className={cn(
-                                  "px-2 py-1 rounded-[5px] text-[11px] font-semibold border transition-colors cursor-pointer",
-                                  selected
-                                    ? "bg-[#242d3c] text-white border-[#242d3c]"
-                                    : "bg-white text-[#242d3c] border-[#bdc0c4] hover:border-[#242d3c]"
-                                )}
-                              >
-                                {g.name}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+              <AdminGenrePicker
+                genres={genres}
+                categories={GENRE_CATEGORIES}
+                selectedIds={singleGenreIds}
+                onChange={setSingleGenreIds}
+              />
 
               <button
                 type="submit"
