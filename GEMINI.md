@@ -2,8 +2,8 @@
 
 이 프로젝트는 **MOONTOMI (문형규의 토요일, 음악에 미치는 날 — 대중 음악의 이해)** 웹 애플리케이션(`Next.js App Router + TypeScript + Tailwind CSS v4 + Supabase`)입니다.
 
-기능 추가, 수정, UI/UX 작업 시 항상 루트의 **[PRODUCT.md](./PRODUCT.md)** 및 **[DESIGN.md](./DESIGN.md)** 문서를 기준 진실(Source of Truth)로 삼고 아래 핵심 원칙을 반드시 준수하세요.
-특히 **모든 작업(코드·DB·UI 수정) 완료 직후에는 지시받은 내용과 반영된 수정 사항을 `GEMINI.md`, `DESIGN.md`, `PRODUCT.md` 세 문서에 항상 동기화**해야 합니다.
+기능 추가, 수정, UI/UX 작업 시 항상 루트의 **[PRODUCT.md](./PRODUCT.md)**, **[DESIGN.md](./DESIGN.md)**, **[README.md](./README.md)** 문서를 기준 진실(Source of Truth)로 삼고 아래 핵심 원칙을 반드시 준수하세요.
+특히 **모든 작업(코드·DB·UI 수정) 완료 직후에는 지시받은 내용과 반영된 수정 사항을 `GEMINI.md`, `DESIGN.md`, `PRODUCT.md`, `README.md` 네 문서에 항상 동기화**해야 합니다.
 
 ---
 
@@ -57,9 +57,9 @@
 ## 3. 보고, 문서 동기화 및 배포 (Harness Rule)
 - **보고 형식 (필수)**:
   - 모든 수정 사항 보고는 **미사여구 없이**, **불릿/구둣점(`-`, `·`, `:`, `;`)을 이용한 일목요연한 개조식 정리**로만 작성합니다.
-  - 하네스 및 기준 문서(`GEMINI.md`, `DESIGN.md`, `PRODUCT.md`) 반영 전·후의 변경 요점을 명확히 구분하여 보고합니다.
+  - 하네스 및 기준 문서(`GEMINI.md`, `DESIGN.md`, `PRODUCT.md`, `README.md`) 반영 전·후의 변경 요점을 명확히 구분하여 보고합니다.
 - **문서 상시 동기화 (필수)**:
-  - 모든 수정 작업 완료 시, 지시 사항과 실제 수정 내역을 기반으로 **`GEMINI.md`, `DESIGN.md`, `PRODUCT.md` 세 문서를 항상 최신 상태로 동기화**합니다.
+  - 모든 수정 작업 완료 시, 지시 사항과 실제 수정 내역을 기반으로 **`GEMINI.md`, `DESIGN.md`, `PRODUCT.md`, `README.md` 네 문서를 항상 최신 상태로 동기화**합니다.
 - **타입 검증 및 배포**:
   - 코드 수정 후 `npx tsc --noEmit`으로 타입 에러가 없는지 확인합니다.
   - 배포 요청 시 변경된 파일(동기화된 문서 포함)을 커밋하고 `git push origin main`을 통해 Vercel 자동 배포를 트리거합니다.
