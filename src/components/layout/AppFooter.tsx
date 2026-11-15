@@ -155,7 +155,7 @@ export function AppFooter() {
           <span>대중 음악의 이해</span>
           <span className="text-[#ff8080]">·</span>
           <span className="text-[#f0f8ff]/75 font-normal text-xs">
-            MOONTOMI ARCHIVE
+            Copyright © MOONTOMI. All rights reserved.
           </span>
         </div>
         <div className="md:hidden inline-flex items-center justify-center gap-2 font-bold tracking-wider">
