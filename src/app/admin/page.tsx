@@ -24,6 +24,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { getImageUrl, cn } from "@/lib/utils";
 import { uploadImageToStorage } from "@/services/storage.service";
+import { StarRatingInput } from "@/components/ui/StarRating";
 
 type AdminTab =
   | "lectures"
@@ -329,7 +330,7 @@ export default function AdminDashboardPage() {
   const [archiveType, setArchiveType] = useState<"album" | "single">("album");
   const [archiveTargetId, setArchiveTargetId] = useState<number>(0);
   const [archiveWriter, setArchiveWriter] = useState("");
-  const [archiveRatingInput, setArchiveRatingInput] = useState("8.5");
+  const [archiveRatingInput, setArchiveRatingInput] = useState("4.5");
   const [archiveDate, setArchiveDate] = useState("");
 
   // ==================== 5. ARTIST & GENRE STATES ====================
@@ -339,6 +340,16 @@ export default function AdminDashboardPage() {
   const [artistNameEn, setArtistNameEn] = useState("");
   const [artistPronounce, setArtistPronounce] = useState("");
   const [artistNation, setArtistNation] = useState("한국");
+
+  // Quick Artist Modal (from Album / Single form)
+  const [quickArtistTarget, setQuickArtistTarget] = useState<
+    "album" | "single" | null
+  >(null);
+  const [quickArtistName, setQuickArtistName] = useState("");
+  const [quickArtistNameEn, setQuickArtistNameEn] = useState("");
+  const [quickArtistPronounce, setQuickArtistPronounce] = useState("");
+  const [quickArtistNation, setQuickArtistNation] = useState("한국");
+  const [quickArtistSaving, setQuickArtistSaving] = useState(false);
 
   const [editingGenreId, setEditingGenreId] = useState<number | null>(null);
   const [genreCategory, setGenreCategory] = useState<string>("ROCK");
@@ -622,7 +633,12 @@ export default function AdminDashboardPage() {
       showToast("error", "추천인(작성자)을 입력해 주세요.");
       return;
     }
-    const ratingInt = Math.round(Number(archiveRatingInput) * 10);
+    const ratingNum = Number(archiveRatingInput);
+    if (!Number.isFinite(ratingNum) || ratingNum < 0 || ratingNum > 5) {
+      showToast("error", "별점은 0.0 ~ 5.0 사이여야 합니다.");
+      return;
+    }
+    const ratingInt = Math.round(ratingNum * 10);
     try {
       if (editingArchiveId) {
         await runAdminAction("update_archive", {
@@ -648,12 +664,70 @@ export default function AdminDashboardPage() {
       }
       setEditingArchiveId(null);
       setArchiveWriter("");
-      setArchiveRatingInput("8.5");
+      setArchiveRatingInput("4.5");
       setArchiveDate("");
       setArchiveTargetId(0);
       await loadAllData();
     } catch (err) {
       showToast("error", err instanceof Error ? err.message : "오류 발생");
+    }
+  };
+
+  const openQuickArtistModal = (target: "album" | "single") => {
+    setQuickArtistName("");
+    setQuickArtistNameEn("");
+    setQuickArtistPronounce("");
+    setQuickArtistNation("한국");
+    setQuickArtistTarget(target);
+  };
+
+  const handleQuickCreateArtist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedName = quickArtistName.trim();
+    const trimmedNation = quickArtistNation.trim();
+    if (!trimmedName || !trimmedNation) {
+      showToast("error", "아티스트 이름과 국가는 필수입니다.");
+      return;
+    }
+
+    setQuickArtistSaving(true);
+    try {
+      const resData = (await runAdminAction("create_artist", {
+        name: trimmedName,
+        name_en: quickArtistNameEn.trim(),
+        pronounce: quickArtistPronounce.trim(),
+        nation: trimmedNation,
+      })) as { artist_id?: number; id?: number } | null;
+
+      let createdId = resData?.artist_id ?? resData?.id ?? null;
+      if (!createdId) {
+        const supabase = createClient();
+        const { data: latestRow } = await supabase
+          .from("artist")
+          .select("artist_id")
+          .eq("name", trimmedName)
+          .order("artist_id", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        createdId = latestRow?.artist_id ?? null;
+      }
+
+      await loadAllData();
+
+      if (createdId) {
+        if (quickArtistTarget === "album") {
+          setAlbumArtistId(createdId);
+        } else if (quickArtistTarget === "single") {
+          setSingleArtistId(createdId);
+        }
+      }
+
+      showToast("success", `새 아티스트 '${trimmedName}' 등록 및 선택 완료`);
+      setQuickArtistTarget(null);
+    } catch (err) {
+      showToast("error", err instanceof Error ? err.message : "오류 발생");
+    } finally {
+      setQuickArtistSaving(false);
     }
   };
 
@@ -1269,9 +1343,19 @@ export default function AdminDashboardPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#242d3c] mb-1">
-                  아티스트 *
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-[#242d3c]">
+                    아티스트 *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => openQuickArtistModal("album")}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#242d3c] hover:text-[#ff8080] transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-3 h-3 text-[#ff8080]" />
+                    <span>새 아티스트</span>
+                  </button>
+                </div>
                 <select
                   value={albumArtistId || artists[0]?.artist_id || 0}
                   onChange={(e) => setAlbumArtistId(Number(e.target.value))}
@@ -1585,9 +1669,19 @@ export default function AdminDashboardPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#242d3c] mb-1">
-                  아티스트 *
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-[#242d3c]">
+                    아티스트 *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => openQuickArtistModal("single")}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-[#242d3c] hover:text-[#ff8080] transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-3 h-3 text-[#ff8080]" />
+                    <span>새 아티스트</span>
+                  </button>
+                </div>
                 <select
                   value={singleArtistId || artists[0]?.artist_id || 0}
                   onChange={(e) => setSingleArtistId(Number(e.target.value))}
@@ -1927,21 +2021,21 @@ export default function AdminDashboardPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-[#242d3c] mb-1">
-                    평점 (0.0 ~ 10.0) *
+                    별점 (0.0 ~ 5.0 · 드래그) *
                   </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="10"
-                    required
-                    value={archiveRatingInput}
-                    onChange={(e) => setArchiveRatingInput(e.target.value)}
-                    className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs"
-                  />
+                  <div className="h-10 px-3 rounded-[7px] border border-[#bdc0c4] bg-white flex items-center">
+                    <StarRatingInput
+                      value={Math.max(
+                        0,
+                        Math.min(5, Number(archiveRatingInput) || 0)
+                      )}
+                      onChange={(val) => setArchiveRatingInput(val.toFixed(1))}
+                      size={22}
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-[#242d3c] mb-1">
@@ -2667,6 +2761,125 @@ export default function AdminDashboardPage() {
           </div>
         )}
       </main>
+
+      {/* Quick Artist Registration Modal */}
+      {quickArtistTarget && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] flex items-center justify-center p-4"
+          onClick={() => !quickArtistSaving && setQuickArtistTarget(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="새 아티스트 등록"
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-[420px] rounded-[14px] border border-[#242d3c] bg-white shadow-2xl overflow-hidden"
+          >
+            <div className="px-4 py-3 bg-[#242d3c] text-[#f0f8ff] flex items-center justify-between">
+              <div className="flex items-center gap-2 font-bold text-sm">
+                <Users className="w-4 h-4 text-[#ff8080]" />
+                <span>새 아티스트 등록</span>
+              </div>
+              <button
+                type="button"
+                disabled={quickArtistSaving}
+                onClick={() => setQuickArtistTarget(null)}
+                aria-label="닫기"
+                className="p-1 rounded-[6px] text-[#f0f8ff]/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleQuickCreateArtist} className="p-4 space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-[#242d3c] mb-1">
+                  표기명 *
+                </label>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  placeholder="예: 검정치마"
+                  value={quickArtistName}
+                  onChange={(e) => setQuickArtistName(e.target.value)}
+                  className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs focus:outline-none focus:border-[#242d3c]"
+                />
+                {quickArtistName.trim() &&
+                  artists.some(
+                    (a) =>
+                      a.name.trim().toLowerCase() ===
+                      quickArtistName.trim().toLowerCase()
+                  ) && (
+                    <p className="mt-1 text-[11px] text-amber-600 font-semibold">
+                      동일한 표기명의 아티스트가 이미 등록되어 있습니다.
+                    </p>
+                  )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label className="block text-xs font-bold text-[#242d3c] mb-1">
+                    영문명 (선택)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="예: The Black Skirts"
+                    value={quickArtistNameEn}
+                    onChange={(e) => setQuickArtistNameEn(e.target.value)}
+                    className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs focus:outline-none focus:border-[#242d3c]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[#242d3c] mb-1">
+                    발음/읽기 (선택)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="예: 더 블랙 스커츠"
+                    value={quickArtistPronounce}
+                    onChange={(e) => setQuickArtistPronounce(e.target.value)}
+                    className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs focus:outline-none focus:border-[#242d3c]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#242d3c] mb-1">
+                  국가 *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="예: 한국"
+                  value={quickArtistNation}
+                  onChange={(e) => setQuickArtistNation(e.target.value)}
+                  className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs focus:outline-none focus:border-[#242d3c]"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  disabled={quickArtistSaving}
+                  onClick={() => setQuickArtistTarget(null)}
+                  className="h-9 px-3.5 rounded-[7px] border border-[#bdc0c4] text-xs font-bold text-[#242d3c] hover:bg-[#f3f3f3] cursor-pointer"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={quickArtistSaving}
+                  className="h-9 px-4 rounded-[7px] bg-[#242d3c] hover:bg-[#1b222e] text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
+                >
+                  <Plus className="w-3.5 h-3.5 text-[#ff8080]" />
+                  <span>{quickArtistSaving ? "등록 중..." : "등록 및 선택"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
