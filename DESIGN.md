@@ -110,7 +110,7 @@ MOONTOMI의 시각 시스템은 레코드 숍의 스탬프가 찍힌 아날로�
 - **Warm Gold** (`#ffb400`): 아카이브 및 한줄평 별점과 베스트 트랙 1위 표기에 사용됩니다.
 - **Silver Track** (`#4a4f5a`): 한줄평 베스트 트랙 2위 표기에 사용됩니다.
 - **Bronze Track** (`#6e3732`): 한줄평 베스트 트랙 3위 표기에 사용됩니다.
-- **Archive Type Accent**: 아카이브의 `ALBUM` 배지는 에메랄드 그린(`border-green-400 text-green-300`), `SINGLE` 배지는 앰버 오렌지(`border-orange-400 text-orange-300`)로 구분합니다.
+- **Archive Type Accent**: 홈 화면 `Archive Curate`(`LatestArchiveSection`) 및 아카이브 스테이션(`ArchiveGridTile`, `ArchiveDetailBanner`, `ArchiveListItem`) 전반에서 `ALBUM` 배지는 에메랄드 그린(`border-green-400 text-green-300`), `SINGLE` 배지는 앰버 오렌지(`border-orange-400 text-orange-300`) 기조로 통일합니다.
 
 ### Neutral
 - **Surface White** (`#ffffff`): 기본 페이지 및 카드 배경색입니다.
@@ -150,16 +150,18 @@ MOONTOMI의 시각 시스템은 레코드 숍의 스탬프가 찍힌 아날로�
   - **Desktop Navigation (`>= 768px`)**: 좌측 `75px` 폭의 고정 레일(호버 시 `240px` 확장). 상단에는 5개 주요 메뉴(`HOME`, `칼럼`, `음평회`, `둘러보기`, `아카이브`), 하단에는 **멤버 & 최근 소식 허브 버튼**(미열람 소식 존재 시 레드닷 및 개수 배지 표시)이 위치합니다.
   - **Mobile Navigation (`< 768px`)**: 하단 고정 6열 탭바(`height: 56px`, 5개 주요 메뉴 + 6번째 `로그인/멤버명` 탭 및 레드닷 배지).
 - **Content Containers (`PageContainer`)**:
+  - 공통: `html`, `body`, `AppShell`의 `<main>`, `PageContainer`에 `min-w-0 max-w-full overflow-x-clip`을 적용하여 모바일 뷰포트(`100vw`) 초과 및 줌아웃 현상을 방지합니다.
   - `wide` (`max-w-[1160px]`): 홈 화면 (`pt-2 sm:pt-3`으로 상단 여백 최소화)
-  - `archive` (`max-w-[1080px]`): 아카이브 브라우저 (데스크톱 좌측 스티키 상세 배너 + 우측 검색/평점 필터 및 리스트·그리드, 모바일 상단 접이식 미니 플레이어)
-  - `reading` (`max-w-[820px]`): 음평회 목록/상세, 칼럼 목록/상세, 한줄평 둘러보기
-  - `form` (`max-w-[640px]`): 한줄평 작성 및 수정 폼
+  - `archive` (`max-w-[1080px]`): 아카이브 브라우저 (데스크톱 좌측 스티키 상세 배너 + 우측 검색/별점 범위 `0.0~5.0` 필터 및 리스트·그리드, 모바일 상단 접이식 미니 플레이어 및 `공유` 버튼 우측 투고일 표기)
+  - `reading` (`max-w-[820px]`): 음평회 목록/상세, 칼럼 목록/상세(`.editorial-prose` 내 인라인 이미지 `max-width: calc(100% - 24px)` 및 모바일 좌우 마진 `0` 적용), 한줄평 둘러보기(`LookupCommentRow` 이탤릭 앨범명 우측 잘림 방지 `pr-1.5`)
+  - `form` (`max-w-[640px]`): 한줄평 작성 및 수정 폼 (`emoji-picker-react` 이모지 선택기 포함)
 
 ## Components
 
 ### Buttons & Controls
 - **Shape:** 부드러운 모서리(`7px` radius), 한줄평 포스트 버튼은 카드와 동일한 `20px` radius.
 - **Sort & Filter Toggles:** 정렬 옵션 토글 그룹은 `7px` 라운드 컨테이너 내 분할 보더(`divide-x divide-[#bdc0c4]`)를 사용하며 활성 상태에 Midnight Slate(`#242d3c`) 배경과 화이트 텍스트를 적용합니다.
+- **Archive Rating Range Filter:** 아카이브 별점 필터는 `0.0점`~`5.0점`(`0.5점` 단위) 최소·최대 2단 `<select>`로 구성하며, 역전 방지 자동 보정 및 `전체 초기화` 버튼을 제공합니다.
 
 ### Chips & Badges
 - **Optical Alignment:** 모든 소형 칩(알림센터 필터 칩, 카테고리 배지, 아카이브 `ALBUM`/`SINGLE` 배지, 안 읽은 알림 수 배지)은 상하 비대칭 패딩(`pt > pb`) 또는 미세 Y축 이동(`translate-y-[0.5px]`)으로 텍스트가 칩의 수직 정중앙에 위치하도록 보정합니다.
