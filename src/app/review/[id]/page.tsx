@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useMemo, useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Eye, FilePenLine, Loader2 } from "lucide-react";
@@ -8,6 +8,7 @@ import { PageContainer } from "@/components/layout/PageContainer";
 import { TiptapReviewEditor } from "@/components/review/TiptapReviewEditor";
 import { useMemberAuth } from "@/context/MemberAuthContext";
 import { fetchReviewById } from "@/services/review.service";
+import { countEditorialCharacters } from "@/lib/utils";
 import type { ReviewDetail } from "@/types/domain";
 
 export default function ReviewDetailPage({
@@ -25,6 +26,11 @@ export default function ReviewDetailPage({
     if (!Number.isFinite(reviewId)) return;
     fetchReviewById(reviewId, true).then(setReview);
   }, [reviewId]);
+
+  const charCount = useMemo(
+    () => (review ? countEditorialCharacters(review.content) : null),
+    [review]
+  );
 
   if (!review) {
     return (
@@ -137,6 +143,18 @@ export default function ReviewDetailPage({
       <article className="border-t border-[#bdc0c4]/60 pt-8 min-w-0 max-w-full overflow-x-hidden">
         <TiptapReviewEditor content={review.content} editable={false} />
       </article>
+
+      {charCount && (
+        <footer className="border-t border-[#bdc0c4]/60 pt-4 flex items-center justify-end text-xs text-[#808080] tabular-nums">
+          <span>
+            총 <strong className="text-[#242d3c]">{charCount.withSpaces.toLocaleString()}</strong>자
+            {" "}
+            <span className="text-[#808080]/80">
+              (공백 제외 {charCount.withoutSpaces.toLocaleString()}자)
+            </span>
+          </span>
+        </footer>
+      )}
     </PageContainer>
   );
 }
