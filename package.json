@@ -25,6 +25,7 @@
     "@tiptap/pm": "^3.32.2",
     "@tiptap/react": "^3.32.2",
     "@tiptap/starter-kit": "^3.32.2",
+    "@vercel/analytics": "^2.0.1",
     "clsx": "2.1.1",
     "emoji-picker-react": "^5.1.4",
     "lucide-react": "0.511.0",
