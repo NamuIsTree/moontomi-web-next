@@ -33,7 +33,7 @@ export default function LectureDetailPage({
   const { id } = use(params);
   const lectureId = Number(id);
   const router = useRouter();
-  const { requireMemberAuth } = useMemberAuth();
+  const { requireMemberAuth, showAlert } = useMemberAuth();
 
   const [lecture, setLecture] = useState<LectureDetail | null>(null);
   const [comments, setComments] = useState<LectureCommentItem[]>([]);
@@ -104,8 +104,8 @@ export default function LectureDetailPage({
   if (!lecture) {
     return (
       <PageContainer width="reading">
-        <div className="py-20 text-center text-sm text-[#808080]">
-          음평회 정보를 불러오는 중입니다...
+        <div className="py-20 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[#ff8080]" />
         </div>
       </PageContainer>
     );
@@ -359,10 +359,13 @@ export default function LectureDetailPage({
                     (c) => c.member_id === loggedInMember.member_id
                   );
                   if (existingComment) {
-                    alert(
-                      "이미 이 음평회에 작성하신 한줄평이 있어 수정 페이지로 이동합니다."
-                    );
-                    router.push(`/comment/edit/${existingComment.id}`);
+                    showAlert({
+                      title: "한줄평 안내",
+                      message:
+                        "이미 이 음평회에 작성하신 한줄평이 있어 수정 페이지로 이동합니다.",
+                      onConfirm: () =>
+                        router.push(`/comment/edit/${existingComment.id}`),
+                    });
                   } else {
                     router.push(`/comment/create/${lecture.id}`);
                   }

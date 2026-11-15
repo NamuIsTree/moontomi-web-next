@@ -43,6 +43,7 @@ import {
   Video,
 } from "lucide-react";
 import { uploadImageToStorage } from "@/services/storage.service";
+import { useMemberAuth } from "@/context/MemberAuthContext";
 import { cn } from "@/lib/utils";
 
 /**
@@ -193,6 +194,7 @@ export function TiptapReviewEditor({
   onChange,
   editable = true,
 }: TiptapReviewEditorProps) {
+  const { showAlert } = useMemberAuth();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -211,16 +213,18 @@ export function TiptapReviewEditor({
           insertAtUrl(publicUrl);
         }
       } catch (err) {
-        alert(
-          err instanceof Error
-            ? err.message
-            : "이미지 업로드 중 오류가 발생했습니다."
-        );
+        showAlert({
+          title: "이미지 업로드 오류",
+          message:
+            err instanceof Error
+              ? err.message
+              : "이미지 업로드 중 오류가 발생했습니다.",
+        });
       } finally {
         setUploadingImage(false);
       }
     },
-    []
+    [showAlert]
   );
 
   const editor = useEditor({

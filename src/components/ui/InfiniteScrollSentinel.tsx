@@ -39,7 +39,7 @@ export function InfiniteScrollSentinel({
   return (
     <div ref={ref} className="py-8 flex justify-center items-center">
       {loading && (
-        <Loader2 className="w-6 h-6 animate-spin text-[#ff8080]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#ff8080]" />
       )}
     </div>
   );

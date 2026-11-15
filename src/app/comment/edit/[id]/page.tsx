@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
+import { Loader2 } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { CommentEditorForm } from "@/components/lecture/CommentEditorForm";
 import { fetchCommentById } from "@/services/comment.service";
@@ -57,8 +58,8 @@ export default function EditCommentPage({
           initialComment={initialData.comment}
         />
       ) : (
-        <div className="py-20 text-center text-sm text-[#808080]">
-          평가 정보를 불러오는 중입니다...
+        <div className="py-20 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[#ff8080]" />
         </div>
       )}
     </PageContainer>

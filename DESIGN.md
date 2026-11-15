@@ -51,7 +51,7 @@ typography:
     letterSpacing: "0.04em"
 rounded:
   sm: "7px"
-  md: "12px"
+  md: "14px"
   lg: "20px"
 spacing:
   xs: "4px"
@@ -75,6 +75,12 @@ components:
     textColor: "{colors.ink-primary}"
     rounded: "{rounded.lg}"
     padding: "16px 24px"
+  modal-dialog:
+    backgroundColor: "{colors.surface-white}"
+    borderColor: "{colors.midnight-slate}"
+    headerBackgroundColor: "{colors.midnight-slate}"
+    headerTextColor: "{colors.alice-mist}"
+    rounded: "{rounded.md}"
 ---
 
 # Design System: MOONTOMI
@@ -88,32 +94,33 @@ MOONTOMI의 시각 시스템은 레코드 숍의 스탬프가 찍힌 아날로�
 각 섹션은 성격에 맞는 고유한 타이포그래피 목소리를 가집니다. 헤더의 빈티지 스탬프 서체(`Bayaters Stamp`), 본문의 정갈한 산세리프(`LINE Seed KR`), 음평회 점수의 경쾌한 스크립트(`Lobster`), 칼럼의 문학적인 명조(`Nanum Myeongjo ExtraBold`), 그리고 아카이브의 모던 지오메트릭 산세리프(`Nohemi`)가 각자의 자리에서 조화를 이룹니다.
 
 **Key Characteristics:**
-- **Framed Canvas**: 상단 고정 헤더(스크롤 시 90px → 50px 축소)와 좌측 호버 확장형 레일 네비게이션(75px → 240px), 하단 고정 푸터가 콘텐츠 영역을 액자처럼 감쌉니다.
-- **Tactile Album Focus**: 앨범 커버 이미지가 카드, 캐러셀, 상단 프리뷰 배너의 중심 시각 요소로 작동합니다.
-- **Ceremonial Rating Display**: 음평회 평점, 베스트 트랙(골드/실버/브론즈), 오픈 전 블라인드 상태(`OPEN` 칩 및 회전 기어 아이콘)를 명확한 시각적 위계로 표현합니다.
+- **Symmetrical Masthead & Framed Canvas**: 상단 고정 헤더(스크롤 시 `90px` → `52px` 축소)는 우측 버튼 등의 비대칭 요소를 배제하고 정중앙에 `MOONTOMI` 제호만 배치해 매거진 제호로서의 대칭미를 유지합니다. 데스크톱 좌측 호버 확장형 레일 네비게이션(`75px` → `240px`)과 모바일 하단 고정 6열 탭바(`56px`)가 콘텐츠 영역을 액자처럼 감쌉니다.
+- **Tactile Album Focus**: 홈 화면의 Hall of Fame 캐러셀은 상단 여백을 타이트하게(`pt-2 sm:pt-3`, 캐러셀 `pt-1 pb-4`) 당겨 첫인상부터 앨범 커버 아트워크가 중심 시각 요소로 작동하게 합니다.
+- **Ceremonial Rating Display**: 음평회 평점, 베스트 트랙(골드/실버/브론즈), 오픈 전 블라인드 상태(`Open?` 타이틀 및 자물쇠 열림 애니메이션)를 명확한 시각적 위계로 표현합니다.
 
 ## Colors
 
 깊은 밤하늘 같은 네이비(`#242d3c`)와 따뜻한 코랄 핑크(`#ff8080`)의 대비를 중심으로, 앨범 커버의 다채로운 색감이 방해받지 않도록 본문 배경은 순백색을 유지합니다.
 
 ### Primary
-- **Midnight Slate** (`#242d3c`): 상단 헤더, 하단 푸터, 아카이브 고정 배너 배경, 주요 타이틀 및 기본 아이콘 컬러로 사용되어 브랜드의 무게중심을 잡습니다.
-- **Coral Pulse** (`#ff8080`): 활성 네비게이션 상태, 주요 제출/업로드 버튼, 음평회 상세 별점 하이라이트, 로딩 인디케이터에 사용되는 핵심 포인트 컬러입니다.
+- **Midnight Slate** (`#242d3c`): 상단 헤더, 하단 푸터/모바일 탭바, 모달 헤더, 아카이브 고정 배너 배경, 주요 타이틀 및 기본 아이콘 컬러로 사용되어 브랜드의 무게중심을 잡습니다.
+- **Coral Pulse** (`#ff8080`): 활성 네비게이션 상태, 미열람 새 소식 레드닷(Red Dot) 배지, 주요 액션 아이콘 포인트, 음평회 상세 별점 하이라이트, 로딩 프로그레스 도넛(`w-8 h-8`)에 사용되는 핵심 포인트 컬러입니다.
 
 ### Secondary
-- **Warm Gold** (`#ffb400`): 아카이브 및 한줄평 별점(`v-rating`)과 베스트 트랙 1위 표기에 사용됩니다.
+- **Warm Gold** (`#ffb400`): 아카이브 및 한줄평 별점과 베스트 트랙 1위 표기에 사용됩니다.
 - **Silver Track** (`#4a4f5a`): 한줄평 베스트 트랙 2위 표기에 사용됩니다.
 - **Bronze Track** (`#6e3732`): 한줄평 베스트 트랙 3위 표기에 사용됩니다.
+- **Archive Type Accent**: 아카이브의 `ALBUM` 배지는 에메랄드 그린(`border-green-400 text-green-300`), `SINGLE` 배지는 앰버 오렌지(`border-orange-400 text-orange-300`)로 구분합니다.
 
 ### Neutral
 - **Surface White** (`#ffffff`): 기본 페이지 및 카드 배경색입니다.
-- **Alice Mist** (`#f0f8ff`): Midnight Slate(`#242d3c`) 서피스 위에 올라가는 헤더/푸터 텍스트 컬러입니다.
-- **Surface Subtle** (`#f3f3f3`): 한줄평 작성 버튼(`POST YOUR COMMENT`) 및 보조 입력 서피스 배경색입니다.
+- **Alice Mist** (`#f0f8ff`): Midnight Slate(`#242d3c`) 서피스 위에 올라가는 헤더/푸터/모달 헤더 텍스트 컬러입니다.
+- **Surface Subtle** (`#f3f3f3`): 한줄평 작성 버튼(`POST YOUR COMMENT`), 비활성 필터 칩 및 보조 입력 서피스 배경색입니다.
 - **Border Muted** (`#bdc0c4`): 칼럼 카드 및 한줄평 카드의 외곽선 컬러입니다.
 - **Ink Primary** (`#171717`) / **Ink Muted** (`#808080`): 기본 본문 텍스트 및 날짜·조회수 등 보조 메타데이터 컬러입니다.
 
 ### Named Rules
-**The Two-Tone Anchor Rule.** 브랜드 컬러는 언제나 Midnight Slate(`#242d3c`)가 구조(프레임)를 맡고 Coral Pulse(`#ff8080`)가 액션과 하이라이트를 맡는다. 임의의 블루/퍼플 그라데이션을 절대 섞지 않는다.
+**The Two-Tone Anchor Rule.** 브랜드 컬러는 언제나 Midnight Slate(`#242d3c`)가 구조(프레임)를 맡고 Coral Pulse(`#ff8080`)가 액션, 레드닷 알림, 하이라이트를 맡는다. 임의의 블루/퍼플 그라데이션을 절대 섞지 않는다.
 
 ## Typography
 
@@ -129,57 +136,52 @@ MOONTOMI의 시각 시스템은 레코드 숍의 스탬프가 찍힌 아날로�
 - **Display** (`400`, `2.5rem` / 스크롤 축소 시 `1.875rem`, `line-height: 1.1`): 상단 헤더 워드마크(`MOONTOMI`) 및 메인 섹션 타이틀에 사용합니다.
 - **Headline** (`800`, `clamp(1.25rem, 2vw, 1.5rem)`, `line-height: 1.35`): 칼럼 목록 및 칼럼 상세의 인용구형 제목(`Nanum Myeongjo`)에 사용합니다.
 - **Title** (`700`, `clamp(1rem, 2vw, 1.375rem)`, `line-height: 1.3`): 음평회 앨범명 및 아카이브 선택 앨범 타이틀에 사용합니다.
-- **Body** (`400`, `1rem`, `line-height: 1.6`, `65ch` 내외): 한줄평 본문(`word-break: keep-all`, `white-space: pre-line`) 및 칼럼 본문에 사용합니다.
-- **Label** (`700`, `0.75rem`, `letter-spacing: 0.04em`, `uppercase`): `ALBUM` / `SINGLE` 타입 칩, `OPEN` 배지, 장르 및 시즌 태그에 사용합니다.
+- **Body** (`400`, `1rem`, `line-height: 1.6`, `65ch` 내외): 한줄평 본문(`word-break: keep-all`) 및 칼럼 본문(`.editorial-prose`, 가로 오버플로우 방지 적용)에 사용합니다.
+- **Label** (`700`, `0.75rem`, `letter-spacing: 0.04em`, `uppercase`): `ALBUM` / `SINGLE` 타입 칩, 알림 카테고리 태그(`음평회`, `칼럼`, `아카이브`), 장르 및 시즌 태그에 사용합니다.
 
 ### Named Rules
-**The Role-Bound Typeface Rule.** 서체는 지정된 역할에만 사용한다: `Lobster`는 오직 평점 숫자에만, `Nanum Myeongjo`는 칼럼 타이틀과 필진 표기에만, `Bayaters Stamp`는 브랜드 헤더에만 사용한다.
+- **The Role-Bound Typeface Rule.** 서체는 지정된 역할에만 사용한다: `Lobster`는 오직 평점 숫자에만, `Nanum Myeongjo`는 칼럼 타이틀과 필진 표기에만, `Bayaters Stamp`는 브랜드 헤더에만 사용한다.
+- **The Optical Chip Centering Rule.** `LINE Seed KR` 및 `Nohemi` 서체는 베이스라인 하단 여백이 커서 소형 칩/배지에 균등 상하 패딩(`py-*`)을 주면 글자가 위로 쏠려 보인다. 따라서 칩/배지 내부 텍스트는 `leading-none`과 함께 상단 패딩을 하단보다 약간 더 주거나(`pt-[3.5px] pb-[2px]`, `pt-[6px] pb-[4px]`), 텍스트 래퍼에 `translate-y-[0.5px]`~`translate-y-[1px]`을 적용해 시각적 정중앙을 맞춘다.
 
 ## Layout
 
-- **App Frame**: 상단 고정 헤더(`height: 90px`, 스크롤 50px 초과 시 `50px`로 축소)와 하단 고정 푸터가 존재하며, 데스크톱(`>= 768px`)에서는 좌측에 `75px` 폭의 고정 네비게이션 레일이 배치되어 호버 시 `240px`로 부드럽게 확장됩니다.
-- **Content Containers**:
-  - 홈 화면: 최대 폭 `1000px ~ 1200px` 중앙 정렬
-  - 음평회 / 칼럼 목록 및 상세: 데스크톱 기준 `768px` 중심의 읽기 편한 단일 컬럼 레이아웃
-  - 아카이브: 데스크톱(`>= 1280px`) `1064px`, 태블릿(`768px ~ 1279px`) `640px`, 모바일(`< 768px`) `340px` 컨테이너와 상단 고정 프리뷰 배너 + 하단 정사각형 그리드 구조
-
-## Elevation & Depth
-
-기본 서피스는 평면(Flat)과 얇은 보더(`1px solid #bdc0c4`)를 중심으로 구성되며, 스크롤 위에 떠 있는 아카이브 상단 상세 배너와 호버된 카드에만 절제된 그림자와 스케일/클리핑 트랜지션을 부여합니다.
-
-## Shapes
-
-- **Cards & Sheets**:
-  - 한줄평 카드(`comment-card`): 넉넉한 라운드 코너(`20px`)와 `1px solid #bdc0c4` 보더
-  - 칼럼 리스트 카드(`review-sheet`): 우측/하단 보더 강조(`7px` 라운드)와 썸네일 이미지의 사선 폴리곤 클리핑(`clip-path: polygon(0 0, 95% 0, 90% 100%, 0 100%)`, 호버 시 `85% / 75%`로 역동적 전환)
-  - 아카이브 배너: `7px` 라운드 코너와 은은한 다크 슬레이트 쉬머(`linear-gradient(-45deg, rgba(36, 45, 60, 0.8)...)`) 배경
+- **App Frame**:
+  - **Top Header**: 정중앙 `MOONTOMI` 제호만 담는 대칭 헤더(`height: 90px`, 스크롤 50px 초과 시 `52px`로 축소).
+  - **Desktop Navigation (`>= 768px`)**: 좌측 `75px` 폭의 고정 레일(호버 시 `240px` 확장). 상단에는 5개 주요 메뉴(`HOME`, `칼럼`, `음평회`, `둘러보기`, `아카이브`), 하단에는 **멤버 & 최근 소식 허브 버튼**(미열람 소식 존재 시 레드닷 및 개수 배지 표시)이 위치합니다.
+  - **Mobile Navigation (`< 768px`)**: 하단 고정 6열 탭바(`height: 56px`, 5개 주요 메뉴 + 6번째 `로그인/멤버명` 탭 및 레드닷 배지).
+- **Content Containers (`PageContainer`)**:
+  - `wide` (`max-w-[1160px]`): 홈 화면 (`pt-2 sm:pt-3`으로 상단 여백 최소화)
+  - `archive` (`max-w-[1080px]`): 아카이브 브라우저 (데스크톱 좌측 스티키 상세 배너 + 우측 검색/평점 필터 및 리스트·그리드, 모바일 상단 접이식 미니 플레이어)
+  - `reading` (`max-w-[820px]`): 음평회 목록/상세, 칼럼 목록/상세, 한줄평 둘러보기
+  - `form` (`max-w-[640px]`): 한줄평 작성 및 수정 폼
 
 ## Components
 
-### Buttons
-- **Shape:** 부드러운 모서리(`7px` radius), 한줄평 포스트 버튼은 카드와 동일한 `20px` radius
-- **Primary:** Coral Pulse(`#ff8080`) 배경에 화이트 텍스트, 대문자 레이블(`UPLOAD`, `평가 수정`)
-- **Secondary / Toggle:** 정렬 옵션 토글 버튼 그룹은 직각형(`0px` radius) 아웃라인 보더를 사용하며 활성 상태에 Midnight Slate(`#242d3c`) 배경과 화이트 텍스트를 적용합니다.
+### Buttons & Controls
+- **Shape:** 부드러운 모서리(`7px` radius), 한줄평 포스트 버튼은 카드와 동일한 `20px` radius.
+- **Sort & Filter Toggles:** 정렬 옵션 토글 그룹은 `7px` 라운드 컨테이너 내 분할 보더(`divide-x divide-[#bdc0c4]`)를 사용하며 활성 상태에 Midnight Slate(`#242d3c`) 배경과 화이트 텍스트를 적용합니다.
 
-### Chips
-- **Style:** 장르 칩(`장르명 | 카테고리`), 시즌 라벨 칩, 그리고 아카이브의 `ALBUM`(그린 아웃라인) / `SINGLE`(오렌지 아웃라인) 배지로 구분됩니다.
+### Chips & Badges
+- **Optical Alignment:** 모든 소형 칩(알림센터 필터 칩, 카테고리 배지, 아카이브 `ALBUM`/`SINGLE` 배지, 안 읽은 알림 수 배지)은 상하 비대칭 패딩(`pt > pb`) 또는 미세 Y축 이동(`translate-y-[0.5px]`)으로 텍스트가 칩의 수직 정중앙에 위치하도록 보정합니다.
+- **Notification Red Dot:** 읽지 않은 새 컨텐츠(`새 음평회`, `새 칼럼`, `새 아카이브`)가 있을 때 네비게이션의 멤버 아이콘 우측 상단과 알림 리스트 항목 우측에 `bg-[#ff8080]` 원형 도트를 표시합니다.
 
-### Cards / Containers
-- **Corner Style:** 한줄평 카드는 `20px`, 칼럼 및 아카이브 카드는 `7px`
-- **Background:** 순백색(`#ffffff`), 아카이브 프리뷰 카드는 다크 슬레이트 반투명 그라데이션(`rgba(36, 45, 60, 0.8)`)
+### Modals (Member Hub & Custom Alert)
+- **Unified Modal Frame:** 모든 모달(멤버 & 최근 소식 허브, 멤버 선택 모달, 전역 알림 모달 `showAlert`)은 반투명 블러 백드롭(`bg-black/50 backdrop-blur-[2px]`), `14px` 라운드 화이트 카드, `1px solid #242d3c` 보더, 그리고 Midnight Slate(`#242d3c`) 상단 헤더 바(`#ff8080` 포인트 아이콘 + 타이틀 + 닫기 버튼)를 공통 규격으로 사용합니다.
+- **No Native Alerts:** 브라우저 기본 `window.alert()`는 절대 사용하지 않으며, 반드시 `useMemberAuth().showAlert()` 커스텀 모달을 통해 안내 메시지를 표시합니다.
 
-### Navigation
-- **Desktop:** 좌측 고정 레일(`75px` 기본, 마우스 호버 시 `240px` 확장), 상단 스크롤과 연동되어 헤더 높이가 함께 축소(`90px` → `50px`)
-- **Mobile (`< 768px`):** 좌측 레일이 숨겨지고 하단 푸터(`🧭 NAVIGATION`)를 탭하면 좌측 드로어 메뉴가 열립니다.
+### Loading Indicator (Progress Donut)
+- **Unified Size:** 모든 페이지(홈 초기 로딩, 음평회 목록/상세, 칼럼 목록/상세, 둘러보기 목록/모달, 아카이브 목록, 작성/수정 폼, `InfiniteScrollSentinel`)의 로딩 스피너(`Loader2`)는 **`w-8 h-8` (`32px`, `animate-spin text-[#ff8080]`)** 단일 크기로 통일합니다.
+- **Single Spinner Per View:** 로딩 중 상태바에 별도의 작은 스피너(`w-3.5`/`w-4`)를 중복 노출하지 않고, 컨텐츠 영역 중앙의 `w-8 h-8` 프로그레스 도넛 하나만 깔끔하게 표시합니다.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** 한글 본문과 한줄평에는 항상 `word-break: keep-all`을 적용하여 단어 중간이 끊어지지 않게 유지하세요.
-- **Do** 음평회 상세에서 아직 공개 전(`rating === null`)인 경우 평점 대신 `OPEN` 상태와 블라인드 처리된 한줄평(회전 기어 애니메이션 및 개별 토글 버튼)을 표시하세요.
-- **Do** 헤더의 스크롤 축소(`scrollTop > 50`일 때 `90px` → `50px`)와 데스크톱 좌측 레일 여백(`75px`)의 공간적 일관성을 모든 페이지에서 유지하세요.
+- **Do** 상단 헤더(`AppHeader`)는 중앙 제호의 대칭 균형을 위해 우측에 버튼을 추가하지 말고, 계정 및 알림 진입점은 네비게이션(좌측 레일 하단 / 모바일 하단 탭바)으로 일원화하세요.
+- **Do** 한글 본문과 안내 모달에는 항상 `word-break: keep-all`(`break-keep`)을 적용하고, 에디토리얼 본문(`.editorial-prose`)에는 `overflow-wrap: anywhere`와 `overflow-x: hidden`을 함께 적용해 긴 URL이나 텍스트로 인한 가로 스크롤 발생을 방지하세요.
+- **Do** 상단 페이지 헤더에 이미 설명글이 존재하는 경우(예: `/lookup`), 하단 컨트롤 영역에 중복된 안내 문구를 반복하지 마세요.
+- **Do** 모든 페이지의 로딩 프로그레스 도넛 크기를 `w-8 h-8`로 동일하게 유지하고, 안내 팝업은 `showAlert` 자체 모달을 사용하세요.
 
 ### Don't:
-- **Don't** 브랜드 컬러인 `#242d3c`와 `#ff8080` 외에 임의의 네온 컬러나 AI 기본 보라색 그라데이션을 사용하지 마세요.
-- **Don't** 평점 표기용 서체인 `Lobster`를 일반 본문이나 버튼 텍스트에 사용하지 마세요.
-- **Don't** 카드 안에 또 다른 박스형 카드를 중첩(Nested Cards)하여 화면을 답답하게 만들지 마세요.
+- **Don't** 브랜드 컬러인 `#242d3c`와 `#ff8080` 외에 임의의 네온 컬러나 보라색 그라데이션을 사용하지 마세요.
+- **Don't** 브라우저 기본 `alert()`를 호출하여 사이트의 디자인 일관성을 깨뜨리지 마세요.
+- **Don't** 소형 칩/배지 내부 텍스트가 위쪽으로 쏠린 채 방치하지 마세요 (`Optical Chip Centering Rule` 준수).

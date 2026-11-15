@@ -331,9 +331,8 @@ export default function LecturesPage() {
         <div className="flex items-center justify-between pt-1 text-xs text-[#808080] tabular-nums">
           <div>
             {loading ? (
-              <span className="inline-flex items-center gap-1.5 text-[#808080] font-semibold">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#ff8080]" />
-                <span>음평회 카탈로그를 불러오는 중...</span>
+              <span className="text-[#808080] font-semibold">
+                음평회 카탈로그를 불러오는 중...
               </span>
             ) : (
               <>

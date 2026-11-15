@@ -77,7 +77,7 @@ export default function HomePage() {
   }
 
   return (
-    <PageContainer width="wide">
+    <PageContainer width="wide" className="pt-2 sm:pt-3">
       <div className="animate-fade-in">
         {topAlbums.length > 0 && (
           <section className="text-left">

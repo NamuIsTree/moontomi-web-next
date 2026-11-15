@@ -20,7 +20,7 @@ export function LectureCommentCard({
   isLectureOpen,
 }: LectureCommentCardProps) {
   const router = useRouter();
-  const { member, openLoginModal } = useMemberAuth();
+  const { member, openLoginModal, showAlert } = useMemberAuth();
   const [revealed, setRevealed] = useState(isLectureOpen);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const prevLectureOpenRef = useRef(isLectureOpen);
@@ -34,7 +34,10 @@ export function LectureCommentCard({
   const handleEditClick = () => {
     if (member) {
       if (comment.member_id && member.member_id !== comment.member_id) {
-        alert("본인이 작성한 한줄평만 수정할 수 있습니다.");
+        showAlert({
+          title: "수정 권한 안내",
+          message: "본인이 작성한 한줄평만 수정할 수 있습니다.",
+        });
         return;
       }
       router.push(`/comment/edit/${comment.id}`);
@@ -46,7 +49,10 @@ export function LectureCommentCard({
       subtitle: "본인이 작성한 한줄평을 수정하려면 비밀번호를 입력해주세요.",
       onSuccess: (loggedIn) => {
         if (comment.member_id && loggedIn.member_id !== comment.member_id) {
-          alert("본인이 작성한 한줄평만 수정할 수 있습니다.");
+          showAlert({
+            title: "수정 권한 안내",
+            message: "본인이 작성한 한줄평만 수정할 수 있습니다.",
+          });
           return;
         }
         router.push(`/comment/edit/${comment.id}`);

@@ -56,7 +56,7 @@ export function CommentEditorForm({
   initialComment = "",
 }: CommentEditorFormProps) {
   const router = useRouter();
-  const { member, ready, openLoginModal } = useMemberAuth();
+  const { member, ready, openLoginModal, showAlert } = useMemberAuth();
   const [writer, setWriter] = useState(initialWriter);
   const [rating, setRating] = useState(initialRating);
   const [bests, setBests] = useState<[string, string, string]>(initialBests);
@@ -81,9 +81,11 @@ export function CommentEditorForm({
     findMemberCommentIdForLecture(lecture.id, member.member_id).then(
       (existingId) => {
         if (!cancelled && existingId !== null) {
-          alert(
-            "이미 이 음평회에 작성하신 한줄평이 있어 수정 페이지로 이동합니다."
-          );
+          showAlert({
+            title: "한줄평 안내",
+            message:
+              "이미 이 음평회에 작성하신 한줄평이 있어 수정 페이지로 이동합니다.",
+          });
           router.replace(`/comment/edit/${existingId}`);
         }
       }
@@ -91,7 +93,7 @@ export function CommentEditorForm({
     return () => {
       cancelled = true;
     };
-  }, [mode, member, lecture.id, router]);
+  }, [mode, member, lecture.id, router, showAlert]);
 
   // Prompt login if not logged in
   useEffect(() => {

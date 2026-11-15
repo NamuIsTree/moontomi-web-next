@@ -135,7 +135,7 @@ export function AlbumRankCarousel({ items }: AlbumRankCarouselProps) {
         setIsHovered(false);
         handlePointerEnd();
       }}
-      className="relative w-full py-6 select-none overflow-hidden"
+      className="relative w-full pt-1 pb-4 select-none overflow-hidden"
     >
       <div
         onMouseDown={(e) => {
@@ -154,7 +154,7 @@ export function AlbumRankCarousel({ items }: AlbumRankCarouselProps) {
         onClickCapture={handleClickCapture}
         onDragStart={(e) => e.preventDefault()}
         className={cn(
-          "relative h-[240px] sm:h-[300px] md:h-[340px] flex items-center justify-center",
+          "relative h-[215px] sm:h-[275px] md:h-[315px] flex items-center justify-center",
           isDragging ? "cursor-grabbing" : "cursor-grab"
         )}
       >

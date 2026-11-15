@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, FilePenLine } from "lucide-react";
+import { ArrowLeft, Eye, FilePenLine, Loader2 } from "lucide-react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { TiptapReviewEditor } from "@/components/review/TiptapReviewEditor";
 import { useMemberAuth } from "@/context/MemberAuthContext";
@@ -18,7 +18,7 @@ export default function ReviewDetailPage({
   const { id } = use(params);
   const reviewId = Number(id);
   const router = useRouter();
-  const { member, openLoginModal } = useMemberAuth();
+  const { member, openLoginModal, showAlert } = useMemberAuth();
   const [review, setReview] = useState<ReviewDetail | null>(null);
 
   useEffect(() => {
@@ -29,8 +29,8 @@ export default function ReviewDetailPage({
   if (!review) {
     return (
       <PageContainer width="reading">
-        <div className="py-20 text-center text-sm text-[#808080]">
-          칼럼을 불러오는 중입니다...
+        <div className="py-20 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[#ff8080]" />
         </div>
       </PageContainer>
     );
@@ -44,7 +44,10 @@ export default function ReviewDetailPage({
   const handleEditReviewClick = () => {
     if (member) {
       if (review.member_id && member.member_id !== review.member_id) {
-        alert("본인이 작성한 칼럼만 수정할 수 있습니다.");
+        showAlert({
+          title: "수정 권한 안내",
+          message: "본인이 작성한 칼럼만 수정할 수 있습니다.",
+        });
         return;
       }
       router.push(`/review/${review.id}/edit`);
@@ -56,7 +59,10 @@ export default function ReviewDetailPage({
       subtitle: "본인이 작성한 원고를 수정하려면 비밀번호를 입력해주세요.",
       onSuccess: (loggedIn) => {
         if (review.member_id && loggedIn.member_id !== review.member_id) {
-          alert("본인이 작성한 칼럼만 수정할 수 있습니다.");
+          showAlert({
+            title: "수정 권한 안내",
+            message: "본인이 작성한 칼럼만 수정할 수 있습니다.",
+          });
           return;
         }
         router.push(`/review/${review.id}/edit`);

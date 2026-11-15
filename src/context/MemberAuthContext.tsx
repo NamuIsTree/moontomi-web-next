@@ -11,6 +11,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  AlertCircle,
   Bell,
   CheckCheck,
   CirclePlay,
@@ -55,6 +56,16 @@ interface MemberAuthContextValue {
   requireMemberAuth: (
     onAuthenticated: (member: AuthenticatedMember) => void,
     options?: { title?: string; subtitle?: string }
+  ) => void;
+  showAlert: (
+    options:
+      | string
+      | {
+          title?: string;
+          message: string;
+          confirmLabel?: string;
+          onConfirm?: () => void;
+        }
   ) => void;
 }
 
@@ -119,6 +130,53 @@ export function MemberAuthProvider({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const onSuccessRef = useRef<((m: AuthenticatedMember) => void) | null>(null);
+
+  // Global Custom Alert Modal state
+  const [alertModal, setAlertModal] = useState<{
+    title: string;
+    message: string;
+    confirmLabel: string;
+  } | null>(null);
+  const alertConfirmRef = useRef<(() => void) | null>(null);
+
+  const showAlert = useCallback(
+    (
+      options:
+        | string
+        | {
+            title?: string;
+            message: string;
+            confirmLabel?: string;
+            onConfirm?: () => void;
+          }
+    ) => {
+      if (typeof options === "string") {
+        alertConfirmRef.current = null;
+        setAlertModal({
+          title: "안내",
+          message: options,
+          confirmLabel: "확인",
+        });
+      } else {
+        alertConfirmRef.current = options.onConfirm ?? null;
+        setAlertModal({
+          title: options.title ?? "안내",
+          message: options.message,
+          confirmLabel: options.confirmLabel ?? "확인",
+        });
+      }
+    },
+    []
+  );
+
+  const handleCloseAlert = useCallback(() => {
+    setAlertModal(null);
+    const cb = alertConfirmRef.current;
+    alertConfirmRef.current = null;
+    if (cb) {
+      cb();
+    }
+  }, []);
 
   // Restore saved session on mount & re-validate silently
   useEffect(() => {
@@ -437,9 +495,57 @@ export function MemberAuthProvider({
         closeLoginModal,
         logout,
         requireMemberAuth,
+        showAlert,
       }}
     >
       {children}
+
+      {/* Global Custom Alert Modal */}
+      {alertModal && (
+        <div
+          className="fixed inset-0 z-[110] bg-black/50 backdrop-blur-[2px] flex items-center justify-center p-4 animate-fade-in"
+          onClick={handleCloseAlert}
+        >
+          <div
+            className="w-full max-w-[360px] rounded-[14px] bg-white border border-[#242d3c] shadow-xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-5 py-3.5 bg-[#242d3c] text-[#f0f8ff] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-[#ff8080]" />
+                <h2 className="text-sm sm:text-base font-bold tracking-tight">
+                  {alertModal.title}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={handleCloseAlert}
+                aria-label="닫기"
+                className="p-1 rounded-full text-[#f0f8ff]/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              <p className="text-xs sm:text-sm text-[#171717] leading-relaxed break-keep">
+                {alertModal.message}
+              </p>
+
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={handleCloseAlert}
+                  autoFocus
+                  className="px-5 py-2 rounded-[7px] bg-[#242d3c] hover:bg-[#242d3c]/90 text-[#f0f8ff] text-xs font-bold transition-colors cursor-pointer"
+                >
+                  {alertModal.confirmLabel}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Global Member & Notification Hub Modal */}
       {isModalOpen && (

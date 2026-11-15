@@ -195,10 +195,7 @@ export default function LookupPage() {
           {(loading || stats || selectedIds.length > 0) && (
             <div className="text-sm text-[#171717] tabular-nums">
               {loading ? (
-                <div className="inline-flex items-center gap-2 text-[#808080]">
-                  <Loader2 className="w-4 h-4 animate-spin text-[#ff8080]" />
-                  <span> 조회 중...</span>
-                </div>
+                <span className="text-[#808080] font-semibold">조회 중...</span>
               ) : stats ? (
                 <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
                   <span>
@@ -251,15 +248,21 @@ export default function LookupPage() {
       </section>
 
       {/* Results List */}
-      <div className="divide-y divide-[#bdc0c4]/50">
-        {sortedComments.map((comment, idx) => (
-          <LookupCommentRow
-            key={comment.id}
-            index={idx + 1}
-            comment={comment}
-          />
-        ))}
-      </div>
+      {loading ? (
+        <div className="py-20 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[#ff8080]" />
+        </div>
+      ) : (
+        <div className="divide-y divide-[#bdc0c4]/50">
+          {sortedComments.map((comment, idx) => (
+            <LookupCommentRow
+              key={comment.id}
+              index={idx + 1}
+              comment={comment}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Member Selection Modal */}
       {isModalOpen && (
@@ -304,7 +307,7 @@ export default function LookupPage() {
 
               {membersLoading ? (
                 <div className="py-10 flex justify-center">
-                  <Loader2 className="w-6 h-6 animate-spin text-[#ff8080]" />
+                  <Loader2 className="w-8 h-8 animate-spin text-[#ff8080]" />
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[320px] overflow-y-auto pr-1">
