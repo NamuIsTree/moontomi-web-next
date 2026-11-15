@@ -148,10 +148,6 @@ export default function ReviewDetailPage({
         <footer className="border-t border-[#bdc0c4]/60 pt-4 flex items-center justify-end text-xs text-[#808080] tabular-nums">
           <span>
             총 <strong className="text-[#242d3c]">{charCount.withSpaces.toLocaleString()}</strong>자
-            {" "}
-            <span className="text-[#808080]/80">
-              (공백 제외 {charCount.withoutSpaces.toLocaleString()}자)
-            </span>
           </span>
         </footer>
       )}
