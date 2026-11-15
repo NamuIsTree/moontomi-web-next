@@ -1,10 +1,12 @@
 import { createClient } from "@/lib/supabase/client";
+import { invalidateServerCache } from "@/lib/cache-client";
 import { getImageUrl } from "@/lib/utils";
 import type {
   LatestLectureSummary,
   LectureCommentItem,
   LectureDetail,
   LectureListItem,
+  LectureNavOption,
   RankedLectureAlbum,
 } from "@/types/domain";
 
@@ -275,5 +277,52 @@ export async function openLectureWithAdminPassword(
       ? ((data as { rating: number }).rating / 1000)
       : 0;
 
+  void invalidateServerCache(["lectures", "home"]);
+
   return { rating: rawRating };
+}
+
+/** Fetch lightweight list of all episodes for quick episode switching (via Next.js server cache). */
+export async function fetchLectureNavOptions(): Promise<LectureNavOption[]> {
+  try {
+    const res = await fetch("/api/cache/lectures/nav");
+    if (res.ok) {
+      const json = (await res.json()) as { options?: LectureNavOption[] };
+      if (Array.isArray(json.options)) return json.options;
+    }
+  } catch {
+    // Fallback to direct Supabase query below
+  }
+
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("lecture")
+    .select(
+      "lecture_id, rating, album:album_id(title, artist:artist_id(name, name_en, pronounce))"
+    )
+    .order("lecture_id", { ascending: false })
+    .limit(1000);
+
+  if (error || !data) return [];
+
+  return data.map((row) => {
+    const album = row.album as unknown as {
+      title: string;
+      artist: {
+        name: string;
+        name_en?: string | null;
+        pronounce?: string | null;
+      } | null;
+    } | null;
+
+    return {
+      id: row.lecture_id,
+      title: album?.title ?? "",
+      artist: album?.artist?.name ?? "",
+      artist_en: album?.artist?.name_en ?? null,
+      artist_pronounce: album?.artist?.pronounce ?? null,
+      isOpen: row.rating !== null,
+    };
+  });
 }

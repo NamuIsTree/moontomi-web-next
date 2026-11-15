@@ -34,24 +34,35 @@ export default function HomePage() {
     let mounted = true;
     setInitialLoading(true);
 
-    Promise.all([
-      fetchTopLectures().catch(() => ({ upperTop: [], lowerTop: [] })),
-      fetchLatestLecture().catch(() => null),
-      fetchReviewList({
-        page: 1,
-        limit: 10,
-        sortBy: "id",
-        order: "desc",
-      }).catch(() => []),
-      fetchCuratedArchives(10, 3).catch(() => []),
-    ])
-      .then(([topResult, latest, reviews, archives]) => {
+    const loadDirectFallback = () =>
+      Promise.all([
+        fetchTopLectures().catch(() => ({ upperTop: [], lowerTop: [] })),
+        fetchLatestLecture().catch(() => null),
+        fetchReviewList({
+          page: 1,
+          limit: 10,
+          sortBy: "id",
+          order: "desc",
+        }).catch(() => []),
+        fetchCuratedArchives(10, 3).catch(() => []),
+      ]).then(([topResult, latest, reviews, archives]) => ({
+        upperTop: topResult.upperTop,
+        lowerTop: topResult.lowerTop,
+        latestLecture: latest,
+        latestReviews: reviews.slice(0, 10),
+        latestArchives: archives,
+      }));
+
+    fetch("/api/cache/home")
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("cache miss"))))
+      .catch(() => loadDirectFallback())
+      .then((data) => {
         if (!mounted) return;
-        setUpperTop(topResult.upperTop);
-        setLowerTop(topResult.lowerTop);
-        setLatestLecture(latest);
-        setLatestReviews(reviews.slice(0, 10));
-        setLatestArchives(archives);
+        setUpperTop(data.upperTop ?? []);
+        setLowerTop(data.lowerTop ?? []);
+        setLatestLecture(data.latestLecture ?? null);
+        setLatestReviews((data.latestReviews ?? []).slice(0, 10));
+        setLatestArchives(data.latestArchives ?? []);
       })
       .finally(() => {
         if (mounted) {

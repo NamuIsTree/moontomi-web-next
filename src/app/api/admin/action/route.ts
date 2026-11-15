@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import { createClient } from "@/lib/supabase/client";
 import {
   ADMIN_COOKIE_NAME,
@@ -50,6 +52,11 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    revalidateTag(CACHE_TAGS.home);
+    revalidateTag(CACHE_TAGS.lectures);
+    revalidateTag(CACHE_TAGS.reviews);
+    revalidateTag(CACHE_TAGS.archives);
 
     return NextResponse.json({ ok: true, data });
   } catch (err) {

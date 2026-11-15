@@ -159,6 +159,7 @@ MOONTOMI의 시각 시스템은 레코드 숍의 스탬프가 찍힌 아날로�
 ## Components
 
 ### Buttons & Controls
+- **Lecture Episode Switcher (`LectureEpisodeSwitcher`):** 음평회 상세(`/lecture/[id]`)의 앨범명(`<h1>`) + `ChevronDown` 트리거 클릭 시 `w-[min(460px,calc(100vw-2rem))]` 팝오버가 열리며, 이전/다음 회차 퀵 버튼, 검색 입력창, 현재 회차 자동 중앙 스크롤 및 `#242d3c`/`#ff8080` 하이라이트가 적용된 `XXX회 - 아티스트 (앨범명)` 스크롤 리스트를 제공합니다.
 - **Shape:** 부드러운 모서리(`7px` radius), 한줄평 포스트 버튼은 카드와 동일한 `20px` radius.
 - **Sort & Filter Toggles:** 정렬 옵션 토글 그룹은 `7px` 라운드 컨테이너 내 분할 보더(`divide-x divide-[#bdc0c4]`)를 사용하며 활성 상태에 Midnight Slate(`#242d3c`) 배경과 화이트 텍스트를 적용합니다.
 - **Archive Rating Range Filter:** 아카이브 별점 필터는 `0.0점`~`5.0점`(`0.5점` 단위) 최소·최대 2단 `<select>`로 구성하며, 역전 방지 자동 보정 및 `전체 초기화` 버튼을 제공합니다.

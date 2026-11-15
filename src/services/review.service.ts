@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { invalidateServerCache } from "@/lib/cache-client";
 import { getImageUrl } from "@/lib/utils";
 import type { ReviewDetail, ReviewListItem } from "@/types/domain";
 
@@ -138,6 +139,7 @@ export async function createReview(params: {
   }
 
   const result = data as { id: number } | null;
+  void invalidateServerCache(["reviews", "home"]);
   return result?.id ?? 0;
 }
 
@@ -169,5 +171,6 @@ export async function updateReview(params: {
   }
 
   const result = data as { id: number } | null;
+  void invalidateServerCache(["reviews", "home"]);
   return result?.id ?? params.reviewId;
 }

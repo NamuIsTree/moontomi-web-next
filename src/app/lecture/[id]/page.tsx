@@ -16,6 +16,7 @@ import { PageContainer } from "@/components/layout/PageContainer";
 import { SeasonChip, GenreChipList } from "@/components/ui/GenreChipList";
 import { StarRating } from "@/components/ui/StarRating";
 import { LectureCommentCard } from "@/components/lecture/LectureCommentCard";
+import { LectureEpisodeSwitcher } from "@/components/lecture/LectureEpisodeSwitcher";
 import { useMemberAuth } from "@/context/MemberAuthContext";
 import {
   fetchLectureById,
@@ -153,9 +154,10 @@ export default function LectureDetailPage({
           </span>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-bold italic text-[#171717] break-keep">
-          {lecture.title}
-        </h1>
+        <LectureEpisodeSwitcher
+          currentId={lecture.id}
+          currentTitle={lecture.title}
+        />
 
         <h2 className="text-base sm:text-lg italic text-[#171717]/80">
           {lecture.artist} ({lecture.release.trim()})

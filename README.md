@@ -12,7 +12,7 @@
 - **Framework**: Next.js 16 (App Router, TypeScript)
 - **Styling & Typography**: Tailwind CSS v4, Lucide Icons, Custom Fonts (`Bayaters Stamp`, `LINE Seed KR`, `Lobster`, `Nanum Myeongjo ExtraBold`, `Nohemi`, `Roboto Mono`)
 - **Rich Text & UI Libraries**: Tiptap (`@tiptap/react`), `emoji-picker-react`, Swiper
-- **Backend / Database**: Supabase Serverless (PostgreSQL, Row Level Security, RPC Functions, Storage)
+- **Backend / Database**: Supabase Serverless (PostgreSQL, Row Level Security, RPC Functions, Storage) + Next.js Server Data Cache (`unstable_cache` & `revalidateTag` on Vercel)
 - **PWA**: Web App Manifest (`manifest.json`, `install.webmanifest`) 및 Service Worker 지원
 - **Brand Colors**:
   - Midnight Slate (`#242d3c`): 헤더, 네비게이션, 모달 헤더, 주요 프레임
@@ -26,6 +26,7 @@
   - 최신 칼럼 피드(`Recent Columns`), 최신 음평회(`Latest Lectures`), 아카이브 큐레이션(`Archive Curate` — `ALBUM` 녹색 / `SINGLE` 주황색 배지)
 - **음평회 (`/lectures`, `/lecture/[id]`) & 한줄평 (`/comment/create/[id]`, `/comment/edit/[id]`)**:
   - 블라인드 진행(`Open?`, 자물쇠 잠금 상태) 및 마감 후 동시 공개(열림 애니메이션, 평균 평점 소수점 1자리·호버 시 3자리, 베스트 트랙 1~3위 집계)
+  - **회차 빠른 이동 스위처(`LectureEpisodeSwitcher`)**: 음평회 상세 페이지에서 앨범명 클릭 시 `XXX회 - 아티스트 (앨범명)` 스크롤·검색 드롭다운 및 이전/다음 회차 퀵 이동 제공
   - **1 음평회 1 한줄평 정책**: 기작성 한줄평 존재 시 작성 버튼 클릭 시 수정 페이지로 자동 이동
   - **멤버 인증 기반 작성·수정**: 작성 및 수정 시 표시 닉네임(`writer`) 자유 변경 가능, `emoji-picker-react` 전체 이모지 선택기 지원
 - **칼럼 (`/reviews`, `/review/[id]`, `/review/create`, `/review/[id]/edit`)**:

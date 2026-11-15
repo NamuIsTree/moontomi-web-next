@@ -24,7 +24,7 @@ web
 
 ## Operating Context
 
-- **음평회 (`Lectures`)**: 회차순/평점순(컴필레이션 제외) 정렬, 시즌·장르 필터(`K-POP`은 `Korean POP`으로 통합) 및 검색, 앨범 정보·장르·시즌 태그, 평균 평점 및 멤버별 베스트 트랙 1~3위(골드/실버/브론즈 컬러)와 한줄평 카드 목록.
+- **음평회 (`Lectures`)**: 회차순/평점순(컴필레이션 제외) 정렬, 시즌·장르 필터(`K-POP`은 `Korean POP`으로 통합) 및 검색, 앨범 정보·장르·시즌 태그, 평균 평점 및 멤버별 베스트 트랙 1~3위(골드/실버/브론즈 컬러)와 한줄평 카드 목록. 음평회 상세(`/lecture/[id]`)에서는 앨범명 클릭 시 `XXX회 - 아티스트 (앨범명)` 목록을 스크롤·검색해 다른 회차로 즉시 이동할 수 있는 회차 스위처를 제공한다.
 - **한줄평 등록/수정 (`Comments`)**: 멤버 비밀번호 인증을 통해 참여하며, 1 음평회 1 한줄평 정책(기작성 한줄평 존재 시 수정 페이지로 자동 이동), 작성 및 수정 시 표시 닉네임(`writer`) 자유 변경, `emoji-picker-react` 전체 이모지 피커, 평점 슬라이더, 수록곡 베스트 1~3 선택을 지원한다.
 - **칼럼 (`Reviews`)**: 썸네일 이미지, 카테고리(`결산`, `칼럼`, `잡설`), 제목, 요약 설명, 리치 텍스트(Tiptap) 본문으로 구성된 음악 칼럼 투고 및 열람(24시간 쿨다운 기반 조회수 집계, 모바일 가로 영역 `100vw` 초과 방지 적용).
 - **둘러보기 (`Lookup`)**: 10인의 통합 멤버 계정(`문교수`, `나무트리`, `분조장`[구 `후속작좀내라` 통합], `선유랑`, `더러운눈동자`[구 `아바투르` 통합], `설향박스팜`, `박평식`, `닉네임고민중`[구 `견습`], `노란양말`, `아인치`) 기반 복수 선택 모달을 통해 선택한 멤버들의 공개된 한줄평 통계(총 건수, 평균·최고·최저 평점)와 목록을 회차순/점수순으로 비교.
@@ -33,7 +33,7 @@ web
 
 ## Capabilities and Constraints
 
-- **Architecture**: 별도 백엔드 서버 없이 **Next.js (App Router, TypeScript) + Supabase (PostgreSQL, RLS, RPC Functions, Storage)** 서버리스 구조로 동작한다.
+- **Architecture**: 별도 백엔드 서버 없이 **Next.js (App Router, TypeScript) + Supabase (PostgreSQL, RLS, RPC Functions, Storage)** 서버리스 구조로 동작하며, 홈 데이터(`/api/cache/home`)와 회차 스위처 목록(`/api/cache/lectures/nav`)은 Next.js `unstable_cache` + `revalidateTag` 기반 Vercel 서버 캐싱으로 DB 부하를 최소화하고 변경 시 즉시 갱신한다.
 - **Database Audit Columns**: 모든 테이블은 `created_at`, `modified_at` (`timestamptz`, nullable — 기존 마이그레이션 데이터는 `null` 허용, 신규 생성 시 `now()` 기본값 및 수정 시 트리거 자동 갱신)을 포함한다.
 - **Client-Side Notification Tracking**: 별도 알림 테이블 없이 `lecture`, `review`, `archive`의 최신 데이터를 병렬 조회하고 `localStorage` 읽음 상태(`readKeys`) 및 URL 진입 감지를 결합해 레드닷 알림을 경량 구현한다.
 - **Incumbent Design Direction**: 기존 `moontomi-web`의 레이아웃과 인터랙션 구조를 계승하면서, Impeccable을 통해 여백, 타이포그래피 위계, 반응형 완성도, 디테일 인터랙션을 세련되게 다듬는다(Refinement & Extension).

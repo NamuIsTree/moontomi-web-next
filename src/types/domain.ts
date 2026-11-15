@@ -70,6 +70,15 @@ export interface LectureDetail {
   archive: { id: number } | null;
 }
 
+export interface LectureNavOption {
+  id: number;
+  title: string;
+  artist: string;
+  artist_en?: string | null;
+  artist_pronounce?: string | null;
+  isOpen: boolean;
+}
+
 export interface MemberPublicInfo {
   member_id: number;
   name: string;

@@ -8,13 +8,14 @@
 ---
 
 ## 1. 아키텍처 & 데이터 규칙
-- **Serverless Supabase 구조**: 별도 백엔드 서버 없이 `src/services/*.service.ts`를 통해 Supabase 테이블 및 RPC 함수(`create_comment`, `update_comment`, `create_review`, `update_review`, `verify_member_login`, `admin_action`)를 호출합니다.
+- **Serverless Supabase 구조 & Vercel 서버 캐싱**: 별도 백엔드 서버 없이 `src/services/*.service.ts`를 통해 Supabase 테이블 및 RPC 함수(`create_comment`, `update_comment`, `create_review`, `update_review`, `verify_member_login`, `admin_action`)를 호출합니다. 홈 데이터(`/api/cache/home`)와 회차 스위처 목록(`/api/cache/lectures/nav`)은 `src/lib/server-cache.ts`의 `unstable_cache`로 Vercel Data Cache에 저장되며, 음평회 오픈·투고 등록/수정·어드민 액션 시 `revalidateTag`(`/api/revalidate`)로 즉시 무효화됩니다.
 - **멤버 인증 및 허브 (`MemberAuthContext`)**:
   - 멤버 로그인 상태, 최근 컨텐츠 알림(`새 음평회`, `새 칼럼`, `새 아카이브`) 및 레드닷(`unreadCount`), 그리고 전역 커스텀 알림 모달(`showAlert`)은 `src/context/MemberAuthContext.tsx`에서 통합 관리합니다.
   - 한줄평이나 칼럼 작성/수정 등 멤버 인증이 필요한 액션은 `requireMemberAuth()`를 사용합니다.
   - 멤버 계정은 10개(`문교수`, `나무트리`, `분조장`[구 `후속작좀내라` 통합], `선유랑`, `더러운눈동자`[구 `아바투르` 통합], `설향박스팜`, `박평식`, `닉네임고민중`[구 `견습`], `노란양말`, `아인치`)로 통합 운영되며, `/admin`의 `멤버 · 비밀번호` 탭에서 비밀번호를 변경할 수 있습니다.
 - **음평회 리추얼, 한줄평 정책 & 랭킹 규칙**:
   - `lecture.rating === null`인 회차는 블라인드 진행 중(`Open?`) 상태이며, 한줄평 카드는 자물쇠(Padlock) 뒤에 가려져 있다가 공개 시 열림 애니메이션과 함께 노출됩니다.
+  - **음평회 상세 회차 빠른 이동(`LectureEpisodeSwitcher`)**: `/lecture/[id]`에서 앨범명을 클릭하면 `XXX회 - 아티스트 (앨범명)` 형식의 스크롤·검색 가능한 회차 전환 드롭다운이 열리며, 현재 회차 자동 중앙 스크롤 및 이전/다음 회차 퀵 이동을 지원합니다.
   - **1 음평회 1 한줄평 원칙**: 이미 본인이 작성한 한줄평이 있는 음평회에서 `POST YOUR COMMENT`(또는 `/comment/create/[id]`) 진입 시 안내 모달 후 기존 한줄평 수정 페이지(`/comment/edit/[commentId]`)로 이동합니다.
   - **표시 닉네임 수정 허용 & 이모지 피커**: 한줄평 작성 시뿐만 아니라 수정 시에도 표시 닉네임(`writer`)을 자유롭게 변경할 수 있으며, `emoji-picker-react` 기반 전체 이모지 선택기를 제공합니다.
   - 평점 랭킹 산정 시 컴필레이션 시즌(`season_id = 8`)은 제외합니다.
