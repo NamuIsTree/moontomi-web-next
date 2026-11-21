@@ -26,6 +26,10 @@ import { getImageUrl, cn } from "@/lib/utils";
 import { uploadImageToStorage } from "@/services/storage.service";
 import { StarRatingInput } from "@/components/ui/StarRating";
 import { AdminGenrePicker } from "@/components/admin/AdminGenrePicker";
+import {
+  AdminSearchSelect,
+  type AdminSearchSelectOption,
+} from "@/components/admin/AdminSearchSelect";
 
 type AdminTab =
   | "lectures"
@@ -434,6 +438,70 @@ export default function AdminDashboardPage() {
         c.text.toLowerCase().includes(q)
     );
   }, [comments, commentSearch]);
+
+  const albumSelectOptions = useMemo<AdminSearchSelectOption[]>(
+    () =>
+      albums.map((a) => ({
+        value: a.album_id,
+        badge: `#${a.album_id}`,
+        label: a.title,
+        sublabel: `${a.artist?.name ?? "아티스트 미상"}${a.release ? ` · ${a.release}` : ""}`,
+        imageUrl: getImageUrl(a.image_id),
+        searchText: `${a.album_id} ${a.title} ${a.artist?.name ?? ""} ${a.release}`,
+      })),
+    [albums]
+  );
+
+  const seasonSelectOptions = useMemo<AdminSearchSelectOption[]>(
+    () =>
+      seasons.map((s) => ({
+        value: s.season_id,
+        badge: `#${s.season_id}`,
+        label: s.name,
+        colorHex: s.color,
+        searchText: `${s.season_id} ${s.name}`,
+      })),
+    [seasons]
+  );
+
+  const artistSelectOptions = useMemo<AdminSearchSelectOption[]>(
+    () =>
+      artists.map((ar) => ({
+        value: ar.artist_id,
+        badge: `#${ar.artist_id}`,
+        label: ar.name,
+        sublabel: [ar.name_en, ar.pronounce, ar.nation]
+          .filter(Boolean)
+          .join(" · "),
+        searchText: `${ar.artist_id} ${ar.name} ${ar.name_en ?? ""} ${ar.pronounce ?? ""} ${ar.nation}`,
+      })),
+    [artists]
+  );
+
+  const archiveTargetOptions = useMemo<AdminSearchSelectOption[]>(() => {
+    if (archiveType === "album") {
+      return albums
+        .filter((a) => a.archive_id === null)
+        .map((a) => ({
+          value: a.album_id,
+          badge: `#${a.album_id}`,
+          label: a.title,
+          sublabel: `${a.artist?.name ?? "아티스트 미상"}${a.release ? ` · ${a.release}` : ""}`,
+          imageUrl: getImageUrl(a.image_id),
+          searchText: `${a.album_id} ${a.title} ${a.artist?.name ?? ""} ${a.release}`,
+        }));
+    }
+    return singles
+      .filter((s) => s.archive_id === null)
+      .map((s) => ({
+        value: s.single_id,
+        badge: `#${s.single_id}`,
+        label: s.title,
+        sublabel: `${s.artist?.name ?? "아티스트 미상"}${s.release ? ` · ${s.release}` : ""}`,
+        imageUrl: getImageUrl(s.image_id),
+        searchText: `${s.single_id} ${s.title} ${s.artist?.name ?? ""} ${s.release}`,
+      }));
+  }, [archiveType, albums, singles]);
 
   // ==================== HANDLERS ====================
   const resetLectureForm = () => {
@@ -954,34 +1022,30 @@ export default function AdminDashboardPage() {
                   <label className="block text-xs font-bold text-[#242d3c] mb-1">
                     대상 앨범 선택
                   </label>
-                  <select
+                  <AdminSearchSelect
+                    options={albumSelectOptions}
                     value={lectureAlbumId || albums[0]?.album_id || 0}
-                    onChange={(e) => setLectureAlbumId(Number(e.target.value))}
-                    className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs bg-white"
-                  >
-                    {albums.map((a) => (
-                      <option key={a.album_id} value={a.album_id}>
-                        #{a.album_id} — {a.title} ({a.artist?.name})
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setLectureAlbumId}
+                    modalTitle="대상 앨범 선택"
+                    searchPlaceholder="앨범명, 아티스트, 발매연도, #ID 검색..."
+                    placeholder="앨범을 선택해 주세요"
+                    icon={<Disc3 className="w-4 h-4 text-[#ff8080]" />}
+                  />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-[#242d3c] mb-1">
                     시즌 선택
                   </label>
-                  <select
+                  <AdminSearchSelect
+                    options={seasonSelectOptions}
                     value={lectureSeasonId || seasons[0]?.season_id || 0}
-                    onChange={(e) => setLectureSeasonId(Number(e.target.value))}
-                    className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs bg-white"
-                  >
-                    {seasons.map((s) => (
-                      <option key={s.season_id} value={s.season_id}>
-                        #{s.season_id} — {s.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setLectureSeasonId}
+                    modalTitle="시즌 선택"
+                    searchPlaceholder="시즌명 또는 #ID 검색..."
+                    placeholder="시즌을 선택해 주세요"
+                    icon={<CirclePlay className="w-4 h-4 text-[#ff8080]" />}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -1365,18 +1429,17 @@ export default function AdminDashboardPage() {
                     <span>새 아티스트</span>
                   </button>
                 </div>
-                <select
+                <AdminSearchSelect
+                  options={artistSelectOptions}
                   value={albumArtistId || artists[0]?.artist_id || 0}
-                  onChange={(e) => setAlbumArtistId(Number(e.target.value))}
-                  className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs bg-white"
-                >
-                  {artists.map((ar) => (
-                    <option key={ar.artist_id} value={ar.artist_id}>
-                      #{ar.artist_id} — {ar.name}{" "}
-                      {ar.name_en ? `(${ar.name_en})` : ""} [{ar.nation}]
-                    </option>
-                  ))}
-                </select>
+                  onChange={setAlbumArtistId}
+                  modalTitle="아티스트 선택"
+                  searchPlaceholder="아티스트명, 영문명, 발음, 국가, #ID 검색..."
+                  placeholder="아티스트를 선택해 주세요"
+                  icon={<Users className="w-4 h-4 text-[#ff8080]" />}
+                  quickCreateLabel="새 아티스트"
+                  onQuickCreate={() => openQuickArtistModal("album")}
+                />
               </div>
 
               {/* Cover Upload */}
@@ -1653,18 +1716,17 @@ export default function AdminDashboardPage() {
                     <span>새 아티스트</span>
                   </button>
                 </div>
-                <select
+                <AdminSearchSelect
+                  options={artistSelectOptions}
                   value={singleArtistId || artists[0]?.artist_id || 0}
-                  onChange={(e) => setSingleArtistId(Number(e.target.value))}
-                  className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs bg-white"
-                >
-                  {artists.map((ar) => (
-                    <option key={ar.artist_id} value={ar.artist_id}>
-                      #{ar.artist_id} — {ar.name}{" "}
-                      {ar.name_en ? `(${ar.name_en})` : ""} [{ar.nation}]
-                    </option>
-                  ))}
-                </select>
+                  onChange={setSingleArtistId}
+                  modalTitle="아티스트 선택"
+                  searchPlaceholder="아티스트명, 영문명, 발음, 국가, #ID 검색..."
+                  placeholder="아티스트를 선택해 주세요"
+                  icon={<Users className="w-4 h-4 text-[#ff8080]" />}
+                  quickCreateLabel="새 아티스트"
+                  onQuickCreate={() => openQuickArtistModal("single")}
+                />
               </div>
 
               <div>
@@ -1912,30 +1974,24 @@ export default function AdminDashboardPage() {
                     <label className="block text-xs font-bold text-[#242d3c] mb-1">
                       대상 {archiveType === "album" ? "앨범" : "싱글"} 선택 (미등록 항목)
                     </label>
-                    <select
+                    <AdminSearchSelect
+                      options={archiveTargetOptions}
                       value={archiveTargetId}
-                      onChange={(e) =>
-                        setArchiveTargetId(Number(e.target.value))
+                      onChange={setArchiveTargetId}
+                      modalTitle={
+                        archiveType === "album"
+                          ? "대상 앨범 선택 (미등록 항목)"
+                          : "대상 싱글 선택 (미등록 항목)"
                       }
-                      className="w-full h-10 px-3 rounded-[7px] border border-[#bdc0c4] text-xs bg-white"
-                    >
-                      <option value={0}>-- 선택해 주세요 --</option>
-                      {archiveType === "album"
-                        ? albums
-                            .filter((a) => a.archive_id === null)
-                            .map((a) => (
-                              <option key={a.album_id} value={a.album_id}>
-                                #{a.album_id} — {a.title} ({a.artist?.name})
-                              </option>
-                            ))
-                        : singles
-                            .filter((s) => s.archive_id === null)
-                            .map((s) => (
-                              <option key={s.single_id} value={s.single_id}>
-                                #{s.single_id} — {s.title} ({s.artist?.name})
-                              </option>
-                            ))}
-                    </select>
+                      searchPlaceholder="제목, 아티스트, 발매연도, #ID 검색..."
+                      placeholder="-- 선택해 주세요 --"
+                      emptyText={
+                        archiveType === "album"
+                          ? "선택 가능한 미등록 앨범이 없습니다."
+                          : "선택 가능한 미등록 싱글이 없습니다."
+                      }
+                      icon={<Music className="w-4 h-4 text-[#ff8080]" />}
+                    />
                   </div>
                 </>
               )}

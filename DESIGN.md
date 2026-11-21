@@ -168,8 +168,8 @@ MOONTOMI의 시각 시스템은 레코드 숍의 스탬프가 찍힌 아날로�
 - **Optical Alignment:** 모든 소형 칩(알림센터 필터 칩, 카테고리 배지, 아카이브 `ALBUM`/`SINGLE` 배지, 안 읽은 알림 수 배지)은 상하 비대칭 패딩(`pt > pb`) 또는 미세 Y축 이동(`translate-y-[0.5px]`)으로 텍스트가 칩의 수직 정중앙에 위치하도록 보정합니다.
 - **Notification Red Dot:** 읽지 않은 새 컨텐츠(`새 음평회`, `새 칼럼`, `새 아카이브`)가 있을 때 네비게이션의 멤버 아이콘 우측 상단과 알림 리스트 항목 우측에 `bg-[#ff8080]` 원형 도트를 표시합니다.
 
-### Modals (Member Hub & Custom Alert)
-- **Unified Modal Frame:** 모든 모달(멤버 & 최근 소식 허브, 멤버 선택 모달, 전역 알림 모달 `showAlert`)은 반투명 블러 백드롭(`bg-black/50 backdrop-blur-[2px]`), `14px` 라운드 화이트 카드, `1px solid #242d3c` 보더, 그리고 Midnight Slate(`#242d3c`) 상단 헤더 바(`#ff8080` 포인트 아이콘 + 타이틀 + 닫기 버튼)를 공통 규격으로 사용합니다.
+### Modals (Member Hub, Custom Alert & Admin Search Select)
+- **Unified Modal Frame:** 모든 모달(멤버 & 최근 소식 허브, 멤버 선택 모달, 전역 알림 모달 `showAlert`, 어드민 검색 선택 모달 `AdminSearchSelect`)은 반투명 블러 백드롭(`bg-black/50 backdrop-blur-[2px]`), `14px` 라운드 화이트 카드, `1px solid #242d3c` 보더, 그리고 Midnight Slate(`#242d3c`) 상단 헤더 바(`#ff8080` 포인트 아이콘 + 타이틀 + 닫기 버튼)를 공통 규격으로 사용합니다.
 - **No Native Alerts:** 브라우저 기본 `window.alert()`는 절대 사용하지 않으며, 반드시 `useMemberAuth().showAlert()` 커스텀 모달을 통해 안내 메시지를 표시합니다.
 
 ### Loading Indicator (Progress Donut)
